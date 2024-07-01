@@ -1,0 +1,18 @@
+.Vue-Toastification__container>.Vue-Toastification__toast {
+  @media(max-width: 600px) {
+    width: 94vw;
+    padding: 10px 12px;
+    border-radius: 8px;
+    margin-left: 3vw;
+    margin-top: 3vw;
+    margin-bottom: 0;
+    margin-right: 2vw;
+    min-height: 32px;
+  }
+}
+
+.Vue-Toastification__icon {
+  @media(max-width: 600px) {
+    margin: 2px 12px 2px 0px;
+  }
+}

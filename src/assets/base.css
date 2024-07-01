@@ -1,0 +1,150 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* color palette from <https://github.com/vuejs/theme> */
+:root {
+  --vt-c-light: #e4dbcc;
+  --vt-c-light-transparent: rgb(228, 219, 204, 0.85);
+  /* rgba(228,219,204,255) */
+  --vt-c-dark: #212e30;
+  --color-dark: var(--vt-c-dark) --vt-c-dark-transparent: rgb(33, 46, 48, 0.85);
+  /* rgba(33,46,48,255) */
+
+  --vt-c-white: #ffffff;
+  --vt-c-white-soft: #f5f5f5;
+  --vt-c-white-mute: #eeeeee;
+
+  --vt-c-black: #181818;
+  --vt-c-black-soft: #222222;
+  --vt-c-black-mute: #282828;
+
+  --vt-c-divider-light-1: rgba(60, 60, 60, 0.29);
+  --vt-c-divider-light-2: rgba(60, 60, 60, 0.12);
+  --vt-c-divider-dark-1: rgba(84, 84, 84, 0.65);
+  --vt-c-divider-dark-2: rgba(84, 84, 84, 0.48);
+
+  --vt-c-text-light-1: var(--vt-c-dark);
+  --vt-c-text-light-2: rgba(33, 46, 48, 0.85);
+  --vt-c-text-dark-1: var(--vt-c-light);
+  --vt-c-text-dark-2: rgba(228, 219, 204, 0.85);
+
+  --vt-c-text-highlight: #ff3b00;
+  --vt-c-orange: #ff3b00;
+  /* rgba(255,59,0,255) */
+  --vt-c-teal: #81c2ba;
+  /* rgba(129,194,186,255) */
+  --vt-c-brown: #735334;
+  /* rgba(115,83,52,255) */
+  --vt-c-sage: #d6df92;
+  /* rgba(214,223,146,255) */
+  --vt-c-green: #01975d;
+
+  --wavy-1: #e59d02;
+  --wavy-2: #e55502;
+  --wavy-3: #970122;
+
+  --wavy-1-transparent: #e59d0257;
+  --wavy-2-transparent: #e5550257;
+  --wavy-3-transparent: #97012257;
+}
+
+/* semantic color variables for this project */
+:root {
+  --color-background: var(--vt-c-light);
+  --color-background-transparent: var(--vt-c-light-transparent);
+  --color-background-soft: var(--vt-c-white-soft);
+  --color-background-mute: var(--vt-c-white-mute);
+
+  --color-border: var(--vt-c-orange);
+  --color-border-alt: var(--vt-c-text-light-2);
+  --color-border-hover: var(--vt-c-divider-light-1);
+
+  --color-heading: var(--vt-c-text-light-1);
+  --color-text: var(--vt-c-text-light-1);
+  --color-text-select: var(--vt-c-teal);
+  --color-transparent: rgba(0, 0, 0, 0);
+  --color-highlighted-text: var(--vt-c-text-highlight);
+
+  --color-orange: var(--vt-c-orange);
+  --color-green: var(--vt-c-green);
+  --color-teal: var(--vt-c-teal);
+  --color-brown: var(--vt-c-brown);
+  --color-sage: var(--vt-c-sage);
+  --color-orange-transparent: rgba(255, 59, 0, 1);
+  --color-teal-transparent: rgba(129, 194, 186, 1);
+  --color-brown-transparent: rgba(115, 83, 52, 1);
+  --color-sage-transparent: rgba(214, 223, 146, 1);
+  --color-orange-transparent-table: rgba(255, 59, 0, 0.5);
+  --color-brown-transparent-table: rgba(115, 83, 52, 0.5);
+
+  --section-gap: 160px;
+}
+
+.dark {
+  --color-background: var(--vt-c-dark);
+  --color-background-transparent: var(--vt-c-dark-transparent);
+  --color-background-soft: var(--vt-c-black-soft);
+  --color-background-mute: var(--vt-c-black-mute);
+
+  --color-border: var(--vt-c-teal);
+  --color-border-alt: var(--vt-c-text-dark-1);
+  --color-border-hover: var(--vt-c-divider-dark-1);
+
+  --color-heading: var(--vt-c-text-dark-1);
+  --color-text: var(--vt-c-text-dark-2);
+  --color-text-select: var(--vt-c-brown);
+
+  --color-orange: var(--vt-c-orange);
+  --color-green: var(--vt-c-green);
+  --color-teal: var(--vt-c-teal);
+  --color-brown: var(--vt-c-brown);
+  --color-sage: var(--vt-c-sage);
+  --color-orange-transparent: rgba(255, 59, 0, 0.5);
+  --color-teal-transparent: rgba(129, 194, 186, 0.7);
+  --color-brown-transparent: rgba(115, 83, 52, 0.4);
+  --color-sage-transparent: rgba(214, 223, 146, 0.4);
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  position: relative;
+  font-weight: normal;
+}
+
+body {
+  min-height: 90vh;
+  color: var(--color-text);
+  background: var(--color-background);
+  transition: color 0.5s, background-color 0.5s;
+  line-height: 1.4;
+  font-family: PPMori, Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
+    Oxygen, Ubuntu, Cantarell, 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  font-size: 1rem;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+span.prompt {
+  margin-top: 1rem;
+  display: flex;
+  position: relative;
+  color: var(--color-highlighted-text);
+}
+
+::-webkit-scrollbar {
+  display: none;
+}
+
+::selection {
+  background: var(--color-text-select);
+}
+
+::-moz-selection {
+  background: var(--color-text-select);
+}
