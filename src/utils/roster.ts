@@ -28,7 +28,6 @@ export const initializeNewRoster = async (
 ): Promise<RosterRow | null> => {
   const rosterStore = useRosterStore()
   const roles = [] as RoleImpl[]
-  console.log(rosterStore.roles)
   rosterStore.roles.forEach((defaultRole) => {
     const services = [] as ServiceImpl[]
     for (let i = 0; i < rosterStore.services; i++) {
@@ -176,7 +175,7 @@ export const refreshUnavailabilityByDateList = () => {
   })
 }
 
-export const saveDate = async (id: number, date: string | null) => {
+export const saveDate = async (id: number, date: string) => {
   const { error } = await supabase
     .from('roster')
     .update({
@@ -187,6 +186,48 @@ export const saveDate = async (id: number, date: string | null) => {
   if (error) {
     // some error handling
   } else {
-    globalToast.success('Updated date')
+    if (!date.length) {
+      globalToast.success('Saved empty date')
+    } else {
+      globalToast.success('Saved updated date')
+    }
+  }
+}
+
+export const saveTitle = async (id: number, title: string) => {
+  const globalToast = useGlobalToast()
+  if (title === null || !title.length) {
+    globalToast.error('Title cannot be empty!')
+  } else {
+    const { error } = await supabase
+      .from('roster')
+      .update({
+        title: title
+      })
+      .eq('id', id)
+    if (error) {
+      // some error handling
+    } else {
+      globalToast.success('Saved updated title')
+    }
+  }
+}
+
+export const updatePublished = async (id: number, published: boolean) => {
+  const { error } = await supabase
+    .from('roster')
+    .update({
+      published: published
+    })
+    .eq('id', id)
+  const globalToast = useGlobalToast()
+  if (error) {
+    // some error handling
+  } else {
+    if (published) {
+      globalToast.success('Roster is live!')
+    } else {
+      globalToast.success('Roster is not live')
+    }
   }
 }

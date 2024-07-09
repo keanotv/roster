@@ -11,7 +11,9 @@ import {
   getRosterById,
   getRosters,
   getUnavailability,
-  saveDate
+  saveDate,
+  saveTitle,
+  updatePublished
 } from '@/utils/roster'
 import { defineStore } from 'pinia'
 
@@ -66,8 +68,14 @@ export const useRosterStore = defineStore({
         return roster
       }
     },
-    async saveDate(id: number, date: string | null) {
+    async saveDate(id: number, date: string) {
       await saveDate(id, date)
+    },
+    async saveTitle(id: number, title: string) {
+      await saveTitle(id, title)
+    },
+    async updatePublished(id: number, published: boolean) {
+      await updatePublished(id, published)
     }
   }
 })

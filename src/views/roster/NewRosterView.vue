@@ -26,9 +26,9 @@ const initializeRoster = async () => {
 <template>
   <main>
     <div class="m-8">
-      <p class="mt-2 text-sm">New Roster Title:</p>
+      <p class="mt-2">New Roster Title:</p>
       <BForm @submit.prevent="initializeRoster()">
-        <BFormInput v-model.trim="title" size="sm" :disabled="isLoading"/>
+        <BFormInput v-model.trim="title" :disabled="isLoading"/>
         <BButton type="submit" :disabled="isLoading">Submit</BButton>
       </BForm>
     </div>

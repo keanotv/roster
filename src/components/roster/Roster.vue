@@ -1,21 +1,38 @@
 <script setup lang="ts">
 import { useRosterStore } from '@/stores/roster'
+import { ref } from 'vue';
 const props = defineProps<{
   id: number
 }>()
 
 const rosterStore = useRosterStore()
 const roster = await rosterStore.getRosterById(props.id)
+const previousDate = ref(roster.date)
 </script>
 
 <template>
   <div>
     <template v-if="roster !== undefined && roster.roster !== null">
-      <h1 contenteditable class="max-w-[40vw] overflow-x-scroll">{{ roster.title }}</h1>
-      <BFormInput @change="(e) => {
-        roster.date = e.target.value
-        rosterStore.saveDate(roster.id, roster.date)
-      }" v-model="roster.date" type="date" min="2024-06-23" step="7"/>
+      <BInputGroup prepend="Title">
+        <BInput v-model="roster.title" @change="(e) => {
+          rosterStore.saveTitle(roster.id, e.target.value)
+        }"/>
+      <!-- <h1 contenteditable class="max-w-[40vw] overflow-x-scroll">{{ roster.title }}</h1> -->
+      </BInputGroup>
+      <div class=" my-2 flex">
+        <div><BInputGroup prepend="Date">
+        <BFormInput @blur="(e) => {
+          if (previousDate != e.target.value) {
+            rosterStore.saveDate(roster.id, e.target.value || '')
+            previousDate = e.target.value
+          }
+        }" v-model="roster.date" type="date"/>
+        </BInputGroup></div>
+        <div class="place-items-center flex">
+          <span class="ml-3 mr-2 font-bold text-sm">LIVE</span>
+          <BFormCheckbox class="mb-1" v-model="roster.published" switch @click="rosterStore.updatePublished(roster.id, !roster.published)" />
+        </div>
+      </div>
       <BContainer style="--bs-gutter-x: 0;">
         <BRow cols="1" cols-md="2" cols-lg="4" cols-xl="5" style="--bs-gutter-x: 0;">
           <template v-for="role in roster.unsavedRoster" :key="role.title">

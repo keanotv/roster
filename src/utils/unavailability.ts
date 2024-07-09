@@ -71,7 +71,6 @@ export const submitUnavailability = async (
 ) => {
   const globalToast = useGlobalToast()
   const emptyUnavailability: UnavailabilityInsert[] = unavailability.filter(ua => ua.days.length === 0)
-  // console.log(emptyUnavailability)
   const responses = await Promise.all([
     supabase.from('unavailability').upsert(unavailability.filter(ua => ua.days.length > 0)),
     supabase.from('reason').upsert(reasons)
