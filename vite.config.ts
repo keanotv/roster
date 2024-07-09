@@ -6,12 +6,17 @@ import vue from '@vitejs/plugin-vue'
 import Icons from 'unplugin-icons/vite'
 import IconsResolver from 'unplugin-icons/resolver'
 import Components from 'unplugin-vue-components/vite'
+import { BootstrapVueNextResolver } from 'bootstrap-vue-next'
 
 const r = (...args: string[]) => resolve(__dirname, ...args)
 
 // https://vitejs.dev/config/
 export default defineConfig({
   base: "/camp/",
+  define: {
+    // enable hydration mismatch details in production build
+    __VUE_PROD_HYDRATION_MISMATCH_DETAILS__: 'true'
+  },
   plugins: [
     vue(),
 
@@ -22,7 +27,8 @@ export default defineConfig({
       resolvers: [
         IconsResolver({
           prefix: ''
-        })
+        }),
+        BootstrapVueNextResolver()
       ]
     }),
 

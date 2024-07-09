@@ -9,136 +9,121 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      answers: {
+      people: {
         Row: {
-          answer: string
+          active: boolean
+          id: number
+          name: string
+        }
+        Insert: {
+          active?: boolean
+          id?: number
+          name: string
+        }
+        Update: {
+          active?: boolean
+          id?: number
+          name?: string
+        }
+        Relationships: []
+      }
+      reason: {
+        Row: {
+          month: number
+          people_id: number
+          text: string | null
+          year: number
+        }
+        Insert: {
+          month: number
+          people_id: number
+          text?: string | null
+          year: number
+        }
+        Update: {
+          month?: number
+          people_id?: number
+          text?: string | null
+          year?: number
+        }
+        Relationships: []
+      }
+      role: {
+        Row: {
+          id: number
+          order: number
+          title: string
+        }
+        Insert: {
+          id?: number
+          order: number
+          title: string
+        }
+        Update: {
+          id?: number
+          order?: number
+          title?: string
+        }
+        Relationships: []
+      }
+      roster: {
+        Row: {
           created_at: string
+          date: string | null
           id: number
-          vg: string
+          published: boolean
+          roster: string | null
+          title: string
         }
         Insert: {
-          answer?: string
           created_at?: string
+          date?: string | null
           id?: number
-          vg?: string
+          published?: boolean
+          roster?: string | null
+          title?: string
         }
         Update: {
-          answer?: string
           created_at?: string
+          date?: string | null
           id?: number
-          vg?: string
+          published?: boolean
+          roster?: string | null
+          title?: string
         }
         Relationships: []
       }
-      authorized_users: {
+      unavailability: {
         Row: {
-          telegram_id: string
+          days: number[]
+          month: number
+          people_id: number
+          reason: boolean
+          year: number
         }
         Insert: {
-          telegram_id: string
+          days: number[]
+          month: number
+          people_id: number
+          reason?: boolean
+          year: number
         }
         Update: {
-          telegram_id?: string
-        }
-        Relationships: []
-      }
-      countdown: {
-        Row: {
-          durations: string
-          end: string
-          id: number
-          reveal: boolean
-          started: boolean
-          time: string
-          video: boolean
-        }
-        Insert: {
-          durations?: string
-          end: string
-          id?: number
-          reveal: boolean
-          started: boolean
-          time?: string
-          video: boolean
-        }
-        Update: {
-          durations?: string
-          end?: string
-          id?: number
-          reveal?: boolean
-          started?: boolean
-          time?: string
-          video?: boolean
-        }
-        Relationships: []
-      }
-      masterclass: {
-        Row: {
-          id: number
-          votes: number
-        }
-        Insert: {
-          id?: number
-          votes?: number
-        }
-        Update: {
-          id?: number
-          votes?: number
-        }
-        Relationships: []
-      }
-      settings: {
-        Row: {
-          bot_notifications: boolean | null
-          light_mode_default: boolean | null
-          updated_at: string | null
-          user_id: string
-        }
-        Insert: {
-          bot_notifications?: boolean | null
-          light_mode_default?: boolean | null
-          updated_at?: string | null
-          user_id: string
-        }
-        Update: {
-          bot_notifications?: boolean | null
-          light_mode_default?: boolean | null
-          updated_at?: string | null
-          user_id?: string
+          days?: number[]
+          month?: number
+          people_id?: number
+          reason?: boolean
+          year?: number
         }
         Relationships: [
           {
-            foreignKeyName: "settings_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: true
-            referencedRelation: "users"
+            foreignKeyName: "unavailability_people_id_fkey"
+            columns: ["people_id"]
+            isOneToOne: false
+            referencedRelation: "people"
             referencedColumns: ["id"]
           },
         ]
-      }
-      submissions: {
-        Row: {
-          category: string | null
-          cluster: string | null
-          created_at: string
-          id: number
-          text: string | null
-        }
-        Insert: {
-          category?: string | null
-          cluster?: string | null
-          created_at?: string
-          id?: number
-          text?: string | null
-        }
-        Update: {
-          category?: string | null
-          cluster?: string | null
-          created_at?: string
-          id?: number
-          text?: string | null
-        }
-        Relationships: []
       }
     }
     Views: {
@@ -160,80 +145,80 @@ type PublicSchema = Database[Extract<keyof Database, "public">]
 
 export type Tables<
   PublicTableNameOrOptions extends
-  | keyof (PublicSchema["Tables"] & PublicSchema["Views"])
-  | { schema: keyof Database },
+    | keyof (PublicSchema["Tables"] & PublicSchema["Views"])
+    | { schema: keyof Database },
   TableName extends PublicTableNameOrOptions extends { schema: keyof Database }
-  ? keyof (Database[PublicTableNameOrOptions["schema"]]["Tables"] &
-    Database[PublicTableNameOrOptions["schema"]]["Views"])
-  : never = never,
+    ? keyof (Database[PublicTableNameOrOptions["schema"]]["Tables"] &
+        Database[PublicTableNameOrOptions["schema"]]["Views"])
+    : never = never,
 > = PublicTableNameOrOptions extends { schema: keyof Database }
   ? (Database[PublicTableNameOrOptions["schema"]]["Tables"] &
-    Database[PublicTableNameOrOptions["schema"]]["Views"])[TableName] extends {
+      Database[PublicTableNameOrOptions["schema"]]["Views"])[TableName] extends {
       Row: infer R
     }
-  ? R
-  : never
+    ? R
+    : never
   : PublicTableNameOrOptions extends keyof (PublicSchema["Tables"] &
-    PublicSchema["Views"])
-  ? (PublicSchema["Tables"] &
-    PublicSchema["Views"])[PublicTableNameOrOptions] extends {
-      Row: infer R
-    }
-  ? R
-  : never
-  : never
+        PublicSchema["Views"])
+    ? (PublicSchema["Tables"] &
+        PublicSchema["Views"])[PublicTableNameOrOptions] extends {
+        Row: infer R
+      }
+      ? R
+      : never
+    : never
 
 export type TablesInsert<
   PublicTableNameOrOptions extends
-  | keyof PublicSchema["Tables"]
-  | { schema: keyof Database },
+    | keyof PublicSchema["Tables"]
+    | { schema: keyof Database },
   TableName extends PublicTableNameOrOptions extends { schema: keyof Database }
-  ? keyof Database[PublicTableNameOrOptions["schema"]]["Tables"]
-  : never = never,
+    ? keyof Database[PublicTableNameOrOptions["schema"]]["Tables"]
+    : never = never,
 > = PublicTableNameOrOptions extends { schema: keyof Database }
   ? Database[PublicTableNameOrOptions["schema"]]["Tables"][TableName] extends {
-    Insert: infer I
-  }
-  ? I
-  : never
+      Insert: infer I
+    }
+    ? I
+    : never
   : PublicTableNameOrOptions extends keyof PublicSchema["Tables"]
-  ? PublicSchema["Tables"][PublicTableNameOrOptions] extends {
-    Insert: infer I
-  }
-  ? I
-  : never
-  : never
+    ? PublicSchema["Tables"][PublicTableNameOrOptions] extends {
+        Insert: infer I
+      }
+      ? I
+      : never
+    : never
 
 export type TablesUpdate<
   PublicTableNameOrOptions extends
-  | keyof PublicSchema["Tables"]
-  | { schema: keyof Database },
+    | keyof PublicSchema["Tables"]
+    | { schema: keyof Database },
   TableName extends PublicTableNameOrOptions extends { schema: keyof Database }
-  ? keyof Database[PublicTableNameOrOptions["schema"]]["Tables"]
-  : never = never,
+    ? keyof Database[PublicTableNameOrOptions["schema"]]["Tables"]
+    : never = never,
 > = PublicTableNameOrOptions extends { schema: keyof Database }
   ? Database[PublicTableNameOrOptions["schema"]]["Tables"][TableName] extends {
-    Update: infer U
-  }
-  ? U
-  : never
+      Update: infer U
+    }
+    ? U
+    : never
   : PublicTableNameOrOptions extends keyof PublicSchema["Tables"]
-  ? PublicSchema["Tables"][PublicTableNameOrOptions] extends {
-    Update: infer U
-  }
-  ? U
-  : never
-  : never
+    ? PublicSchema["Tables"][PublicTableNameOrOptions] extends {
+        Update: infer U
+      }
+      ? U
+      : never
+    : never
 
 export type Enums<
   PublicEnumNameOrOptions extends
-  | keyof PublicSchema["Enums"]
-  | { schema: keyof Database },
+    | keyof PublicSchema["Enums"]
+    | { schema: keyof Database },
   EnumName extends PublicEnumNameOrOptions extends { schema: keyof Database }
-  ? keyof Database[PublicEnumNameOrOptions["schema"]]["Enums"]
-  : never = never,
+    ? keyof Database[PublicEnumNameOrOptions["schema"]]["Enums"]
+    : never = never,
 > = PublicEnumNameOrOptions extends { schema: keyof Database }
   ? Database[PublicEnumNameOrOptions["schema"]]["Enums"][EnumName]
   : PublicEnumNameOrOptions extends keyof PublicSchema["Enums"]
-  ? PublicSchema["Enums"][PublicEnumNameOrOptions]
-  : never
+    ? PublicSchema["Enums"][PublicEnumNameOrOptions]
+    : never

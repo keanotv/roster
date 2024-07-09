@@ -16,7 +16,7 @@ const settingsStore = useSettingsStore()
 <template>
   <template v-if="!data.redirect || data.wip">
     <component
-      :is="((data.wip && userStore.user.role !== USER_ROLES.ADMIN) || data.route === ROUTE_NAMES.DARK) ? 'span' : 'router-link'"
+      :is="(data.wip && userStore.user.role.some(role => role !== USER_ROLES.ADMIN) || data.route === ROUTE_NAMES.DARK) ? 'span' : 'router-link'"
       :to="data.route">
       <div :class="{
         blank: true,

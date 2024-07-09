@@ -17,19 +17,29 @@ export const enum SCREEN_SIZE {
 
 export const enum ROUTE_NAMES {
   HOME = 'home',
-  SETTINGS = 'settings',
+  LOGIN = 'login',
   LOGOUT = 'logout',
-  GAME = 'game',
-  GAME_ADMIN = 'gameadmin',
   PROGRAM = 'program',
+  ROSTER = 'roster',
   PACKING = 'packing',
   MASTERCLASS = 'masterclass',
+  UNAVAILABILITY = 'unavailability',
   DARK = 'dark',
   UNKNOWN = 'unknown'
 }
 
+export const enum ROSTER_ROUTE_NAMES {
+  NEW = 'new',
+  VIEW = 'view',
+  ARCHIVED = 'archived',
+}
+
 export const path = (name: string) => {
   return '/' + name
+}
+
+export const hyphenate = (strings: string[]) => {
+  return strings.join('-')
 }
 
 export const campDates = [

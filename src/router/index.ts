@@ -1,12 +1,20 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import HomeView from '@/views/HomeView.vue'
-import SettingsView from '@/views/SettingsView.vue'
 import PackingView from '@/views/PackingView.vue'
 import ProgramView from '@/views/ProgramView.vue'
 import MasterclassView from '@/views/MasterclassView.vue'
-import GameView from '@/views/GameView.vue'
-import GameAdminView from '@/views/GameAdminView.vue'
-import { path, ROUTE_NAMES, DEFAULT_TITLE } from '@/constants/constants'
+import LoginView from '@/views/LoginView.vue'
+import RosteringView from '@/views/RosteringView.vue'
+import NewRosterView from '@/views/roster/NewRosterView.vue'
+import RosterView from '@/views/roster/RosterView.vue'
+import UnavailabilityView from '@/views/UnavailabilityView.vue'
+import {
+  path,
+  ROUTE_NAMES,
+  DEFAULT_TITLE,
+  ROSTER_ROUTE_NAMES,
+  hyphenate
+} from '@/constants/constants'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -16,7 +24,7 @@ const router = createRouter({
       name: ROUTE_NAMES.HOME,
       component: HomeView,
       meta: {
-        title: 'V Camp 2024',
+        title: 'BCM Roster'
       }
     },
     {
@@ -24,50 +32,63 @@ const router = createRouter({
       name: ROUTE_NAMES.PROGRAM,
       component: ProgramView,
       meta: {
-        title: 'V Camp | Program',
-      },
+        title: 'Program'
+      }
     },
     {
       path: path(ROUTE_NAMES.MASTERCLASS),
       name: ROUTE_NAMES.MASTERCLASS,
       component: MasterclassView,
       meta: {
-        title: 'V Camp | Masterclass',
-      },
-    },
-    {
-      path: path(ROUTE_NAMES.GAME),
-      name: ROUTE_NAMES.GAME,
-      component: GameView,
-      meta: {
-        title: 'V Camp | Game',
-      },
+        title: 'Masterclass'
+      }
     },
     {
       path: path(ROUTE_NAMES.PACKING),
       name: ROUTE_NAMES.PACKING,
       component: PackingView,
       meta: {
-        title: 'V Camp | Packing List',
-      },
-    },
-    {
-      path: path(ROUTE_NAMES.SETTINGS),
-      name: ROUTE_NAMES.SETTINGS,
-      component: SettingsView,
-      meta: {
-        requiresAuth: true,
-        title: 'V Camp | Settings',
+        title: 'Packing List'
       }
     },
     {
-      path: path(ROUTE_NAMES.GAME_ADMIN),
-      name: ROUTE_NAMES.GAME_ADMIN,
-      component: GameAdminView,
+      path: path(ROUTE_NAMES.UNAVAILABILITY),
+      name: ROUTE_NAMES.UNAVAILABILITY,
+      component: UnavailabilityView,
       meta: {
-        requiresAuth: true,
-        title: 'V Camp | Game Admin',
-      },
+        title: 'Unavailable Dates'
+      }
+    },
+    {
+      path: path(ROUTE_NAMES.LOGIN),
+      name: ROUTE_NAMES.LOGIN,
+      component: LoginView,
+      meta: {
+        title: 'Login'
+      }
+    },
+    {
+      path: path(ROUTE_NAMES.ROSTER),
+      children: [
+        {
+          path: '',
+          name: ROUTE_NAMES.ROSTER,
+          component: RosteringView
+        },
+        { path: ROSTER_ROUTE_NAMES.NEW, component: NewRosterView },
+        { path: ROSTER_ROUTE_NAMES.ARCHIVED, component: PackingView },
+        {
+          path: ROSTER_ROUTE_NAMES.VIEW,
+          children: [
+            {
+              path: '',
+              // name: hyphenate([ROUTE_NAMES.ROSTER, ROSTER_ROUTE_NAMES.VIEW]),
+              component: PackingView
+            },
+            { path: ':id(\\d+)', component: RosterView, props: true }
+          ]
+        }
+      ]
     },
     {
       path: path(ROUTE_NAMES.LOGOUT),
@@ -91,8 +112,8 @@ const router = createRouter({
 
 // toast and toggle dark stuffs
 import { useGlobalToast } from '@/utils/toast'
-import { USER_ROLES, useUserStore } from '@/stores/user'
 import { nextTick } from 'vue'
+import { USER_ROLES, useUserStore } from '@/stores/user'
 
 const globalToast = useGlobalToast()
 
@@ -100,7 +121,7 @@ const globalToast = useGlobalToast()
 router.beforeEach(async (to, from, next) => {
   const userStore = useUserStore()
   if (to.name === ROUTE_NAMES.LOGOUT) {
-    await userStore.logout()
+    // await userStore.logout()
     next({ name: ROUTE_NAMES.HOME })
   } else if (to.matched.some((record) => record.meta.requiresAuth)) {
     if (to.meta.requiresAuth) {
@@ -114,7 +135,7 @@ router.beforeEach(async (to, from, next) => {
       next()
     }
   } else if (to.matched.some((record) => record.meta.wip)) {
-    if (userStore.user.role.some(role => role === USER_ROLES.ADMIN)) {
+    if (userStore.user.role.some((role) => role === USER_ROLES.ADMIN)) {
       next()
     } else {
       globalToast.info('Sorry, page is not ready!')
@@ -124,7 +145,7 @@ router.beforeEach(async (to, from, next) => {
 })
 
 router.afterEach((to, _from) => {
-  nextTick(() => document.title = to.meta.title as string || DEFAULT_TITLE)
+  nextTick(() => (document.title = (to.meta.title as string) || DEFAULT_TITLE))
 })
 
 export default router

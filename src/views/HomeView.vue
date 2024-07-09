@@ -1,27 +1,12 @@
 <script setup lang="ts">
-import LoginButton from '@/components/buttons/LoginButton.vue'
 import MenuTile from '@/components/home/MenuTile.vue'
-import { useUserStore, USER_ROLES } from '@/stores/user'
-import { MenuMetaDataImpl, type MenuMetaData } from '@/types/types'
+import { useUserStore } from '@/stores/user'
+import type { MenuMetaData } from '@/types/types'
 import { useSettingsStore } from '@/stores/settings'
-import { LINKS, PASSWORDS, path, ROUTE_NAMES } from '@/constants/constants'
-import { useUrlSearchParams } from '@vueuse/core'
-import { onMounted, ref } from 'vue'
-import { getReveal } from '@/utils/game'
+import { LINKS, path, ROUTE_NAMES } from '@/constants/constants'
 
 const userStore = useUserStore()
 const settingsStore = useSettingsStore()
-
-const gameTile: MenuMetaData = {
-  title: 'GAME',
-  route: path(ROUTE_NAMES.GAME),
-  icon: '<svg xmlns="http://www.w3.org/2000/svg" width="5em" height="5em" viewBox="0 0 24 24"><g stroke="currentColor" stroke-linecap="round" stroke-width="2"><path fill="none" stroke-dasharray="16" stroke-dashoffset="16" d="M10.5 13.5L3 21"><animate fill="freeze" attributeName="stroke-dashoffset" begin="0.4s" dur="0.2s" values="16;0"/></path><path fill="currentColor" fill-opacity="0" stroke-dasharray="40" stroke-dashoffset="40" d="M10.7574 13.2426C8.41421 10.8995 8.41421 7.10051 10.7574 4.75736C13.1005 2.41421 16.8995 2.41421 19.2426 4.75736C21.5858 7.10051 21.5858 10.8995 19.2426 13.2426C16.8995 15.5858 13.1005 15.5858 10.7574 13.2426Z"><animate fill="freeze" attributeName="stroke-dashoffset" dur="0.4s" values="40;0"/><animate fill="freeze" attributeName="fill-opacity" begin="0.6s" dur="0.15s" values="0;0.3"/></path></g></svg>',
-}
-const gameAdminTile: MenuMetaData = {
-  title: 'GAME ADMIN',
-  route: path(ROUTE_NAMES.GAME_ADMIN),
-  icon: '<svg xmlns="http://www.w3.org/2000/svg" width="5em" height="5em" viewBox="0 0 24 24"><defs><clipPath id="lineMdWatchTwotoneLoop0"><rect width="24" height="12"/></clipPath><symbol id="lineMdWatchTwotoneLoop1"><path fill="#fff" fill-opacity="0" stroke="#fff" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M23 16.5C23 10.4249 18.0751 5.5 12 5.5C5.92487 5.5 1 10.4249 1 16.5z" clip-path="url(#lineMdWatchTwotoneLoop0)"><animate attributeName="d" dur="6s" keyTimes="0;0.07;0.93;1" repeatCount="indefinite" values="M23 16.5C23 11.5 18.0751 12 12 12C5.92487 12 1 11.5 1 16.5z;M23 16.5C23 10.4249 18.0751 5.5 12 5.5C5.92487 5.5 1 10.4249 1 16.5z;M23 16.5C23 10.4249 18.0751 5.5 12 5.5C5.92487 5.5 1 10.4249 1 16.5z;M23 16.5C23 11.5 18.0751 12 12 12C5.92487 12 1 11.5 1 16.5z"/><animate fill="freeze" attributeName="fill-opacity" begin="0.6s" dur="0.15s" values="0;0.3"/></path></symbol><mask id="lineMdWatchTwotoneLoop2"><use href="#lineMdWatchTwotoneLoop1"/><use href="#lineMdWatchTwotoneLoop1" transform="rotate(180 12 12)"/><circle cx="12" cy="12" r="0" fill="#fff"><animate attributeName="r" dur="6s" keyTimes="0;0.03;0.97;1" repeatCount="indefinite" values="0;3;3;0"/></circle></mask></defs><rect width="24" height="24" fill="currentColor" mask="url(#lineMdWatchTwotoneLoop2)"/></svg>',
-}
 
 const tileData: MenuMetaData[] = [
   {
@@ -65,58 +50,19 @@ const tileData: MenuMetaData[] = [
   },
 ]
 
-const blankTile = new MenuMetaDataImpl()
+// const blankTile = new MenuMetaDataImpl()
 
-const params = useUrlSearchParams('history')
-if (params.login !== undefined) {
-  userStore.checkPassword(PASSWORDS.ADMIN)
-}
+// const params = useUrlSearchParams('history')
 const shift = Math.floor(Math.random() * 4)
-
-const isGameRevealed = ref(false)
-
-const updateIsGameRevealed = () => {
-  getReveal().then(reveal => {
-    isGameRevealed.value = reveal
-  })
-}
-
-
-onMounted(async () => {
-  updateIsGameRevealed()
-  document.addEventListener("visibilitychange", () => {
-    if (!document.hidden) {
-      updateIsGameRevealed()
-    }
-  })
-})
 </script>
 
 <template>
   <main>
-    <template v-if="userStore.user.role.some(role => role === USER_ROLES.ADMIN) && !userStore.user.isLoggedIn">
-      <div class="m-8 mt-48">
-        Login as admin
-        <LoginButton />
-      </div>
-    </template>
-    <template v-else>
-      <div class="menu">
-        <template v-for="(data, index) in tileData" :key="data.title">
-          <MenuTile :data="data" :index="index + shift" />
-        </template>
-        <template v-if="userStore.user.role.some(role => role === USER_ROLES.ADMIN)">
-          <MenuTile :data="gameTile" :index="7 + shift" />
-          <MenuTile :data="gameAdminTile" :index="8 + shift" />
-        </template>
-        <template v-else-if="!isGameRevealed">
-          <MenuTile :data="blankTile" :index="7 + shift" />
-        </template>
-        <template v-else>
-          <MenuTile :data="gameTile" :index="7 + shift" />
-        </template>
-      </div>
-    </template>
+    <div class="menu">
+      <template v-for="(data, index) in tileData" :key="data.title">
+        <MenuTile :data="data" :index="index + shift" />
+      </template>
+    </div>
   </main>
 </template>
 
