@@ -5,6 +5,7 @@ import router from '@/router'
 import { path, ROSTER_ROUTE_NAMES, ROUTE_NAMES } from '@/constants/constants'
 
 const title = ref('')
+const date = ref('')
 const isLoading = ref(false)
 
 const rosterStore = useRosterStore()
@@ -26,10 +27,12 @@ const initializeRoster = async () => {
 <template>
   <main>
     <div class="m-8">
-      <p class="mt-2">New Roster Title:</p>
+      <h1>Create New Roster</h1>
       <BForm @submit.prevent="initializeRoster()">
-        <BFormInput v-model.trim="title" :disabled="isLoading"/>
-        <BButton type="submit" :disabled="isLoading">Submit</BButton>
+        <BInputGroup class="mt-4 mb-2" prepend="Title">
+          <BFormInput v-model.trim="title" :disabled="isLoading" placeholder="e.g. 23 June 2024 draft"/>
+        </BInputGroup>
+        <BButton type="submit" :disabled="isLoading">Create</BButton>
       </BForm>
     </div>
   </main>

@@ -85,7 +85,11 @@ const router = createRouter({
               // name: hyphenate([ROUTE_NAMES.ROSTER, ROSTER_ROUTE_NAMES.VIEW]),
               component: PackingView
             },
-            { path: ':id(\\d+)', component: RosterView, props: true }
+            { 
+              path: ':id(\\d+)',
+              name: hyphenate([ROUTE_NAMES.ROSTER, ROSTER_ROUTE_NAMES.VIEW]),
+              component: RosterView,
+              props: true }
           ]
         }
       ]
@@ -114,6 +118,8 @@ const router = createRouter({
 import { useGlobalToast } from '@/utils/toast'
 import { nextTick } from 'vue'
 import { USER_ROLES, useUserStore } from '@/stores/user'
+import { getRosterById } from '@/utils/roster'
+import { useRosterStore } from '@/stores/roster'
 
 const globalToast = useGlobalToast()
 
@@ -146,6 +152,15 @@ router.beforeEach(async (to, from, next) => {
 
 router.afterEach((to, _from) => {
   nextTick(() => (document.title = (to.meta.title as string) || DEFAULT_TITLE))
+})
+
+router.beforeResolve(async to => {
+  if (to.name == hyphenate([ROUTE_NAMES.ROSTER, ROSTER_ROUTE_NAMES.VIEW])) {
+    if (!Array.isArray(to.params.id)) {
+      const id = Number.parseInt(to.params.id)
+      await getRosterById(id)
+    }
+  }
 })
 
 export default router

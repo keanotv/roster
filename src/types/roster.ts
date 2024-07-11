@@ -68,8 +68,8 @@ export class SlotImpl implements Slot {
   segments: string
   name: string
   id: number
-  constructor() {
-    this.order = 0
+  constructor(order?: number) {
+    this.order = order || 0
     this.segments = ''
     this.name = ''
     this.id = 0

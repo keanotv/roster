@@ -28,11 +28,31 @@ export const enum ROUTE_NAMES {
   UNKNOWN = 'unknown'
 }
 
+export const enum ACTIONS {
+  SAVE = 'save',
+  SYNC = 'sync',
+  DELETE = 'delete'
+}
+
 export const enum ROSTER_ROUTE_NAMES {
   NEW = 'new',
   VIEW = 'view',
   ARCHIVED = 'archived',
 }
+
+export const SERVICE_NO_MAP = new Map<number,string>([
+  [0, 'Error'],
+  [1, '1st'],
+  [2, '2nd'],
+  [3, '3rd'],
+  [4, '4th']
+])
+
+export const PROMPT_MAP = new Map<ACTIONS,string>([
+  [ACTIONS.SAVE, 'By clicking \'save\', you will overwrite what has been saved in the database. Please remember to sync this roster if you plan to edit it on another device, unless you wish to use the version held on that device.'],
+  [ACTIONS.SYNC, 'By clicking \'sync\', you will reset this roster to the version in the database.'],
+  [ACTIONS.DELETE, 'By clicking \'delete\', you will delete this roster from the database and it will not be retrievable.']
+])
 
 export const path = (name: string) => {
   return '/' + name

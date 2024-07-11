@@ -8,7 +8,6 @@ import {
   createNewRosterWithTitle,
   getPeople,
   getRoles,
-  getRosterById,
   getRosters,
   getUnavailability,
   saveDate,
@@ -21,6 +20,7 @@ export const useRosterStore = defineStore({
   id: 'roster',
   persist: true,
   state: () => ({
+    lastUpdated: new Date().getTime(),
     services: 3,
     people: [] as PeopleRow[],
     roles: [] as RoleRow[],
@@ -31,15 +31,18 @@ export const useRosterStore = defineStore({
   }),
   actions: {
     async initializeRosterStore() {
-      if (!this.isInitializing) {
-        this.isInitializing = true
-        await Promise.all([
-          getPeople(),
-          getRoles(),
-          getUnavailability(),
-          getRosters()
-        ])
-        this.isInitializing = false
+      if (new Date().getTime() - 60_000 > this.lastUpdated) {
+        this.lastUpdated = new Date().getTime()
+        if (!this.isInitializing) {
+          this.isInitializing = true
+          await Promise.all([
+            getPeople(),
+            getRoles(),
+            getUnavailability(),
+            getRosters()
+          ])
+          this.isInitializing = false
+        }
       }
     },
     async createNewRosterWithTitle(title: string) {
@@ -59,14 +62,15 @@ export const useRosterStore = defineStore({
     async getRosters() {
       await getRosters()
     },
-    async getRosterById(id: number) {
-      const roster = this.rosters.find(roster => roster.id === id)
-      if (roster == undefined) {
-        await getRosterById(id)
-        return this.rosters.find(roster => roster.id === id)!
-      } else {
-        return roster
-      }
+    getRosterById(id: number) {
+      return this.rosters.find(roster => roster.id === id)!
+      // const roster = this.rosters.find(roster => roster.id === id)
+      // if (roster == undefined) {
+      //   await getRosterById(id)
+      //   return this.rosters.find(roster => roster.id === id)!
+      // } else {
+      //   return roster
+      // }
     },
     async saveDate(id: number, date: string) {
       await saveDate(id, date)
