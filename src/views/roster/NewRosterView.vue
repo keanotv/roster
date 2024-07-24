@@ -26,10 +26,10 @@ const initializeRoster = async () => {
 
 <template>
   <main>
-    <div class="m-8">
-      <h1>Create New Roster</h1>
+    <div class="m-8 min-w-[50vw]">
+      <h1 class="text-center">Create New Roster</h1>
       <BForm @submit.prevent="initializeRoster()">
-        <BInputGroup class="mt-4 mb-2" prepend="Title">
+        <BInputGroup class="mt-4 mb-3" prepend="Title">
           <BFormInput v-model.trim="title" :disabled="isLoading" placeholder="e.g. 23 June 2024 draft"/>
         </BInputGroup>
         <BButton type="submit" :disabled="isLoading">Create</BButton>

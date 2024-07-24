@@ -1,12 +1,5 @@
 import { defineStore } from 'pinia'
-import { sendError } from '@/utils/supabase'
-import type { TelegramUser } from 'user-types'
 import type { User } from 'user-types'
-import { supabase } from '@/utils/supabase'
-import { useGlobalToast } from '@/utils/toast'
-import { PASSWORDS } from '@/constants/constants'
-
-const globalToast = useGlobalToast()
 
 export const enum USER_ROLES {
   YOUTH = 'YOUTH',

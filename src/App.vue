@@ -1,19 +1,16 @@
 <template>
   <LoadingScreen :isLoading="isLoading" />
   <template v-if="!isLoading">
-    <template v-if="settingsStore.screenWidth >= SCREEN_SIZE.MEDIUM_LARGE">
-      <div></div>
-    </template>
-    <Suspense>
-      <RouterView v-slot="{ Component }">
-        <KeepAlive>
-          <component :is="Component" />
-        </KeepAlive>
-      </RouterView>
-    </Suspense>
-    <template v-if="settingsStore.screenWidth >= SCREEN_SIZE.MEDIUM_LARGE">
-      <div></div>
-    </template>
+    <MenuToggle />
+    <div class="flex justify-center">
+      <Suspense>
+        <RouterView v-slot="{ Component }">
+          <KeepAlive>
+            <component :is="Component" />
+          </KeepAlive>
+        </RouterView>
+      </Suspense>
+    </div>
   </template>
 </template>
 
@@ -22,19 +19,20 @@ import { RouterView } from 'vue-router'
 import { onMounted, ref } from 'vue'
 
 import { useSettingsStore } from './stores/settings'
-import { SCREEN_SIZE } from './constants/constants'
-import LoadingScreen from './components/loaders/LoadingScreen.vue';
-import { useRosterStore } from './stores/roster';
+import LoadingScreen from './components/loaders/LoadingScreen.vue'
+import MenuToggle from '@/components/common/MenuToggle.vue'
+import { useRosterStore } from './stores/roster'
 
 const settingsStore = useSettingsStore()
 const isLoading = ref(true)
 const rosterStore = useRosterStore()
-onMounted(async () => {
-  await rosterStore.initializeRosterStore()
+onMounted(() => {
+  rosterStore.initializeRosterStore()
   settingsStore.applyDarkMode()
   function getWidth() {
     settingsStore.screenWidth = window.innerWidth
   }
+  window.removeEventListener('resize', getWidth)
   window.addEventListener('resize', getWidth)
   isLoading.value = false
 })

@@ -2,9 +2,8 @@
 @tailwind components;
 @tailwind utilities;
 
-/* color palette from <https://github.com/vuejs/theme> */
 :root {
-  --vt-c-light: #e4dbcc;
+  --vt-c-light: #f8f4f9;
   --vt-c-light-transparent: rgb(228, 219, 204, 0.85);
   /* rgba(228,219,204,255) */
   --vt-c-dark: #212e30;
@@ -29,7 +28,7 @@
   --vt-c-text-dark-1: var(--vt-c-light);
   --vt-c-text-dark-2: rgba(228, 219, 204, 0.85);
 
-  --vt-c-text-highlight: #ff3b00;
+  --vt-c-text-highlight: #ee5622;
   --vt-c-orange: #ff3b00;
   /* rgba(255,59,0,255) */
   --vt-c-teal: #81c2ba;

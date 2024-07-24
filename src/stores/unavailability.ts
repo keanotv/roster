@@ -11,7 +11,7 @@ export const useUnavailabilityStore = defineStore({
   persist: true,
   state: () => ({
     selectedPersonId: 0,
-    selectedPersonName: 'Name'
+    selectedPersonName: ''
   }),
   actions: {
     selectPerson(id: number, name: string) {

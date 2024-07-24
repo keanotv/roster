@@ -20,13 +20,34 @@ export const createNewRosterWithTitle = async (
   } else {
     let roster = await initializeNewRoster(title).then((roster) => {
       if (roster !== null && roster.id != 0) {
-        globalToast.success('Create new roster success!')
+        globalToast.success('Created new roster!')
         return roster
       } else {
         return null
       }
     })
     return roster
+  }
+}
+
+export const createNewRosterWithTitleAndRosterData = async (
+  title: string,
+  roster: string
+): Promise<number | null> => {
+  const globalToast = useGlobalToast()
+  const { data, error } = await supabase
+    .from('roster')
+    .insert({
+      title: title.concat(' Copy'),
+      roster: roster
+    })
+    .select('id')
+  if (error) {
+    // some error handling
+    return null
+  } else {
+    globalToast.success('Duplicated roster!')
+    return data[0].id
   }
 }
 
@@ -118,6 +139,17 @@ export const getRosters = async () => {
         })
       }
     })
+  }
+}
+
+export const getReasons = async () => {
+  console.log('Fetching reasons')
+  const rosterStore = useRosterStore()
+  const { data, error } = await supabase.from('reason').select('*')
+  if (error) {
+    // some error handling
+  } else {
+    rosterStore.reasons = data
   }
 }
 
@@ -237,7 +269,7 @@ export const saveTitle = async (id: number, title: string) => {
 }
 
 export const updatePublished = async (id: number, published: boolean) => {
-  console.log('Changing publish flag')
+  console.log('Changing live flag')
   const { error } = await supabase
     .from('roster')
     .update({
@@ -253,5 +285,31 @@ export const updatePublished = async (id: number, published: boolean) => {
     } else {
       globalToast.success('Roster is not live')
     }
+  }
+}
+
+export const saveRoster = async (id: number, unsavedRoster: Role[]) => {
+  console.log('Saving roster')
+  const { error } = await supabase.from('roster').update({
+    roster: JSON.stringify(unsavedRoster)
+  }).eq('id', id)
+  const globalToast = useGlobalToast()
+  if (error) {
+    // some error handling
+  } else {
+    globalToast.success('Saved updated roster!')
+  }
+}
+
+export const deleteRoster = async (id: number) => {
+  console.log('Deleting roster')
+  const { error } = await supabase.from('roster').delete().eq('id', id)
+  const globalToast = useGlobalToast()
+  if (error) {
+    // some error handling
+  } else {
+    globalToast.success('Deleted roster!')
+    const rosterStore = useRosterStore()
+    rosterStore.rosters = rosterStore.rosters.filter(roster => roster.id !== id)
   }
 }

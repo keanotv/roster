@@ -1,19 +1,17 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import HomeView from '@/views/HomeView.vue'
-import PackingView from '@/views/PackingView.vue'
-import ProgramView from '@/views/ProgramView.vue'
-import MasterclassView from '@/views/MasterclassView.vue'
 import LoginView from '@/views/LoginView.vue'
-import RosteringView from '@/views/RosteringView.vue'
 import NewRosterView from '@/views/roster/NewRosterView.vue'
 import RosterView from '@/views/roster/RosterView.vue'
-import UnavailabilityView from '@/views/UnavailabilityView.vue'
+import UnavailableDatesView from '@/views/UnavailableDatesView.vue'
+import ViewRostersView from '@/views/roster/ViewRostersView.vue'
 import {
   path,
   ROUTE_NAMES,
   DEFAULT_TITLE,
   ROSTER_ROUTE_NAMES,
-  hyphenate
+  hyphenate,
+  UNAVAILABILITY_ROUTE_NAMES
 } from '@/constants/constants'
 
 const router = createRouter({
@@ -28,36 +26,21 @@ const router = createRouter({
       }
     },
     {
-      path: path(ROUTE_NAMES.PROGRAM),
-      name: ROUTE_NAMES.PROGRAM,
-      component: ProgramView,
-      meta: {
-        title: 'Program'
-      }
-    },
-    {
-      path: path(ROUTE_NAMES.MASTERCLASS),
-      name: ROUTE_NAMES.MASTERCLASS,
-      component: MasterclassView,
-      meta: {
-        title: 'Masterclass'
-      }
-    },
-    {
-      path: path(ROUTE_NAMES.PACKING),
-      name: ROUTE_NAMES.PACKING,
-      component: PackingView,
-      meta: {
-        title: 'Packing List'
-      }
-    },
-    {
       path: path(ROUTE_NAMES.UNAVAILABILITY),
-      name: ROUTE_NAMES.UNAVAILABILITY,
-      component: UnavailabilityView,
-      meta: {
-        title: 'Unavailable Dates'
-      }
+      children: [
+        {
+          path: UNAVAILABILITY_ROUTE_NAMES.VIEW,
+          component: UnavailabilityView
+        },
+        {
+          path: '',
+          name: ROUTE_NAMES.UNAVAILABILITY,
+          meta: {
+            title: 'Unavailable Dates'
+          },
+          component: UnavailableDatesView
+        }
+      ]
     },
     {
       path: path(ROUTE_NAMES.LOGIN),
@@ -70,26 +53,21 @@ const router = createRouter({
     {
       path: path(ROUTE_NAMES.ROSTER),
       children: [
-        {
-          path: '',
-          name: ROUTE_NAMES.ROSTER,
-          component: RosteringView
-        },
         { path: ROSTER_ROUTE_NAMES.NEW, component: NewRosterView },
-        { path: ROSTER_ROUTE_NAMES.ARCHIVED, component: PackingView },
+        // { path: ROSTER_ROUTE_NAMES.ARCHIVED, component: HomeView },
         {
           path: ROSTER_ROUTE_NAMES.VIEW,
           children: [
             {
-              path: '',
-              // name: hyphenate([ROUTE_NAMES.ROSTER, ROSTER_ROUTE_NAMES.VIEW]),
-              component: PackingView
-            },
-            { 
               path: ':id(\\d+)',
               name: hyphenate([ROUTE_NAMES.ROSTER, ROSTER_ROUTE_NAMES.VIEW]),
               component: RosterView,
-              props: true }
+              props: true
+            },
+            {
+              path: '',
+              component: ViewRostersView
+            }
           ]
         }
       ]
@@ -119,7 +97,7 @@ import { useGlobalToast } from '@/utils/toast'
 import { nextTick } from 'vue'
 import { USER_ROLES, useUserStore } from '@/stores/user'
 import { getRosterById } from '@/utils/roster'
-import { useRosterStore } from '@/stores/roster'
+import UnavailabilityView from '@/views/roster/UnavailabilityView.vue'
 
 const globalToast = useGlobalToast()
 
@@ -154,7 +132,7 @@ router.afterEach((to, _from) => {
   nextTick(() => (document.title = (to.meta.title as string) || DEFAULT_TITLE))
 })
 
-router.beforeResolve(async to => {
+router.beforeResolve(async (to) => {
   if (to.name == hyphenate([ROUTE_NAMES.ROSTER, ROSTER_ROUTE_NAMES.VIEW])) {
     if (!Array.isArray(to.params.id)) {
       const id = Number.parseInt(to.params.id)

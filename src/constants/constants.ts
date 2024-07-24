@@ -1,4 +1,4 @@
-export const DEFAULT_TITLE = 'V Camp 2024'
+export const DEFAULT_TITLE = 'BCM Roster'
 
 export const enum PASSWORDS {
   YOUTH = 'eternity',
@@ -21,7 +21,6 @@ export const enum ROUTE_NAMES {
   LOGOUT = 'logout',
   PROGRAM = 'program',
   ROSTER = 'roster',
-  PACKING = 'packing',
   MASTERCLASS = 'masterclass',
   UNAVAILABILITY = 'unavailability',
   DARK = 'dark',
@@ -30,6 +29,7 @@ export const enum ROUTE_NAMES {
 
 export const enum ACTIONS {
   SAVE = 'save',
+  COPY = 'copy',
   SYNC = 'sync',
   DELETE = 'delete'
 }
@@ -38,6 +38,10 @@ export const enum ROSTER_ROUTE_NAMES {
   NEW = 'new',
   VIEW = 'view',
   ARCHIVED = 'archived',
+}
+
+export const enum UNAVAILABILITY_ROUTE_NAMES {
+  VIEW = 'view'
 }
 
 export const SERVICE_NO_MAP = new Map<number,string>([
@@ -50,6 +54,7 @@ export const SERVICE_NO_MAP = new Map<number,string>([
 
 export const PROMPT_MAP = new Map<ACTIONS,string>([
   [ACTIONS.SAVE, 'By clicking \'save\', you will overwrite what has been saved in the database. Please remember to sync this roster if you plan to edit it on another device, unless you wish to use the version held on that device.'],
+  [ACTIONS.COPY, 'By clicking \'copy\', you will create a copy of this roster in your current view.'],
   [ACTIONS.SYNC, 'By clicking \'sync\', you will reset this roster to the version in the database.'],
   [ACTIONS.DELETE, 'By clicking \'delete\', you will delete this roster from the database and it will not be retrievable.']
 ])

@@ -8,19 +8,18 @@
   font-weight: normal;
   display: grid;
 
-  @media (min-width: 1024px) {
+  /* @media (min-width: 1024px) {
     grid-template-columns: 1fr 5fr 1fr;
   }
 
   @media (min-width: 1600px) {
     grid-template-columns: 1fr 4fr 1fr;
-  }
+  } */
 }
 
 a,
 .orange {
   text-decoration: none;
-  color: #f24201;
   transition: 0.4s;
 }
 
@@ -28,13 +27,15 @@ button {
   border-color: var(--color-text);
 }
 
-@media (hover: hover) {
+main {
+  width: 100%;
+}
 
+@media (hover: hover) {
   a:hover,
-  RouterLink:hover,
-  .tile:hover {
-    background-color: var(--color-text);
-    cursor: default;
+  RouterLink:hover {
+    color: var(--color-highlighted-text);
+    cursor: pointer;
   }
 }
 
@@ -45,4 +46,14 @@ h1 {
 
 .btn {
   color: currentColor;
+}
+
+.accordion-button {
+  padding-left: 0;
+  padding-top: 0;
+  padding-bottom: 0;
+}
+
+.accordion-body {
+  padding: 0;
 }

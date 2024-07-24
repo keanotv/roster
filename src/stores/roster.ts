@@ -2,15 +2,20 @@ import type {
   RoleRow,
   PeopleRow,
   UnavailabilityRow,
-  RosterRowLocal
+  RosterRowLocal,
+  Role,
+  ReasonRow
 } from '@/types/roster'
 import {
   createNewRosterWithTitle,
+  deleteRoster,
   getPeople,
+  getReasons,
   getRoles,
   getRosters,
   getUnavailability,
   saveDate,
+  saveRoster,
   saveTitle,
   updatePublished
 } from '@/utils/roster'
@@ -20,11 +25,12 @@ export const useRosterStore = defineStore({
   id: 'roster',
   persist: true,
   state: () => ({
-    lastUpdated: new Date().getTime(),
+    lastUpdated: 0,
     services: 3,
     people: [] as PeopleRow[],
     roles: [] as RoleRow[],
     unavailability: [] as UnavailabilityRow[],
+    reasons: [] as ReasonRow[],
     isInitializing: false,
     rosters: [] as RosterRowLocal[],
     unavailabilityByDate: [] as Map<string, Set<number>>[]
@@ -39,7 +45,8 @@ export const useRosterStore = defineStore({
             getPeople(),
             getRoles(),
             getUnavailability(),
-            getRosters()
+            getRosters(),
+            getReasons()
           ])
           this.isInitializing = false
         }
@@ -54,23 +61,19 @@ export const useRosterStore = defineStore({
       }
     },
     async getUnavailability() {
-      await getUnavailability()
+      if (!this.isInitializing) await getUnavailability()
     },
     async getPeople() {
-      await getPeople()
+      if (!this.isInitializing) await getPeople()
     },
     async getRosters() {
-      await getRosters()
+      if (!this.isInitializing) await getRosters()
+    },
+    async getReasons() {
+      if (!this.isInitializing) await getReasons()
     },
     getRosterById(id: number) {
       return this.rosters.find(roster => roster.id === id)!
-      // const roster = this.rosters.find(roster => roster.id === id)
-      // if (roster == undefined) {
-      //   await getRosterById(id)
-      //   return this.rosters.find(roster => roster.id === id)!
-      // } else {
-      //   return roster
-      // }
     },
     async saveDate(id: number, date: string) {
       await saveDate(id, date)
@@ -80,6 +83,12 @@ export const useRosterStore = defineStore({
     },
     async updatePublished(id: number, published: boolean) {
       await updatePublished(id, published)
+    },
+    async saveRoster(id: number, unsavedRoster: Role[]) {
+      await saveRoster(id, unsavedRoster)
+    },
+    async deleteRoster(id: number) {
+      await deleteRoster(id)
     }
   }
 })

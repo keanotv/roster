@@ -1,13 +1,17 @@
+.Vue-Toastification__container {
+  z-index: 999;
+}
+
 .Vue-Toastification__container>.Vue-Toastification__toast {
   @media(max-width: 600px) {
-    width: 94vw;
-    padding: 10px 12px;
-    border-radius: 8px;
-    margin-left: 3vw;
-    margin-top: 3vw;
+    min-width: 70vw;
+    width: calc(100vw - 4.5rem);
+    padding: 9px 12px;
+    border-radius: 0.35rem;
+    margin-left: 3.65rem;
+    margin-top: 0.65rem;
     margin-bottom: 0;
-    margin-right: 2vw;
-    min-height: 32px;
+    min-height: 2rem;
   }
 }
 

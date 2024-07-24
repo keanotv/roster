@@ -12,7 +12,7 @@ const r = (...args: string[]) => resolve(__dirname, ...args)
 
 // https://vitejs.dev/config/
 export default defineConfig({
-  base: "/camp/",
+  base: "/roster/",
   define: {
     // enable hydration mismatch details in production build
     __VUE_PROD_HYDRATION_MISMATCH_DETAILS__: 'true'
