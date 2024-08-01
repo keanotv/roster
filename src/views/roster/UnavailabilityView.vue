@@ -1,6 +1,10 @@
 <script setup lang="ts">
 import { useRosterStore } from '@/stores/roster'
-import { getSundaysInNextThreeMonths, MONTHS } from '@/utils/unavailability'
+import {
+  getSundaysInNextMonth,
+  getSundaysInNextTwoMonths,
+  MONTHS
+} from '@/utils/unavailability'
 import { onMounted, ref } from 'vue'
 
 const rosterStore = useRosterStore()
@@ -38,58 +42,56 @@ onMounted(() => {
   })
 })
 
-const sundays = getSundaysInNextThreeMonths()
+const sundays = getSundaysInNextTwoMonths()
 </script>
 
 <template>
-  <main>
-    <div id="unavailability" class="my-8 mx-4">
-      <h1 class="my-2 text-center">Unavailability</h1>
-      <template v-for="sunday in sundays">
-          <p class="text-lg font-bold m-1">
-            {{ MONTHS[sunday.month - 1] }} {{ sunday.year }}
-          </p>
-          <BTableSimple hover small responsive>
-            <colgroup>
-              <col />
-              <col />
-              <col />
-            </colgroup>
-            <BThead>
+  <div id="unavailability" class="p-8 w-[100vw]">
+    <h1 class="my-2 text-center">Unavailability</h1>
+    <template v-for="sunday in sundays">
+      <p class="text-lg font-bold m-1">
+        {{ MONTHS[sunday.month - 1] }} {{ sunday.year }}
+      </p>
+      <BTableSimple hover small responsive>
+        <colgroup>
+          <col />
+          <col />
+          <col />
+        </colgroup>
+        <BThead>
+          <BTr>
+            <BTh class="w-20">Name</BTh>
+            <BTh class="w-24">Date(s)</BTh>
+            <BTh>Reason</BTh>
+          </BTr>
+        </BThead>
+        <BTbody class="text-sm">
+          <template v-for="unavailability in unavailabilities">
+            <template
+              v-if="
+                sunday.year === unavailability.year &&
+                sunday.month === unavailability.month
+              "
+            >
               <BTr>
-                <BTh class="w-20">Name</BTh>
-                <BTh class="w-24">Date(s)</BTh>
-                <BTh>Reason</BTh>
+                <BTd>
+                  {{ unavailability.name }}
+                </BTd>
+                <BTd>
+                  {{ unavailability.days.join(', ') }}
+                </BTd>
+                <BTd>
+                  <div class="reason-box">
+                    {{ unavailability.reason ?? '-' }}
+                  </div>
+                </BTd>
               </BTr>
-            </BThead>
-            <BTbody class="text-sm">
-              <template v-for="unavailability in unavailabilities">
-                <template
-                  v-if="
-                    sunday.year === unavailability.year &&
-                    sunday.month === unavailability.month
-                  "
-                >
-                  <BTr>
-                    <BTd>
-                      {{ unavailability.name }}
-                    </BTd>
-                    <BTd>
-                      {{ unavailability.days.join(', ') }}
-                    </BTd>
-                    <BTd>
-                      <div class="reason-box">
-                        {{ unavailability.reason ?? '-' }}
-                      </div>
-                    </BTd>
-                  </BTr>
-                </template>
-              </template>
-            </BTbody>
-          </BTableSimple>
-        </template>
-    </div>
-  </main>
+            </template>
+          </template>
+        </BTbody>
+      </BTableSimple>
+    </template>
+  </div>
 </template>
 
 <style scoped>

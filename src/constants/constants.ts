@@ -1,11 +1,5 @@
 export const DEFAULT_TITLE = 'BCM Roster'
 
-export const enum PASSWORDS {
-  YOUTH = 'eternity',
-  ADMIN = 'admin',
-  GAME = 'game'
-}
-
 export const enum SCREEN_SIZE {
   SMALLER = 420,
   SMALL = 480,
@@ -21,7 +15,6 @@ export const enum ROUTE_NAMES {
   LOGOUT = 'logout',
   PROGRAM = 'program',
   ROSTER = 'roster',
-  MASTERCLASS = 'masterclass',
   UNAVAILABILITY = 'unavailability',
   DARK = 'dark',
   UNKNOWN = 'unknown'

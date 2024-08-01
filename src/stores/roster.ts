@@ -20,6 +20,7 @@ import {
   updatePublished
 } from '@/utils/roster'
 import { defineStore } from 'pinia'
+import { useUserStore } from '@/stores/user'
 
 export const useRosterStore = defineStore({
   id: 'roster',
@@ -37,7 +38,8 @@ export const useRosterStore = defineStore({
   }),
   actions: {
     async initializeRosterStore() {
-      if (new Date().getTime() - 60_000 > this.lastUpdated) {
+      const userStore = useUserStore()
+      if (new Date().getTime() - 60_000 > this.lastUpdated && userStore.isLoggedIn) {
         this.lastUpdated = new Date().getTime()
         if (!this.isInitializing) {
           this.isInitializing = true
@@ -51,6 +53,14 @@ export const useRosterStore = defineStore({
           this.isInitializing = false
         }
       }
+    },
+    clearStore() {
+      this.people = []
+      this.roles = []
+      this.unavailability = []
+      this.reasons = []
+      this.rosters = []
+      this.unavailabilityByDate = []
     },
     async createNewRosterWithTitle(title: string) {
       const roster = await createNewRosterWithTitle(title)

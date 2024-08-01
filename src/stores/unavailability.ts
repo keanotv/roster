@@ -1,7 +1,7 @@
 import { submitUnavailability } from '@/utils/unavailability'
 import { defineStore } from 'pinia'
 import { useRosterStore } from './roster'
-import { getNextThreeMonths } from '@/utils/unavailability'
+import { getNextMonth } from '@/utils/unavailability'
 import type { Sunday } from '@/types/unavailability'
 import type { ReasonInsert, UnavailabilityInsert } from '@/types/roster'
 import { getUnavailability } from '@/utils/roster'
@@ -17,13 +17,13 @@ export const useUnavailabilityStore = defineStore({
     selectPerson(id: number, name: string) {
       this.selectedPersonId = id
       this.selectedPersonName = name
-      this.initializeNextThreeMonthsUnavailability()
+      this.initializeNextMonthUnavailability()
     },
-    async submitUnavailability(unavailableSundays: Sunday[], reasons: string[]) {
+    async submitUnavailability(unavailableSundays: Sunday[], reason: string) {
       const unavailabilityRows = [] as UnavailabilityInsert[]
       const reasonRows = [] as ReasonInsert[]
-      unavailableSundays.forEach((sunday, index) => {
-        if (reasons[index] !== null && reasons[index].length > 0) {
+      unavailableSundays.forEach((sunday) => {
+        if (reason !== null && reason.length > 0) {
           unavailabilityRows.push({
             days: sunday.days,
             month: sunday.month,
@@ -35,7 +35,7 @@ export const useUnavailabilityStore = defineStore({
             month: sunday.month,
             people_id: this.selectedPersonId,
             year: sunday.year,
-            text: reasons[index]
+            text: reason
           })
         } else {
           unavailabilityRows.push({
@@ -50,34 +50,35 @@ export const useUnavailabilityStore = defineStore({
       await submitUnavailability(unavailabilityRows, reasonRows)
       await getUnavailability()
     },
-    initializeNextThreeMonthsUnavailability() {
+    initializeNextMonthUnavailability() {
       const rosterStore = useRosterStore()
-      const months = getNextThreeMonths()
-      months.forEach(month => {
-        if ( // unavailability for month + i not found
-          rosterStore.unavailability.findIndex(
-            (item) =>
-              item.people_id === this.selectedPersonId &&
-              item.year === month.year &&
-              item.month === month.month
-          ) === -1
-        ) {
-          rosterStore.unavailability.push({
-            days: [] as number[],
-            month: month.month,
-            year: month.year,
-            people_id: this.selectedPersonId,
-            reason: false
-          })
-        }
-      })
+      const month = getNextMonth()
+      if ( // unavailability for month + i not found
+        rosterStore.unavailability.findIndex(
+          (item) =>
+            item.people_id === this.selectedPersonId &&
+            item.year === month.year &&
+            item.month === month.month
+        ) === -1
+      ) {
+        rosterStore.unavailability.push({
+          days: [] as number[],
+          month: month.month,
+          year: month.year,
+          people_id: this.selectedPersonId,
+          reason: false
+        })
+      }
     },
     getUnavailableSundays(): Sunday[] {
       const rosterStore = useRosterStore()
-      this.initializeNextThreeMonthsUnavailability()
+      const month = getNextMonth()
+      this.initializeNextMonthUnavailability()
       return rosterStore.unavailability.filter(
         (item) =>
           item.people_id === this.selectedPersonId
+        && item.month === month.month
+        && item.year === month.year
       ).map(item => {
         return {
           year: item.year,

@@ -7,10 +7,8 @@ defineProps<{
 </script>
 
 <template>
-  <main>
-    <div class="mt-8 mx-4">
-      <h1 class="my-2 text-center">Roster Edit</h1>
-      <Roster :id="Number.parseInt(id)" />
-    </div>
-  </main>
+  <div class="my-8 mx-4">
+    <h1 class="my-2 text-center">Roster (Edit)</h1>
+    <Roster :id="Number.parseInt(id)" />
+  </div>
 </template>

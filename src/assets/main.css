@@ -57,3 +57,32 @@ h1 {
 .accordion-body {
   padding: 0;
 }
+
+.nav {
+  flex-wrap: nowrap;
+  max-width: calc(100vw - 3rem);
+  overflow-x: scroll;
+}
+
+.nav-link {
+  width: 80px;
+  padding: 0.5rem 0.25rem 0.5rem 0.25rem;
+  overflow-y: hidden;
+
+  @media(min-width: 600px) {
+    width: 125px;
+  }
+}
+
+.row > * {
+  padding-left: 0;
+  padding-right: 0;
+}
+
+.card-body {
+  padding: 0.65rem;
+}
+
+.card {
+  border-radius: 0;
+}

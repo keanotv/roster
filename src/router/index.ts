@@ -105,11 +105,11 @@ const globalToast = useGlobalToast()
 router.beforeEach(async (to, from, next) => {
   const userStore = useUserStore()
   if (to.name === ROUTE_NAMES.LOGOUT) {
-    // await userStore.logout()
+    userStore.logout()
     next({ name: ROUTE_NAMES.HOME })
   } else if (to.matched.some((record) => record.meta.requiresAuth)) {
     if (to.meta.requiresAuth) {
-      if (!userStore.user.isLoggedIn) {
+      if (!userStore.isLoggedIn) {
         globalToast.info('Log in to view requested page')
         next({ name: ROUTE_NAMES.HOME })
       } else {
@@ -119,7 +119,7 @@ router.beforeEach(async (to, from, next) => {
       next()
     }
   } else if (to.matched.some((record) => record.meta.wip)) {
-    if (userStore.user.role.some((role) => role === USER_ROLES.ADMIN)) {
+    if (userStore.role.some((role) => role === USER_ROLES.ADMIN)) {
       next()
     } else {
       globalToast.info('Sorry, page is not ready!')

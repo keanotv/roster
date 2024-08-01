@@ -1,6 +1,5 @@
 import { createApp } from 'vue'
 import { provideAppToast } from './utils/toast'
-import vue3GoogleLogin from 'vue3-google-login'
 import { createBootstrap } from 'bootstrap-vue-next'
 
 import 'vue-toastification/dist/index.css'
@@ -25,9 +24,6 @@ const options: PluginOptions = {
   timeout: 5000
 }
 app.use(provideAppToast, options)
-app.use(vue3GoogleLogin, {
-  clientId: '219340184028-5euddpa6i10vju16k0714rghciacm4h3.apps.googleusercontent.com'
-})
 app.use(pinia)
 app.use(router)
 app.use(createBootstrap())

@@ -44,11 +44,10 @@ const rosterAction = async () => {
   switch (action.value) {
     case ACTIONS.SAVE:
       if (roster.value.unsavedRoster != null) {
-        // await rosterStore.saveRoster(
-        //   roster.value.id,
-        //   roster.value.unsavedRoster
-        // )
-        console.log(roster.value.unsavedRoster)
+        await rosterStore.saveRoster(
+          roster.value.id,
+          roster.value.unsavedRoster
+        )
       }
       break
     case ACTIONS.COPY:
@@ -134,16 +133,13 @@ const removeRoleOrderFromPersonMap = (id: number, order: number) => {
                 type="date"
               />
             </BInputGroup>
-            <span class="text-xs m-1">Created at: {{ new Date(Date.parse(roster.created_at)).toLocaleString('en-SG', {
-            dateStyle: 'medium',
-            timeStyle: 'short'
-          }) }}</span>
           </div>
           <div class="place-items-center flex">
             <span class="ml-3 mr-2 font-bold text-sm">LIVE</span>
             <BFormCheckbox
               class="mb-1"
               v-model="roster.published"
+              :disabled="roster.date === null"
               switch
               @click="rosterStore.updatePublished(roster.id, !roster.published)"
             />
@@ -226,12 +222,13 @@ const removeRoleOrderFromPersonMap = (id: number, order: number) => {
           </BModal>
         </div>
       </BContainer>
-      <BContainer style="--bs-gutter-x: 0">
+      <BContainer class="my-4" style="--bs-gutter-x: 0">
         <BRow
           cols="1"
           cols-sm="2"
-          cols-lg="3"
-          cols-xxl="4"
+          cols-md="3"
+          cols-xl="4"
+          cols-xxl="5"
           style="--bs-gutter-x: 0"
         >
           <template v-for="role in roster.unsavedRoster" :key="role.title">
@@ -241,7 +238,7 @@ const removeRoleOrderFromPersonMap = (id: number, order: number) => {
                 margin-right: -1px;
                 margin-bottom: -1px;
               "
-              class="p-2 rounded-md"
+              class="p-2"
             >
               <p class="font-bold text-lg text-center">{{ role.title }}</p>
               <BContainer style="--bs-gutter-x: 0">
@@ -351,6 +348,10 @@ const removeRoleOrderFromPersonMap = (id: number, order: number) => {
             </BCol>
           </template>
         </BRow>
+      <span class="text-xs">Created at: {{ new Date(Date.parse(roster.created_at)).toLocaleString('en-SG', {
+            dateStyle: 'medium',
+            timeStyle: 'short'
+          }) }}</span>
       </BContainer>
     </template>
     <template v-else>
@@ -358,9 +359,3 @@ const removeRoleOrderFromPersonMap = (id: number, order: number) => {
     </template>
   </div>
 </template>
-
-<style scoped>
-.dropdown-menu {
-  height: 300px;
-}
-</style>
