@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { SERVICE_NO_MAP } from '@/constants/constants'
-import { useRosterStore } from '@/stores/roster';
+import { useRosterStore } from '@/stores/roster'
 import { Role } from '@/types/roster'
-import { onMounted, ref } from 'vue';
+import { ref, watchEffect } from 'vue'
 
 const props = defineProps<{
   roster: Role[]
@@ -10,13 +10,15 @@ const props = defineProps<{
 
 const rosterStore = useRosterStore()
 const personToRoleOrderMap = ref(new Map<number, Set<number>>())
-rosterStore.people.forEach(person => {
-  personToRoleOrderMap.value.set(person.id, new Set<number>())
-})
-props.roster.forEach(role => {
-  role.services.forEach(service => {
-    service.slot.forEach(slot => {
-      personToRoleOrderMap.value.get(slot.id)?.add(role.order)
+watchEffect(() => {
+  rosterStore.people.forEach((person) => {
+    personToRoleOrderMap.value.set(person.id, new Set<number>())
+  })
+  props.roster.forEach((role) => {
+    role.services.forEach((service) => {
+      service.slot.forEach((slot) => {
+        personToRoleOrderMap.value.get(slot.id)?.add(role.order)
+      })
     })
   })
 })
@@ -35,11 +37,14 @@ props.roster.forEach(role => {
                 </BCardTitle>
                 <div class="service-grid text-sm">
                   <template v-for="service in role.services">
-                    <p class="font-bold">{{ SERVICE_NO_MAP.get(service.no) }}</p>
+                    <p class="font-bold">
+                      {{ SERVICE_NO_MAP.get(service.no) }}
+                    </p>
                     <div>
                       <BListGroup class="inline">
                         <template v-for="slot in service.slot">
-                          <BListGroupItem class="py-0.5 px-1.5"
+                          <BListGroupItem
+                            class="py-0.5 px-1.5"
                             :variant="personToRoleOrderMap.get(slot.id) !== undefined && personToRoleOrderMap.get(slot.id)!.size > 1 ? 'warning' : 'primary'"
                           >
                             <p>
