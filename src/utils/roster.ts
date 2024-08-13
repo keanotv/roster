@@ -1,5 +1,6 @@
 import { useRosterStore } from '@/stores/roster'
 import {
+  type PeopleRow,
   type Role,
   RoleImpl,
   type RosterRow,
@@ -122,8 +123,10 @@ export const getRosters = async () => {
   if (error) {
     // some error handling
   } else {
-    const ids = data.map(row => row.id)
-    rosterStore.rosters = rosterStore.rosters.filter(roster => ids.includes(roster.id))
+    const ids = data.map((row) => row.id)
+    rosterStore.rosters = rosterStore.rosters.filter((roster) =>
+      ids.includes(roster.id)
+    )
     data.forEach((rosterRow) => {
       const index = rosterStore.rosters.findIndex(
         (roster) => roster.id === rosterRow.id
@@ -140,7 +143,9 @@ export const getRosters = async () => {
         })
       }
     })
-    rosterStore.rosters.sort((a, b) => (new Date(a.date!).getTime() - new Date(b.date!).getTime()))
+    rosterStore.rosters.sort(
+      (a, b) => new Date(a.date!).getTime() - new Date(b.date!).getTime()
+    )
   }
 }
 
@@ -167,10 +172,12 @@ export const getRosterById = async (id: number) => {
   } else {
     const rosterStore = useRosterStore()
     if (data.length === 0) {
-      rosterStore.rosters = rosterStore.rosters.filter(roster => roster.id !== id)
+      rosterStore.rosters = rosterStore.rosters.filter(
+        (roster) => roster.id !== id
+      )
       globalToast.warning('Roster not found in database')
     }
-    data.forEach(rosterRow => {
+    data.forEach((rosterRow) => {
       const index = rosterStore.rosters.findIndex(
         (roster) => roster.id === rosterRow.id
       )
@@ -211,16 +218,16 @@ export const refreshUnavailabilityByDateList = () => {
   const rosterStore = useRosterStore()
   const month = getSundaysInNextMonth()
   rosterStore.unavailabilityByDate = [new Map<string, Set<number>>([])]
-  month.days.forEach(dayOfMonth => {
+  month.days.forEach((dayOfMonth) => {
     const date = [
       month.year,
       month.month.toString().length === 1 ? '0' + month.month : month.month,
       dayOfMonth.toString().length === 1 ? '0' + dayOfMonth : dayOfMonth
     ].join('-')
-    rosterStore.unavailabilityByDate[0].set(date, new Set<number>)
+    rosterStore.unavailabilityByDate[0].set(date, new Set<number>())
   })
-  rosterStore.unavailability.forEach(ua => {
-    ua.days.forEach(dayOfMonth => {
+  rosterStore.unavailability.forEach((ua) => {
+    ua.days.forEach((dayOfMonth) => {
       const date = [
         ua.year,
         ua.month.toString().length === 1 ? '0' + ua.month : ua.month,
@@ -313,9 +320,12 @@ export const updateArchived = async (id: number, archived: boolean) => {
 
 export const saveRoster = async (id: number, unsavedRoster: Role[]) => {
   console.log('Saving roster')
-  const { error } = await supabase.from('roster').update({
-    roster: JSON.stringify(unsavedRoster)
-  }).eq('id', id)
+  const { error } = await supabase
+    .from('roster')
+    .update({
+      roster: JSON.stringify(unsavedRoster)
+    })
+    .eq('id', id)
   const globalToast = useGlobalToast()
   if (error) {
     // some error handling
@@ -333,6 +343,40 @@ export const deleteRoster = async (id: number) => {
   } else {
     globalToast.success('Deleted roster!')
     const rosterStore = useRosterStore()
-    rosterStore.rosters = rosterStore.rosters.filter(roster => roster.id !== id)
+    rosterStore.rosters = rosterStore.rosters.filter(
+      (roster) => roster.id !== id
+    )
+  }
+}
+
+export const savePerson = async (
+  person: PeopleRow,
+  newName: string
+): Promise<boolean> => {
+  console.log('Updating person')
+  const { error } = await supabase
+    .from('people')
+    .update({
+      ...person,
+      name: newName.length ? newName : person.name
+    })
+    .eq('id', person.id)
+  const globalToast = useGlobalToast()
+  if (error) {
+    // some error handling
+    globalToast.error('Error updating person :(')
+    return false
+  } else {
+    globalToast.success('Update successful!')
+    const rosterStore = useRosterStore()
+
+    rosterStore.people = rosterStore.people.filter(
+      (people) => people.id !== person.id
+    )
+    rosterStore.people.push(person)
+    rosterStore.people.sort(function (a, b) {
+      return a.name < b.name ? -1 : a.name > b.name ? 1 : 0
+    })
+    return true
   }
 }

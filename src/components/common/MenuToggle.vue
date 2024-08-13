@@ -6,6 +6,7 @@ import {
   ROUTE_NAMES,
   UNAVAILABILITY_ROUTE_NAMES
 } from '@/constants/constants'
+import { useUnavailabilityStore } from '@/stores/unavailability'
 import { USER_ROLES } from '@/stores/user'
 import { useUserStore } from '@/stores/user'
 import { ref } from 'vue'
@@ -62,6 +63,13 @@ const routerLinks = [
     ]
   },
   {
+    title: 'Name',
+    path: path(ROUTE_NAMES.NAME),
+    hasSubLinks: false,
+    admin: false,
+    subLinks: []
+  },
+  {
     title: 'Logout',
     path: path(ROUTE_NAMES.LOGOUT),
     hasSubLinks: false,
@@ -71,6 +79,7 @@ const routerLinks = [
 ]
 
 const userStore = useUserStore()
+const unavailabilityStore = useUnavailabilityStore()
 </script>
 
 <template>
@@ -119,7 +128,16 @@ const userStore = useUserStore()
         <template v-else>
           <RouterLink :to="route.path">
             <div @click="open = false" class="menu-item py-3 px-2">
-              <h1>{{ route.title }}</h1>
+              <h1>
+                {{
+                  route.title == 'Name'
+                    ? 'Not ' + unavailabilityStore.selectedPersonName + '?'
+                    : route.title
+                }}
+              </h1>
+              <template v-if="route.title == 'Name'">
+                <p>(Reselect name)</p>
+              </template>
             </div>
             <hr />
           </RouterLink>

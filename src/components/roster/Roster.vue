@@ -33,7 +33,9 @@ if (roster.value !== undefined) {
 }
 
 watchEffect(async () => {
-  roster.value = rosterStore.getRosterById(props.id)
+  if (roster.value.id !== props.id) {
+    roster.value = rosterStore.getRosterById(props.id)
+  }
 })
 
 const confirmation = ref(false)
@@ -164,7 +166,6 @@ const removeRoleOrderFromPersonMap = (id: number, order: number) => {
               <BFormCheckbox
                 class="mb-1"
                 v-model="roster.archived"
-                :disabled="roster.date === null || !roster.published"
                 switch
                 @click="rosterStore.updateArchived(roster.id, !roster.archived)"
               />
@@ -353,6 +354,9 @@ const removeRoleOrderFromPersonMap = (id: number, order: number) => {
                                     "
                                     @click.prevent="
                                       () => {
+                                        if (slot.id !== 0) {
+                                          removeRoleOrderFromPersonMap(slot.id, role.order)
+                                        }
                                         slot.name = person.name
                                         slot.id = person.id
                                         addRoleOrderToPersonMap(person.id, role.order)

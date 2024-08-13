@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { path, ROSTER_ROUTE_NAMES, ROUTE_NAMES } from '@/constants/constants';
-import { useRosterStore } from '@/stores/roster';
+import { path, ROSTER_ROUTE_NAMES, ROUTE_NAMES } from '@/constants/constants'
+import { useRosterStore } from '@/stores/roster'
 
 const rosterStore = useRosterStore()
 const viewPath = path(ROUTE_NAMES.ROSTER) + path(ROSTER_ROUTE_NAMES.VIEW)
@@ -23,7 +23,45 @@ const viewPath = path(ROUTE_NAMES.ROSTER) + path(ROSTER_ROUTE_NAMES.VIEW)
         </BTr>
       </BThead>
       <BTbody class="text-sm">
-        <template v-for="roster in rosterStore.rosters">
+        <template
+          v-for="roster in rosterStore.rosters.filter(
+            (roster) => !roster.archived
+          )"
+        >
+          <BTr>
+            <BTd class="title underline underline-offset-2">
+              <RouterLink :to="viewPath + path(roster.id.toString())">
+                <div>
+                  {{ roster.title }}
+                </div>
+              </RouterLink>
+            </BTd>
+            <BTd>{{ roster.date || '-' }}</BTd>
+            <BTd>{{ roster.published ? 'Yes' : 'No' }}</BTd>
+          </BTr>
+        </template>
+      </BTbody>
+    </BTableSimple>
+    <h1 class="mt-6 mb-3 text-center">Archived</h1>
+    <BTableSimple hover responsive class="min-w-[320px]">
+      <colgroup>
+        <col />
+        <col />
+        <col />
+      </colgroup>
+      <BThead>
+        <BTr>
+          <BTh>Title</BTh>
+          <BTh>Date</BTh>
+          <BTh>Live</BTh>
+        </BTr>
+      </BThead>
+      <BTbody class="text-sm">
+        <template
+          v-for="roster in rosterStore.rosters.filter(
+            (roster) => roster.archived
+          )"
+        >
           <BTr>
             <BTd class="title underline underline-offset-2">
               <RouterLink :to="viewPath + path(roster.id.toString())">

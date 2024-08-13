@@ -4,20 +4,35 @@ import { PeopleRow } from '@/types/roster'
 import { ref, watchEffect } from 'vue'
 
 const rosterStore = useRosterStore()
-
 const editPerson = ref(false)
-const deletePerson = ref(false)
-
 const selectedPerson = ref({} as PeopleRow)
+const newName = ref('')
+const duplicateName = ref(false)
+
+const handleSave = async () => {
+  const success = await rosterStore.savePerson(
+    selectedPerson.value,
+    newName.value.trim()
+  )
+  if (success) {
+    editPerson.value = false
+    selectedPerson.value = {} as PeopleRow
+    newName.value = ''
+  } else {
+    editPerson.value = true
+  }
+}
 
 watchEffect(() => {
-  console.log(selectedPerson.value)
+  duplicateName.value = rosterStore.people.some(
+    (person) => person.name.toLowerCase() == newName.value.toLowerCase().trim()
+  )
 })
 </script>
 
 <template>
   <div id="people" class="py-8 px-4 w-[100vw]">
-    <h1 class="my-2 text-center">People</h1>
+    <h1 class="my-3 text-center">People</h1>
     <BTableSimple hover responsive>
       <colgroup>
         <col />
@@ -32,7 +47,15 @@ watchEffect(() => {
           <BTr>
             <BTd>
               <div class="flex justify-between">
-                <p class="my-auto pt-0.5">{{ person.name }}</p>
+                <p class="my-auto pt-0.5">
+                  {{ person.name }}
+                  <template v-if="!person.active">
+                    <i class="text-sm text-gray-500">(inactive) </i>
+                  </template>
+                  <template v-if="!person.server">
+                    <i class="text-sm text-gray-500">(non-server)</i>
+                  </template>
+                </p>
                 <div>
                   <BButton
                     @click.prevent="
@@ -41,85 +64,66 @@ watchEffect(() => {
                         editPerson = true
                       }
                     "
-                    class="py-1 px-1 mx-2"
+                    class="py-1 px-1 mx-1"
                     variant="primary"
                     ><line-md:edit-twotone-full class="h-5 w-5"
-                  /></BButton>
-                  <BButton
-                    @click.prevent="
-                      () => {
-                        selectedPerson = person
-                        deletePerson = true
-                      }
-                    "
-                    class="py-1 px-1 mx-1"
-                    variant="danger"
-                    ><line-md:account-delete class="h-5 w-5"
                   /></BButton>
                 </div>
               </div>
             </BTd>
           </BTr>
         </template>
-        <BModal centered hide-footer hide-header v-model="editPerson">
-          <p>Currently editing: <b>{{ selectedPerson.name }}</b></p>
+        <BModal
+          centered
+          hide-footer
+          hide-header
+          v-model="editPerson"
+          no-close-on-backdrop
+        >
+          <p>
+            Currently editing: <b>{{ selectedPerson.name }}</b>
+          </p>
           <hr class="my-2" />
-          <div class="flex my-2">
+          <div class="flex my-3">
             <p class="my-auto">Rename:</p>
-            <BInput class="ml-2"/>
+            <BInput
+              class="ml-2"
+              v-model="newName"
+              :state="newName.length == 0 ? null : !duplicateName"
+            />
           </div>
-          <div class="flex my-2">
-            <p class="mr-2">Active:</p>
-            <BFormCheckbox switch v-model="selectedPerson.active"/>
+          <div class="flex mt-3">
+            <p class="mr-2 pt-0.5">Active:</p>
+            <BFormCheckbox switch v-model="selectedPerson.active" />
           </div>
-          <span class="text-sm">This person is {{ selectedPerson.server ? '' : ' not ' }} active. Their name will {{ selectedPerson.server ? '' : ' not ' }} show up in all the drop-down lists.</span>
-          <div class="flex my-2">
-            <p class="mr-2">Server:</p>
-            <BFormCheckbox switch v-model="selectedPerson.server"/>
+          <span class="text-sm"
+            >This person is {{ selectedPerson.active ? '' : 'in' }}active. Their
+            name will {{ selectedPerson.active ? '' : ' not ' }} appear in
+            drop-down lists.</span
+          >
+          <div class="flex mt-3">
+            <p class="mr-2 pt-0.5">Server:</p>
+            <BFormCheckbox switch v-model="selectedPerson.server" />
           </div>
-          <span class="text-sm">This person is {{ selectedPerson.server ? '' : ' not ' }} a server. Their name will {{ selectedPerson.server ? '' : ' not ' }} show up in the drop-down list when submitting unavailable dates.</span>
+          <span class="text-sm"
+            >This person is {{ selectedPerson.server ? '' : ' not ' }} a server.
+            Their name will {{ selectedPerson.server ? '' : ' not ' }} appear in
+            the drop-down list when submitting unavailable dates.</span
+          >
           <div class="mt-4 flex justify-between">
             <BButton
-              @click.prevent="() => {
-                editPerson = false
-                selectedPerson = {} as PeopleRow
-              }
-              "
+              @click.prevent="handleSave"
               variant="primary"
               class="capitalize"
+              :disabled="duplicateName"
               >Save</BButton
             >
             <BButton
               @click.prevent="() => {
               editPerson = false
               selectedPerson = {} as PeopleRow
+              newName = ''
             }"
-              >Cancel</BButton
-            >
-          </div>
-        </BModal>
-        <BModal centered hide-footer hide-header v-model="deletePerson">
-          <p class="text-justify">
-            Are you sure you want to delete this person? You will not be able to
-            undo this action. Alternatively, you may choose to set this person
-            to inactive (using the edit button) to temporarily disable this
-            person from showing up in drop-down lists.
-          </p>
-          <div class="mt-4 flex justify-between">
-            <BButton
-              @click.prevent="() => {
-                deletePerson = false
-                selectedPerson = {} as PeopleRow
-              }"
-              variant="primary"
-              class="capitalize"
-              >Delete</BButton
-            >
-            <BButton
-              @click.prevent="() => {
-                deletePerson = false
-                selectedPerson = {} as PeopleRow
-              }"
               >Cancel</BButton
             >
           </div>

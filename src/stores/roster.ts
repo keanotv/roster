@@ -15,6 +15,7 @@ import {
   getRosters,
   getUnavailability,
   saveDate,
+  savePerson,
   saveRoster,
   saveTitle,
   updateArchived,
@@ -106,6 +107,9 @@ export const useRosterStore = defineStore({
     },
     async deleteRoster(id: number) {
       await deleteRoster(id)
+    },
+    async savePerson(person: PeopleRow, newName: string): Promise<boolean> {
+      return await savePerson(person, newName)
     }
   }
 })

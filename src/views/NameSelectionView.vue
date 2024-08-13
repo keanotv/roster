@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { useRosterStore } from '@/stores/roster';
-import { useUnavailabilityStore } from '@/stores/unavailability';
-import { ref } from 'vue';
+import { useRosterStore } from '@/stores/roster'
+import { useUnavailabilityStore } from '@/stores/unavailability'
+import { ref } from 'vue'
 
 const rosterStore = useRosterStore()
 await rosterStore.getPeople()
@@ -25,7 +25,11 @@ const blurInput = () => {
 <template>
   <div id="name-selection" class="p-8 w-[100vw]">
     <h1 class="my-2 text-center">What is your name?</h1>
-    <div class="mt-8 w-40" @click="focusInput">
+    <p class="mt-8 text-justify">
+      Select your name using the drop-down list below (click on your name in the
+      drop-down)
+    </p>
+    <div class="mt-3 w-40" @click="focusInput">
       <BDropdown
         v-model="show"
         :text="unavailabilityStore.selectedPersonName"
@@ -72,7 +76,6 @@ const blurInput = () => {
         </template>
       </BDropdown>
     </div>
-    <p class="mt-3">Please select your name using the drop-down list above</p>
   </div>
 </template>
 
