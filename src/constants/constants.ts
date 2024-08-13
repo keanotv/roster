@@ -12,10 +12,12 @@ export const enum SCREEN_SIZE {
 export const enum ROUTE_NAMES {
   HOME = 'home',
   LOGIN = 'login',
+  NAME = 'name',
   LOGOUT = 'logout',
   PROGRAM = 'program',
   ROSTER = 'roster',
   UNAVAILABILITY = 'unavailability',
+  ADMIN = 'admin',
   DARK = 'dark',
   UNKNOWN = 'unknown'
 }
@@ -25,6 +27,11 @@ export const enum ACTIONS {
   COPY = 'copy',
   SYNC = 'sync',
   DELETE = 'delete'
+}
+
+export const enum ADMIN_ROUTE_NAMES {
+  PEOPLE = 'people',
+  ROLES = 'roles'
 }
 
 export const enum ROSTER_ROUTE_NAMES {

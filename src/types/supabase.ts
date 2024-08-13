@@ -14,16 +14,19 @@ export type Database = {
           active: boolean
           id: number
           name: string
+          server: boolean
         }
         Insert: {
           active?: boolean
           id?: number
           name: string
+          server?: boolean
         }
         Update: {
           active?: boolean
           id?: number
           name?: string
+          server?: boolean
         }
         Relationships: []
       }
@@ -68,6 +71,7 @@ export type Database = {
       }
       roster: {
         Row: {
+          archived: boolean
           created_at: string
           date: string | null
           id: number
@@ -76,6 +80,7 @@ export type Database = {
           title: string
         }
         Insert: {
+          archived?: boolean
           created_at?: string
           date?: string | null
           id?: number
@@ -84,6 +89,7 @@ export type Database = {
           title?: string
         }
         Update: {
+          archived?: boolean
           created_at?: string
           date?: string | null
           id?: number

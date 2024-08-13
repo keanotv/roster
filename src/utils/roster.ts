@@ -9,6 +9,7 @@ import {
 import { supabase } from '@/utils/supabase'
 import { useGlobalToast } from './toast'
 import { getSundaysInNextMonth } from './unavailability'
+import { USER_ROLES, useUserStore } from '@/stores/user'
 
 export const createNewRosterWithTitle = async (
   title: string
@@ -139,17 +140,21 @@ export const getRosters = async () => {
         })
       }
     })
+    rosterStore.rosters.sort((a, b) => (new Date(a.date!).getTime() - new Date(b.date!).getTime()))
   }
 }
 
 export const getReasons = async () => {
-  console.log('Fetching reasons')
-  const rosterStore = useRosterStore()
-  const { data, error } = await supabase.from('reason').select('*')
-  if (error) {
-    // some error handling
-  } else {
-    rosterStore.reasons = data
+  const userStore = useUserStore()
+  if (userStore.role.some((role) => role === USER_ROLES.ADMIN)) {
+    console.log('Fetching reasons for admin')
+    const rosterStore = useRosterStore()
+    const { data, error } = await supabase.from('reason').select('*')
+    if (error) {
+      // some error handling
+    } else {
+      rosterStore.reasons = data
+    }
   }
 }
 
@@ -282,6 +287,26 @@ export const updatePublished = async (id: number, published: boolean) => {
       globalToast.success('Roster is live!')
     } else {
       globalToast.success('Roster is not live')
+    }
+  }
+}
+
+export const updateArchived = async (id: number, archived: boolean) => {
+  console.log('Changing live flag')
+  const { error } = await supabase
+    .from('roster')
+    .update({
+      archived: archived
+    })
+    .eq('id', id)
+  const globalToast = useGlobalToast()
+  if (error) {
+    // some error handling
+  } else {
+    if (archived) {
+      globalToast.success('Roster is archived!')
+    } else {
+      globalToast.success('Roster is unarchived')
     }
   }
 }

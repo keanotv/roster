@@ -22,6 +22,6 @@ export const focusAndOpenKeyboard = (el: HTMLInputElement | HTMLTextAreaElement)
       el.click();
       // Remove the temp element
       document.body.removeChild(__tempEl__);
-    }, 177);
+    }, 222);
   }
 }

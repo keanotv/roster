@@ -17,6 +17,7 @@ import {
   saveDate,
   saveRoster,
   saveTitle,
+  updateArchived,
   updatePublished
 } from '@/utils/roster'
 import { defineStore } from 'pinia'
@@ -39,7 +40,10 @@ export const useRosterStore = defineStore({
   actions: {
     async initializeRosterStore() {
       const userStore = useUserStore()
-      if (new Date().getTime() - 60_000 > this.lastUpdated && userStore.isLoggedIn) {
+      if (
+        new Date().getTime() - 60_000 > this.lastUpdated &&
+        userStore.isLoggedIn
+      ) {
         this.lastUpdated = new Date().getTime()
         if (!this.isInitializing) {
           this.isInitializing = true
@@ -83,7 +87,7 @@ export const useRosterStore = defineStore({
       if (!this.isInitializing) await getReasons()
     },
     getRosterById(id: number) {
-      return this.rosters.find(roster => roster.id === id)!
+      return this.rosters.find((roster) => roster.id === id)!
     },
     async saveDate(id: number, date: string) {
       await saveDate(id, date)
@@ -93,6 +97,9 @@ export const useRosterStore = defineStore({
     },
     async updatePublished(id: number, published: boolean) {
       await updatePublished(id, published)
+    },
+    async updateArchived(id: number, published: boolean) {
+      await updateArchived(id, published)
     },
     async saveRoster(id: number, unsavedRoster: Role[]) {
       await saveRoster(id, unsavedRoster)

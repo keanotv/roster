@@ -5,6 +5,8 @@ import { getNextMonth } from '@/utils/unavailability'
 import type { Sunday } from '@/types/unavailability'
 import type { ReasonInsert, UnavailabilityInsert } from '@/types/roster'
 import { getUnavailability } from '@/utils/roster'
+import router from '@/router'
+import { ROUTE_NAMES } from '@/constants/constants'
 
 export const useUnavailabilityStore = defineStore({
   id: 'unavailability',
@@ -18,36 +20,23 @@ export const useUnavailabilityStore = defineStore({
       this.selectedPersonId = id
       this.selectedPersonName = name
       this.initializeNextMonthUnavailability()
+      router.push(ROUTE_NAMES.HOME)
     },
-    async submitUnavailability(unavailableSundays: Sunday[], reason: string) {
-      const unavailabilityRows = [] as UnavailabilityInsert[]
-      const reasonRows = [] as ReasonInsert[]
-      unavailableSundays.forEach((sunday) => {
-        if (reason !== null && reason.length > 0) {
-          unavailabilityRows.push({
-            days: sunday.days,
-            month: sunday.month,
-            people_id: this.selectedPersonId,
-            year: sunday.year,
-            reason: true
-          })
-          reasonRows.push({
-            month: sunday.month,
-            people_id: this.selectedPersonId,
-            year: sunday.year,
-            text: reason
-          })
-        } else {
-          unavailabilityRows.push({
-            days: sunday.days,
-            month: sunday.month,
-            people_id: this.selectedPersonId,
-            year: sunday.year,
-            reason: sunday.reason
-          })
-        }
-      })
-      await submitUnavailability(unavailabilityRows, reasonRows)
+    async submitUnavailability(sunday: Sunday, reason: string) {
+      const unavailabilityRow: UnavailabilityInsert = {
+        days: sunday.days,
+        month: sunday.month,
+        people_id: this.selectedPersonId,
+        year: sunday.year,
+        reason: !!reason.length
+      }
+      const reasonRow: ReasonInsert = {
+        month: sunday.month,
+        people_id: this.selectedPersonId,
+        year: sunday.year,
+        text: reason
+      }
+      await submitUnavailability(unavailabilityRow, reasonRow)
       await getUnavailability()
     },
     initializeNextMonthUnavailability() {

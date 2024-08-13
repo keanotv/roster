@@ -132,18 +132,43 @@ const removeRoleOrderFromPersonMap = (id: number, order: number) => {
                 v-model="roster.date"
                 type="date"
               />
+              <template #append>
+                <BInputGroupText>
+                  <div @click="() => {
+                    if (previousDate != '') {
+                      roster.date = ''
+                      rosterStore.saveDate(roster.id, roster.date)
+                      previousDate = ''
+                    }
+                  }">
+                    <mdi:clear-outline />
+                  </div>
+                </BInputGroupText>
+              </template>
             </BInputGroup>
           </div>
-          <div class="place-items-center flex">
-            <span class="ml-3 mr-2 font-bold text-sm">LIVE</span>
-            <BFormCheckbox
-              class="mb-1"
-              v-model="roster.published"
-              :disabled="roster.date === null"
-              switch
-              @click="rosterStore.updatePublished(roster.id, !roster.published)"
-            />
-          </div>
+        </div>
+        <div class="my-3 flex justify-between">
+            <div class="flex place-items-center">
+              <span class="ml-1 mr-2 font-bold text-sm">LIVE</span>
+              <BFormCheckbox
+                class="mb-1"
+                v-model="roster.published"
+                :disabled="roster.date === null"
+                switch
+                @click="rosterStore.updatePublished(roster.id, !roster.published)"
+              />
+            </div>
+            <div class="flex place-items-center">
+              <span class="ml-3 mr-2 font-bold text-sm">ARCHIVE</span>
+              <BFormCheckbox
+                class="mb-1"
+                v-model="roster.archived"
+                :disabled="roster.date === null || !roster.published"
+                switch
+                @click="rosterStore.updateArchived(roster.id, !roster.archived)"
+              />
+            </div>
         </div>
         <div class="my-2">
           <BButtonToolbar class="justify-between">

@@ -105,21 +105,45 @@ export const getSundaysInNextMonth = (): Sunday => {
 }
 
 export const submitUnavailability = async (
-  unavailability: UnavailabilityInsert[],
-  reasons: ReasonInsert[]
+  unavailability: UnavailabilityInsert,
+  reason: ReasonInsert
 ) => {
   const globalToast = useGlobalToast()
-  const emptyUnavailability: UnavailabilityInsert[] = unavailability.filter(
-    (ua) => ua.days.length === 0
-  )
-  const responses = await Promise.all([
-    supabase
-      .from('unavailability')
-      .upsert(unavailability.filter((ua) => ua.days.length > 0)),
-    supabase.from('reason').upsert(reasons)
-  ])
+  let response
+  if (unavailability.days.length === 0) {
+    response = await Promise.all([
+      await supabase
+        .from('unavailability')
+        .delete()
+        .eq('year', unavailability.year)
+        .eq('month', unavailability.month)
+        .eq('people_id', unavailability.people_id),
+      await supabase
+        .from('reason')
+        .delete()
+        .eq('year', unavailability.year)
+        .eq('month', unavailability.month)
+        .eq('people_id', unavailability.people_id)
+    ])
+  } else {
+    response = await Promise.all([
+      await supabase
+        .from('unavailability')
+        .upsert(unavailability)
+        .eq('year', unavailability.year)
+        .eq('month', unavailability.month)
+        .eq('people_id', unavailability.people_id),
+      await supabase
+        .from('reason')
+        .upsert(reason)
+        .eq('year', unavailability.year)
+        .eq('month', unavailability.month)
+        .eq('people_id', unavailability.people_id)
+    ])
+  }
+
   if (
-    responses.some((response) => {
+    response.some((response) => {
       response.error !== null
     })
   ) {
@@ -127,21 +151,7 @@ export const submitUnavailability = async (
     globalToast.error('Error submitting :( Please try again')
     return false
   } else {
-    globalToast.success('Thanks for submitting!')
-    emptyUnavailability.forEach(async (eua) => {
-      await supabase
-        .from('unavailability')
-        .delete()
-        .eq('year', eua.year)
-        .eq('month', eua.month)
-        .eq('people_id', eua.people_id)
-      await supabase
-        .from('reason')
-        .delete()
-        .eq('year', eua.year)
-        .eq('month', eua.month)
-        .eq('people_id', eua.people_id)
-    })
+    globalToast.success('Submitted successfully!')
     return true
   }
 }

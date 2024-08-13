@@ -7,9 +7,9 @@ const viewPath = path(ROUTE_NAMES.ROSTER) + path(ROSTER_ROUTE_NAMES.VIEW)
 </script>
 
 <template>
-  <div class="my-8 mx-4">
+  <div id="view-rosters" class="my-8 mx-4">
     <h1 class="my-3 text-center">Rosters</h1>
-    <BTableSimple hover responsive class="min-w-[80vw]">
+    <BTableSimple hover responsive class="min-w-[320px]">
       <colgroup>
         <col />
         <col />
@@ -44,5 +44,11 @@ const viewPath = path(ROUTE_NAMES.ROSTER) + path(ROSTER_ROUTE_NAMES.VIEW)
 <style scoped>
 th {
   font-weight: bold;
+}
+
+#view-rosters {
+  @media (min-width: 600px) {
+    width: 600px;
+  }
 }
 </style>

@@ -62,10 +62,11 @@ h1 {
   flex-wrap: nowrap;
   max-width: calc(100vw - 3rem);
   overflow-x: scroll;
+  overflow-y: hidden;
 }
 
 .nav-link {
-  width: 80px;
+  width: 81.5px;
   padding: 0.5rem 0.25rem 0.5rem 0.25rem;
   overflow-y: hidden;
 
@@ -85,4 +86,16 @@ h1 {
 
 .card {
   border-radius: 0;
+}
+
+.form-check-input:hover {
+  cursor: pointer;
+}
+
+.tooltip {
+  width: 150px;
+}
+
+.tooltip-inner {
+  text-align: left;
 }

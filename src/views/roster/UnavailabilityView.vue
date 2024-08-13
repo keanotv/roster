@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { useRosterStore } from '@/stores/roster'
 import {
-  getSundaysInNextMonth,
   getSundaysInNextTwoMonths,
   MONTHS
 } from '@/utils/unavailability'

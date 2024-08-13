@@ -129,13 +129,6 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
-span.prompt {
-  margin-top: 1rem;
-  display: flex;
-  position: relative;
-  color: var(--color-highlighted-text);
-}
-
 ::-webkit-scrollbar {
   display: none;
 }

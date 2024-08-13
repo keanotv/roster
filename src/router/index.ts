@@ -3,6 +3,8 @@ import HomeView from '@/views/HomeView.vue'
 import LoginView from '@/views/LoginView.vue'
 import NewRosterView from '@/views/roster/NewRosterView.vue'
 import RosterView from '@/views/roster/RosterView.vue'
+import PeopleView from '@/views/admin/PeopleView.vue'
+import NameSelectionView from '@/views/NameSelectionView.vue'
 import UnavailableDatesView from '@/views/UnavailableDatesView.vue'
 import ViewRostersView from '@/views/roster/ViewRostersView.vue'
 import {
@@ -11,7 +13,8 @@ import {
   DEFAULT_TITLE,
   ROSTER_ROUTE_NAMES,
   hyphenate,
-  UNAVAILABILITY_ROUTE_NAMES
+  UNAVAILABILITY_ROUTE_NAMES,
+  ADMIN_ROUTE_NAMES
 } from '@/constants/constants'
 
 const router = createRouter({
@@ -22,7 +25,17 @@ const router = createRouter({
       name: ROUTE_NAMES.HOME,
       component: HomeView,
       meta: {
-        title: 'BCM Roster'
+        title: 'BCM Roster',
+        requiresAuth: true
+      }
+    },
+    {
+      path: path(ROUTE_NAMES.NAME),
+      name: ROUTE_NAMES.NAME,
+      component: NameSelectionView,
+      meta: {
+        title: 'Who are you?',
+        requiresAuth: true
       }
     },
     {
@@ -30,13 +43,18 @@ const router = createRouter({
       children: [
         {
           path: UNAVAILABILITY_ROUTE_NAMES.VIEW,
-          component: UnavailabilityView
+          component: UnavailabilityView,
+          meta: {
+            requiresAuth: true,
+            requiresAdmin: true
+          }
         },
         {
           path: '',
           name: ROUTE_NAMES.UNAVAILABILITY,
           meta: {
-            title: 'Unavailable Dates'
+            title: 'Unavailable Dates',
+            requiresAuth: true
           },
           component: UnavailableDatesView
         }
@@ -51,6 +69,20 @@ const router = createRouter({
       }
     },
     {
+      path: path(ROUTE_NAMES.ADMIN),
+      children: [
+        {
+          path: ADMIN_ROUTE_NAMES.PEOPLE,
+          name: ADMIN_ROUTE_NAMES.PEOPLE,
+          component: PeopleView,
+          meta: {
+            requiresAuth: true,
+            requiresAdmin: true
+          }
+        }
+      ]
+    },
+    {
       path: path(ROUTE_NAMES.ROSTER),
       children: [
         { path: ROSTER_ROUTE_NAMES.NEW, component: NewRosterView },
@@ -62,11 +94,19 @@ const router = createRouter({
               path: ':id(\\d+)',
               name: hyphenate([ROUTE_NAMES.ROSTER, ROSTER_ROUTE_NAMES.VIEW]),
               component: RosterView,
+              meta: {
+                requiresAuth: true,
+                requiresAdmin: true
+              },
               props: true
             },
             {
               path: '',
-              component: ViewRostersView
+              component: ViewRostersView,
+              meta: {
+                requiresAuth: true,
+                requiresAdmin: true
+              }
             }
           ]
         }
@@ -111,9 +151,18 @@ router.beforeEach(async (to, from, next) => {
     if (to.meta.requiresAuth) {
       if (!userStore.isLoggedIn) {
         globalToast.info('Log in to view requested page')
-        next({ name: ROUTE_NAMES.HOME })
+        next({ name: ROUTE_NAMES.LOGIN })
       } else {
-        next()
+        if (to.meta.requiresAdmin) {
+          if (!userStore.role.some((role) => role === USER_ROLES.ADMIN)) {
+            globalToast.info('Sorry, admins only!')
+            next({ name: ROUTE_NAMES.HOME })
+          } else {
+            next()
+          }
+        } else {
+          next()
+        }
       }
     } else {
       next()

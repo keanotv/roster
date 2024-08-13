@@ -5,6 +5,7 @@ import router from '@/router'
 import { ROUTE_NAMES } from '@/constants/constants'
 import { USER_ROLES, useUserStore } from '@/stores/user'
 import { useRosterStore } from '@/stores/roster'
+import { useUnavailabilityStore } from '@/stores/unavailability'
 
 export const supabase = createClient<Database>(
   import.meta.env.VITE_SUPABASE_URL,
@@ -44,17 +45,17 @@ export const login = async (password: string) => {
         // some error handling
         globalToast.error('Please try again later :(')
       } else {
-        globalToast.success(loginData.message)
         const userStore = useUserStore()
         userStore.isLoggedIn = true
         userStore.role.push(USER_ROLES.SERVER)
         if (loginData.role === USER_ROLES.ADMIN) {
           userStore.role.push(USER_ROLES.ADMIN)
+          globalToast.success(loginData.message)
         }
         const rosterStore = useRosterStore()
         rosterStore.lastUpdated = 0
         rosterStore.initializeRosterStore()
-        router.push(ROUTE_NAMES.HOME)
+        router.push(ROUTE_NAMES.NAME)
       }
     } else if (loginData.error) {
       globalToast.error(loginData.error.message)
@@ -65,16 +66,23 @@ export const login = async (password: string) => {
 export const logout = async () => {
   const { error } = await supabase.auth.signOut()
   const globalToast = useGlobalToast()
+  const userStore = useUserStore()
+  const rosterStore = useRosterStore()
+  const unavailabilityStore = useUnavailabilityStore()
   if (error) {
     // some error handling
     globalToast.error('Error logging out')
-  } else {
-    globalToast.success('Logged out successfully!')
-    const userStore = useUserStore()
     userStore.isLoggedIn = false
     userStore.role = []
-    const rosterStore = useRosterStore()
     rosterStore.clearStore()
+    unavailabilityStore.selectPerson(0, '')
+    router.push(ROUTE_NAMES.LOGIN)
+  } else {
+    globalToast.success('Logged out successfully!')
+    userStore.isLoggedIn = false
+    userStore.role = []
+    rosterStore.clearStore()
+    unavailabilityStore.selectPerson(0, '')
     router.push(ROUTE_NAMES.LOGIN)
   }
 }

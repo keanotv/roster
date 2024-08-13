@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { useUserStore } from '@/stores/user'
-import { onMounted, ref } from 'vue'
+import { ref } from 'vue'
 const userStore = useUserStore()
 
 const handleSubmitPassword = async () => {
@@ -11,11 +11,6 @@ const handleSubmitPassword = async () => {
 
 const password = ref('')
 const isLoggingIn = ref(false)
-
-onMounted(() => {
-  password.value = ''
-  document.getElementById('password')!.focus()
-})
 </script>
 
 <template>
@@ -27,7 +22,12 @@ onMounted(() => {
           class="flex mt-4 mb-2 gap-2"
           @submit.prevent="handleSubmitPassword"
         >
-          <BInput id="password" type="password" v-model.lazy="password" :disabled="isLoggingIn" />
+          <BInput
+            id="password"
+            type="password"
+            v-model.lazy="password"
+            :disabled="isLoggingIn"
+          />
           <BButton type="submit" :disabled="isLoggingIn">Enter</BButton>
         </BForm>
         <p class="text-center">Please enter password to proceed</p>
