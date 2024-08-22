@@ -81,8 +81,16 @@ watchEffect(() => {
                             "
                           >
                             <p>
-                              {{ slot.segments ? slot.segments + ': ' : '' }}
-                              {{ slot.name ? slot.name : '-' }}
+                              {{
+                                slot.segments && slot.name
+                                  ? slot.segments + ': ' + slot.name
+                                  : slot.segments && !slot.name
+                                  ? slot.segments
+                                  : slot.name
+                                  ? slot.name
+                                  : '-'
+                              }}
+                              <!-- {{ slot.name ? slot.name : '-' }} -->
                             </p>
                           </BListGroupItem>
                         </template>

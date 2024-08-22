@@ -1,14 +1,13 @@
 <script setup lang="ts">
 import { useRosterStore } from '@/stores/roster'
 import { useUnavailabilityStore } from '@/stores/unavailability'
+import { USER_ROLES, useUserStore } from '@/stores/user'
 import type { Sunday } from '@/types/unavailability'
 import { MONTHS, getSundaysInNextMonth } from '@/utils/unavailability'
-import { ref } from 'vue'
+import { ref, watchEffect } from 'vue'
 
 const rosterStore = useRosterStore()
-
-const show = ref(false)
-
+const userStore = useUserStore()
 const unavailableSundays = ref([] as Sunday[])
 await rosterStore.getUnavailability()
 const unavailabilityStore = useUnavailabilityStore()
@@ -32,6 +31,15 @@ const submitUnavailability = async () => {
   isSubmitting.value = false
   confirmation.value = false
 }
+
+const today = new Date()
+const isWithinCutOffDate = today.getDate() > 0 && today.getDate() < 16
+
+const disabled = ref(false)
+watchEffect(() => {
+  disabled.value = !isWithinCutOffDate && !userStore.role.some(role => role === USER_ROLES.ADMIN)
+  updateUnavailableSundays()
+})
 </script>
 
 <template>
@@ -64,47 +72,55 @@ const submitUnavailability = async () => {
         :id="index.toString()"
         v-model="unavailableSundays[index].days"
         :options="sunday.days"
+        :disabled="disabled"
         button-variant="outline-dark"
         size="lg"
         buttons
       >
       </BFormCheckboxGroup>
-      <p class="mt-2 text-sm">Reason:</p>
-      <BFormInput
-        v-model="reason"
-        :disabled="!unavailableSundays[index].days.length"
-        :placeholder="
-          !unavailableSundays[index].days.length
-            ? 'Not required'
-            : unavailableSundays[index].reason
-            ? 'Not required as already submitted'
-            : 'Not submitted yet'
-        "
-      />
-      <template v-if="unavailableSundays[index].reason && reason.length"
-        ><span class="text-xs text-orange-500"
-          >*overwriting previously submitted reason</span
-        ></template
-      >
-      <template
-        v-else-if="
-          !unavailableSundays[index].reason &&
-          unavailableSundays[index].days.length &&
-          !reason.length
-        "
-      >
-        <span class="text-xs text-orange-500">*please enter reason</span>
+      <template v-if="!disabled">
+        <p class="mt-2 text-sm">Reason:</p>
+        <BFormInput
+          v-model="reason"
+          :disabled="
+            !unavailableSundays[index].days.length || disabled
+          "
+          :placeholder="
+            !unavailableSundays[index].days.length
+              ? 'Not required'
+              : unavailableSundays[index].reason
+              ? 'Not required as already submitted'
+              : 'Not submitted yet'
+          "
+        />
+        <template v-if="unavailableSundays[index].reason && reason.length"
+          ><span class="text-xs text-orange-500"
+            >*overwriting previously submitted reason</span
+          ></template
+        >
+        <template
+          v-else-if="
+            !unavailableSundays[index].reason &&
+            unavailableSundays[index].days.length &&
+            !reason.length
+          "
+        >
+          <span class="text-xs text-orange-500">*please enter reason</span>
+        </template>
+        <br />
+        <BButton
+          @click.prevent="confirmation = true"
+          :disabled="isSubmitting || disabled"
+          class="mt-2"
+          :pressed="false"
+          variant="success"
+          >Submit</BButton
+        >
       </template>
-      <br />
+      <template v-else>
+        <p class="text-xs my-3 text-orange-500">Past cut-off date for submission! Please let Chanel or Flynn know if you would like to change unavailable dates.</p>
+      </template>
     </template>
-    <BButton
-      @click.prevent="confirmation = true"
-      :disabled="isSubmitting"
-      class="mt-2"
-      :pressed="false"
-      variant="success"
-      >Submit</BButton
-    >
     <BModal centered hide-footer hide-header v-model="confirmation">
       <p>
         Thank you for serving, {{ unavailabilityStore.selectedPersonName }}!

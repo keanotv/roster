@@ -46,6 +46,7 @@ declare module 'vue' {
     'LineMd:plus': typeof import('~icons/line-md/plus')['default']
     'LineMd:sunnyOutlineTwotone': typeof import('~icons/line-md/sunny-outline-twotone')['default']
     LoadingScreen: typeof import('./src/components/loaders/LoadingScreen.vue')['default']
+    'MaterialSymbols:deleteOutline': typeof import('~icons/material-symbols/delete-outline')['default']
     'Mdi:clearOutline': typeof import('~icons/mdi/clear-outline')['default']
     MenuToggle: typeof import('./src/components/common/MenuToggle.vue')['default']
     PublishedRoster: typeof import('./src/components/roster/PublishedRoster.vue')['default']

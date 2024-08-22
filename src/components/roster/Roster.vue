@@ -32,12 +32,6 @@ if (roster.value !== undefined) {
   previousDate.value = roster.value.date || ''
 }
 
-watchEffect(async () => {
-  if (roster.value.id !== props.id) {
-    roster.value = rosterStore.getRosterById(props.id)
-  }
-})
-
 const confirmation = ref(false)
 const action = ref(ACTIONS.SAVE)
 const prompt = ref('')
@@ -103,6 +97,24 @@ const addRoleOrderToPersonMap = (id: number, order: number) => {
 const removeRoleOrderFromPersonMap = (id: number, order: number) => {
   personToRoleOrderMap.value.get(id)?.delete(order)
 }
+
+
+watchEffect(async () => {
+  if (roster.value.id !== props.id) {
+    roster.value = rosterStore.getRosterById(props.id)
+    personToRoleOrderMap.value = new Map<number, Set<number>>()
+      rosterStore.people.forEach(person => {
+    personToRoleOrderMap.value.set(person.id, new Set<number>())
+  })
+  roster.value.unsavedRoster?.forEach(role => {
+    role.services.forEach(service => {
+      service.slot.forEach(slot => {
+        personToRoleOrderMap.value.get(slot.id)?.add(role.order)
+      })
+    })
+  })
+  }
+})
 </script>
 
 <template>
@@ -257,7 +269,7 @@ const removeRoleOrderFromPersonMap = (id: number, order: number) => {
           cols-xxl="5"
           style="--bs-gutter-x: 0"
         >
-          <template v-for="role in roster.unsavedRoster" :key="role.title">
+          <template v-for="role, index in roster.unsavedRoster" :key="index">
             <BCol
               style="
                 border: 1px solid currentColor;
@@ -266,7 +278,10 @@ const removeRoleOrderFromPersonMap = (id: number, order: number) => {
               "
               class="p-2"
             >
-              <p class="font-bold text-lg text-center">{{ role.title }}</p>
+            <div class="mb-3 flex justify-between">
+              <BInput class="font-bold text-lg text-center w-100" v-model="role.title" />
+              <BButton variant="danger" class="px-1.5 ml-2"><material-symbols:delete-outline class="my-auto w-6 h-6" /></BButton>
+            </div>
               <BContainer style="--bs-gutter-x: 0">
                 <template v-for="service in role.services">
                   <div>
@@ -313,7 +328,7 @@ const removeRoleOrderFromPersonMap = (id: number, order: number) => {
                           <div class="flex my-1">
                             <BInput
                               v-model="slot.segments"
-                              class="w-14 mr-2 px-1 text-center uppercase"
+                              class="w-14 mr-2 px-1 text-center"
                             />
                             <BCol>
                               <BDropdown

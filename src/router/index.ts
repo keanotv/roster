@@ -7,6 +7,7 @@ import PeopleView from '@/views/admin/PeopleView.vue'
 import NameSelectionView from '@/views/NameSelectionView.vue'
 import UnavailableDatesView from '@/views/UnavailableDatesView.vue'
 import ViewRostersView from '@/views/roster/ViewRostersView.vue'
+import UnavailabilityView from '@/views/roster/UnavailabilityView.vue'
 import {
   path,
   ROUTE_NAMES,
@@ -137,7 +138,6 @@ import { useGlobalToast } from '@/utils/toast'
 import { nextTick } from 'vue'
 import { USER_ROLES, useUserStore } from '@/stores/user'
 import { getRosterById } from '@/utils/roster'
-import UnavailabilityView from '@/views/roster/UnavailabilityView.vue'
 
 const globalToast = useGlobalToast()
 

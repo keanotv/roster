@@ -19,7 +19,7 @@ const seeAll = ref(false)
       <BTabs>
       <template
         v-for="publishedRoster in rosterStore.rosters.filter(
-          (roster) => roster.published
+          (roster) => roster.published && !roster.archived
         )"
         :key="publishedRoster.id"
       >
