@@ -10,7 +10,7 @@ import {
 import router from '@/router'
 import { useRosterStore } from '@/stores/roster'
 import { SlotImpl } from '@/types/roster'
-import { createNewRosterWithTitleAndRosterData, getRosterById, refreshUnavailabilityByDateList } from '@/utils/roster'
+import { createNewRole, createNewRosterWithTitleAndRosterData, getRosterById, refreshUnavailabilityByDateList } from '@/utils/roster'
 import { onMounted, ref, watchEffect } from 'vue'
 const props = defineProps<{
   id: number
@@ -35,7 +35,11 @@ if (roster.value !== undefined) {
 const confirmation = ref(false)
 const action = ref(ACTIONS.SAVE)
 const prompt = ref('')
-const roleActionedOnTitle = ref('')
+const roleActionedOnOrder = ref(-1)
+
+const handleAddNewRole = () => {
+  roster.value.unsavedRoster?.push(createNewRole(roster.value.unsavedRoster!.length + 1))
+}
 
 const rosterAction = async () => {
   switch (action.value) {
@@ -72,8 +76,9 @@ const rosterAction = async () => {
       })
       break
     case ACTIONS.DELETE_ROLE:
-      roster.value.unsavedRoster = roster.value.unsavedRoster!.filter(role => role.title != roleActionedOnTitle.value)
-      roleActionedOnTitle.value = ''
+      roster.value.unsavedRoster = roster.value.unsavedRoster!.filter(role => role.order != roleActionedOnOrder.value)
+      roleActionedOnOrder.value = -1
+      resetOrder()
       break
     default:
       console.log('Action not found for ' + action.value)
@@ -103,6 +108,13 @@ const removeRoleOrderFromPersonMap = (id: number, order: number) => {
   personToRoleOrderMap.value.get(id)?.delete(order)
 }
 
+const resetOrder = () => {
+  let order = 1
+  roster.value.unsavedRoster?.forEach(role => {
+    role.order = order
+    order++
+  })
+}
 
 watchEffect(async () => {
   if (roster.value.id !== props.id) {
@@ -275,32 +287,28 @@ watchEffect(async () => {
               <template v-if="index != 0">
                 <BButton @click.prevent="
                   () => {
-                    const tempOrder = roster.unsavedRoster![index].order
-                    roster.unsavedRoster![index].order = roster.unsavedRoster![index - 1].order
-                    roster.unsavedRoster![index - 1].order = tempOrder
                     const temp = roster.unsavedRoster![index]
                     roster.unsavedRoster![index] = roster.unsavedRoster![index - 1]
                     roster.unsavedRoster![index - 1] = temp
-                  }" class="border-none px-1 mr-1"><line-md:arrow-left class="my-auto w-5 h-5" /></BButton>
+                    resetOrder()
+                  }" class="border-none px-0.5 mr-0.5"><line-md:chevron-left class="my-auto w-6 h-6" /></BButton>
               </template>
               <BInput class="font-bold text-md text-center w-100 mx-0.5 px-0" v-model="role.title" />
               <BButton @click.prevent="
                   () => {
                     action = ACTIONS.DELETE_ROLE
                     prompt = PROMPT_MAP.get(action)!.concat(role.title)
-                    roleActionedOnTitle = role.title
+                    roleActionedOnOrder = role.order
                     confirmation = true
-                  }" variant="danger" class="px-1.5 mx-1"><material-symbols:delete-outline class="my-auto w-6 h-6" /></BButton>
+                  }" variant="danger" class="px-1 mx-0.5"><material-symbols:delete-outline class="my-auto w-5 h-5" /></BButton>
                 <template v-if="index != (roster.unsavedRoster!.length! - 1)">
                 <BButton @click.prevent="
                   () => {
-                    const tempOrder = roster.unsavedRoster![index].order
-                    roster.unsavedRoster![index].order = roster.unsavedRoster![index + 1].order
-                    roster.unsavedRoster![index + 1].order = tempOrder
                     const temp = roster.unsavedRoster![index]
                     roster.unsavedRoster![index] = roster.unsavedRoster![index + 1]
                     roster.unsavedRoster![index + 1] = temp
-                  }" class="border-none px-1 ml-1"><line-md:arrow-right class="my-auto w-5 h-5" /></BButton>
+                    resetOrder()
+                  }" class="border-none px-0.5 ml-0.5"><line-md:chevron-right class="my-auto w-6 h-6" /></BButton>
               </template>
             </div>
               <BContainer style="--bs-gutter-x: 0">
@@ -409,6 +417,14 @@ watchEffect(async () => {
                     </BRow>
                   </div>
                 </template>
+                <div class="w-100 flex justify-end">
+                  <BButton
+                    v-if="index == (roster.unsavedRoster!.length! - 1)"
+                    @click.prevent="handleAddNewRole"
+                    variant="primary"
+                    >Add Role</BButton
+                  >
+                </div>
               </BContainer>
             </BCol>
           </template>

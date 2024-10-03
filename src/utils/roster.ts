@@ -54,6 +54,23 @@ export const createNewRosterWithTitleAndRosterData = async (
   }
 }
 
+export const createNewRole = (order: number): Role => {
+  const rosterStore = useRosterStore()
+  const services = [] as ServiceImpl[]
+  for (let i = 0; i < rosterStore.services; i++) {
+    const service = new ServiceImpl(i + 1, [
+      {
+        order: 0,
+        segments: '',
+        name: '',
+        id: 0
+      }
+    ] as Slot[])
+    services.push(service)
+  }
+  return new RoleImpl(order, services, '<new role>')
+}
+
 export const initializeNewRoster = async (
   title: string
 ): Promise<RosterRow | null> => {
