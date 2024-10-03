@@ -31,6 +31,7 @@ const blurInput = () => {
     </p>
     <div class="mt-3 w-40" @click="focusInput">
       <BDropdown
+        no-flip
         v-model="show"
         :text="unavailabilityStore.selectedPersonName"
         :variant="

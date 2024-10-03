@@ -362,6 +362,7 @@ watchEffect(async () => {
                             <BCol>
                               <BDropdown
                                 lazy
+                                no-flip
                                 :text="slot.name"
                                 :variant="
                                       rosterStore.unavailabilityByDate[0]
