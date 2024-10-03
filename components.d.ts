@@ -41,6 +41,8 @@ declare module 'vue' {
     DirectionalShadow: typeof import('./src/components/common/DirectionalShadow.vue')['default']
     Legend: typeof import('./src/components/roster/Legend.vue')['default']
     'LineMd:accountAdd': typeof import('~icons/line-md/account-add')['default']
+    'LineMd:arrowLeft': typeof import('~icons/line-md/arrow-left')['default']
+    'LineMd:arrowRight': typeof import('~icons/line-md/arrow-right')['default']
     'LineMd:closeToMenuTransition': typeof import('~icons/line-md/close-to-menu-transition')['default']
     'LineMd:editTwotoneFull': typeof import('~icons/line-md/edit-twotone-full')['default']
     'LineMd:menuToCloseTransition': typeof import('~icons/line-md/menu-to-close-transition')['default']

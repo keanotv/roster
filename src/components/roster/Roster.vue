@@ -35,6 +35,7 @@ if (roster.value !== undefined) {
 const confirmation = ref(false)
 const action = ref(ACTIONS.SAVE)
 const prompt = ref('')
+const roleActionedOnTitle = ref('')
 
 const rosterAction = async () => {
   switch (action.value) {
@@ -69,6 +70,10 @@ const rosterAction = async () => {
       await rosterStore.deleteRoster(roster.value.id).then(() => {
         router.push(path(ROUTE_NAMES.ROSTER) + path(ROSTER_ROUTE_NAMES.VIEW))
       })
+      break
+    case ACTIONS.DELETE_ROLE:
+      roster.value.unsavedRoster = roster.value.unsavedRoster!.filter(role => role.title != roleActionedOnTitle.value)
+      roleActionedOnTitle.value = ''
       break
     default:
       console.log('Action not found for ' + action.value)
@@ -246,18 +251,6 @@ watchEffect(async () => {
               </BButtonGroup>
             </div>
           </BButtonToolbar>
-          <BModal centered hide-footer hide-header v-model="confirmation">
-            <p class="text-justify">{{ prompt }}</p>
-            <div class="mt-4 flex justify-between">
-              <BButton
-                @click.prevent="rosterAction"
-                variant="primary"
-                class="capitalize"
-                >{{ action }}</BButton
-              >
-              <BButton @click.prevent="confirmation = false">Cancel</BButton>
-            </div>
-          </BModal>
         </div>
       </BContainer>
       <BContainer class="my-4" style="--bs-gutter-x: 0">
@@ -279,8 +272,36 @@ watchEffect(async () => {
               class="p-2"
             >
             <div class="mb-3 flex justify-between">
-              <BInput class="font-bold text-lg text-center w-100" v-model="role.title" />
-              <BButton variant="danger" class="px-1.5 ml-2"><material-symbols:delete-outline class="my-auto w-6 h-6" /></BButton>
+              <template v-if="index != 0">
+                <BButton @click.prevent="
+                  () => {
+                    const tempOrder = roster.unsavedRoster![index].order
+                    roster.unsavedRoster![index].order = roster.unsavedRoster![index - 1].order
+                    roster.unsavedRoster![index - 1].order = tempOrder
+                    const temp = roster.unsavedRoster![index]
+                    roster.unsavedRoster![index] = roster.unsavedRoster![index - 1]
+                    roster.unsavedRoster![index - 1] = temp
+                  }" class="border-none px-1 mr-1"><line-md:arrow-left class="my-auto w-5 h-5" /></BButton>
+              </template>
+              <BInput class="font-bold text-md text-center w-100 mx-0.5 px-0" v-model="role.title" />
+              <BButton @click.prevent="
+                  () => {
+                    action = ACTIONS.DELETE_ROLE
+                    prompt = PROMPT_MAP.get(action)!.concat(role.title)
+                    roleActionedOnTitle = role.title
+                    confirmation = true
+                  }" variant="danger" class="px-1.5 mx-1"><material-symbols:delete-outline class="my-auto w-6 h-6" /></BButton>
+                <template v-if="index != (roster.unsavedRoster!.length! - 1)">
+                <BButton @click.prevent="
+                  () => {
+                    const tempOrder = roster.unsavedRoster![index].order
+                    roster.unsavedRoster![index].order = roster.unsavedRoster![index + 1].order
+                    roster.unsavedRoster![index + 1].order = tempOrder
+                    const temp = roster.unsavedRoster![index]
+                    roster.unsavedRoster![index] = roster.unsavedRoster![index + 1]
+                    roster.unsavedRoster![index + 1] = temp
+                  }" class="border-none px-1 ml-1"><line-md:arrow-right class="my-auto w-5 h-5" /></BButton>
+              </template>
             </div>
               <BContainer style="--bs-gutter-x: 0">
                 <template v-for="service in role.services">
@@ -401,5 +422,17 @@ watchEffect(async () => {
     <template v-else>
       <div>Roster does not exist!</div>
     </template>
+    <BModal centered hide-footer hide-header v-model="confirmation">
+      <p class="text-justify">{{ prompt }}</p>
+      <div class="mt-4 flex justify-between">
+        <BButton
+          @click.prevent="rosterAction"
+          variant="primary"
+          class="capitalize"
+          >{{ action }}</BButton
+        >
+        <BButton @click.prevent="confirmation = false">Cancel</BButton>
+      </div>
+    </BModal>
   </div>
 </template>

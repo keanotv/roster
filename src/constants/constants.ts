@@ -26,7 +26,8 @@ export const enum ACTIONS {
   SAVE = 'save',
   COPY = 'copy',
   SYNC = 'sync',
-  DELETE = 'delete'
+  DELETE = 'delete',
+  DELETE_ROLE = 'delete role'
 }
 
 export const enum ADMIN_ROUTE_NAMES {
@@ -56,7 +57,8 @@ export const PROMPT_MAP = new Map<ACTIONS,string>([
   [ACTIONS.SAVE, 'By clicking \'save\', you will overwrite what has been saved in the database. Please remember to sync this roster if you plan to edit it on another device, unless you wish to use the version held on that device.'],
   [ACTIONS.COPY, 'By clicking \'copy\', you will create a copy of this roster in your current view.'],
   [ACTIONS.SYNC, 'By clicking \'sync\', you will reset this roster to the version in the database.'],
-  [ACTIONS.DELETE, 'By clicking \'delete\', you will delete this roster from the database and it will not be retrievable.']
+  [ACTIONS.DELETE, 'By clicking \'delete\', you will delete this roster from the database and it will not be retrievable.'],
+  [ACTIONS.DELETE_ROLE, 'By clicking \'delete role\', you will delete this role from the roster: ']
 ])
 
 export const path = (name: string) => {
