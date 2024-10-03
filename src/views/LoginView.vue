@@ -6,6 +6,9 @@ const userStore = useUserStore()
 const handleSubmitPassword = async () => {
   isLoggingIn.value = true
   await userStore.login(password.value)
+  if (userStore.isLoggedIn) {
+    password.value = ''
+  }
   isLoggingIn.value = false
 }
 

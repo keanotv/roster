@@ -37,8 +37,9 @@ const action = ref(ACTIONS.SAVE)
 const prompt = ref('')
 const roleActionedOnOrder = ref(-1)
 
-const handleAddNewRole = () => {
-  roster.value.unsavedRoster?.push(createNewRole(roster.value.unsavedRoster!.length + 1))
+const handleAddNewRole = (order: number) => {
+  roster.value.unsavedRoster?.splice(order, 0, createNewRole())
+  resetOrder()
 }
 
 const rosterAction = async () => {
@@ -418,12 +419,16 @@ watchEffect(async () => {
                     </BRow>
                   </div>
                 </template>
-                <div class="w-100 flex justify-end">
+                <div class="w-100 flex justify-between">
                   <BButton
-                    v-if="index == (roster.unsavedRoster!.length! - 1)"
-                    @click.prevent="handleAddNewRole"
-                    variant="primary"
-                    >Add Role</BButton
+                    @click.prevent="() => handleAddNewRole(role.order - 1)"
+                    class="border-none pl-1 pr-1.5"
+                    ><line-md:chevron-left class="my-auto w-6 h-6 inline" /><line-md:plus-circle class="my-auto w-6 h-6 inline" /></BButton
+                  >
+                  <BButton
+                    @click.prevent="() => handleAddNewRole(role.order)"
+                    class="border-none pl-1.5 pr-1"
+                    ><line-md:plus-circle class="my-auto w-6 h-6 inline" /><line-md:chevron-right class="my-auto w-6 h-6 inline" /></BButton
                   >
                 </div>
               </BContainer>

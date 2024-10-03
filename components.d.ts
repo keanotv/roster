@@ -48,6 +48,7 @@ declare module 'vue' {
     'LineMd:menuToCloseTransition': typeof import('~icons/line-md/menu-to-close-transition')['default']
     'LineMd:minus': typeof import('~icons/line-md/minus')['default']
     'LineMd:plus': typeof import('~icons/line-md/plus')['default']
+    'LineMd:plusCircle': typeof import('~icons/line-md/plus-circle')['default']
     'LineMd:sunnyOutlineTwotone': typeof import('~icons/line-md/sunny-outline-twotone')['default']
     LoadingScreen: typeof import('./src/components/loaders/LoadingScreen.vue')['default']
     'MaterialSymbols:deleteOutline': typeof import('~icons/material-symbols/delete-outline')['default']

@@ -54,7 +54,7 @@ export const createNewRosterWithTitleAndRosterData = async (
   }
 }
 
-export const createNewRole = (order: number): Role => {
+export const createNewRole = (): Role => {
   const rosterStore = useRosterStore()
   const services = [] as ServiceImpl[]
   for (let i = 0; i < rosterStore.services; i++) {
@@ -68,7 +68,7 @@ export const createNewRole = (order: number): Role => {
     ] as Slot[])
     services.push(service)
   }
-  return new RoleImpl(order, services, '<new role>')
+  return new RoleImpl(0, services, '')
 }
 
 export const initializeNewRoster = async (
@@ -183,8 +183,11 @@ export const getReasons = async () => {
 
 export const getRosterById = async (id: number) => {
   console.log('Fetching roster by id')
-  const globalToast = useGlobalToast()
-  const { data, error } = await supabase.from('roster').select('*').eq('id', id)
+  const { data, error } = await supabase
+    .from('roster')
+    .select('*')
+    .eq('id', id)
+    .limit(1)
   if (error) {
     // some error handling
   } else {
@@ -193,24 +196,24 @@ export const getRosterById = async (id: number) => {
       rosterStore.rosters = rosterStore.rosters.filter(
         (roster) => roster.id !== id
       )
+      const globalToast = useGlobalToast()
       globalToast.warning('Roster not found in database')
-    }
-    data.forEach((rosterRow) => {
+    } else {
       const index = rosterStore.rosters.findIndex(
-        (roster) => roster.id === rosterRow.id
+        (roster) => roster.id === data[0].id
       )
       if (index !== -1) {
         rosterStore.rosters[index] = {
-          ...rosterRow,
+          ...data[0],
           unsavedRoster: rosterStore.rosters[index].unsavedRoster
         }
       } else {
         rosterStore.rosters.push({
-          ...rosterRow,
-          unsavedRoster: JSON.parse(rosterRow.roster!) as Role[]
+          ...data[0],
+          unsavedRoster: JSON.parse(data[0].roster!) as Role[]
         })
       }
-    })
+    }
   }
 }
 
@@ -236,7 +239,7 @@ export const refreshUnavailabilityByDateList = () => {
   const rosterStore = useRosterStore()
   const months = getSundaysInNextTwoMonths()
   rosterStore.unavailabilityByDate = [new Map<string, Set<number>>([])]
-  months.forEach(month => {
+  months.forEach((month) => {
     month.days.forEach((dayOfMonth) => {
       const date = [
         month.year,
@@ -351,6 +354,11 @@ export const saveRoster = async (id: number, unsavedRoster: Role[]) => {
     // some error handling
   } else {
     globalToast.success('Saved updated roster!')
+    const rosterStore = useRosterStore()
+    const roster = rosterStore.rosters.find((roster) => roster.id === id)
+    if (roster != undefined) {
+      roster.roster = JSON.stringify(unsavedRoster)
+    }
   }
 }
 
@@ -406,12 +414,10 @@ export const savePerson = async (
   newName: string
 ): Promise<boolean> => {
   console.log('Saving person')
-  const { error } = await supabase
-    .from('people')
-    .insert({
-      ...person,
-      name: newName
-    })
+  const { error } = await supabase.from('people').insert({
+    ...person,
+    name: newName
+  })
   const globalToast = useGlobalToast()
   if (error) {
     // some error handling
