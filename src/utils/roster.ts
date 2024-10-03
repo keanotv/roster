@@ -9,7 +9,7 @@ import {
 } from '@/types/roster'
 import { supabase } from '@/utils/supabase'
 import { useGlobalToast } from './toast'
-import { getSundaysInNextMonth } from './unavailability'
+import { getSundaysInNextTwoMonths } from './unavailability'
 import { USER_ROLES, useUserStore } from '@/stores/user'
 
 export const createNewRosterWithTitle = async (
@@ -216,15 +216,17 @@ export const getUnavailability = async () => {
 export const refreshUnavailabilityByDateList = () => {
   console.log('Refreshing unavailability by date list')
   const rosterStore = useRosterStore()
-  const month = getSundaysInNextMonth()
+  const months = getSundaysInNextTwoMonths()
   rosterStore.unavailabilityByDate = [new Map<string, Set<number>>([])]
-  month.days.forEach((dayOfMonth) => {
-    const date = [
-      month.year,
-      month.month.toString().length === 1 ? '0' + month.month : month.month,
-      dayOfMonth.toString().length === 1 ? '0' + dayOfMonth : dayOfMonth
-    ].join('-')
-    rosterStore.unavailabilityByDate[0].set(date, new Set<number>())
+  months.forEach(month => {
+    month.days.forEach((dayOfMonth) => {
+      const date = [
+        month.year,
+        month.month.toString().length === 1 ? '0' + month.month : month.month,
+        dayOfMonth.toString().length === 1 ? '0' + dayOfMonth : dayOfMonth
+      ].join('-')
+      rosterStore.unavailabilityByDate[0].set(date, new Set<number>())
+    })
   })
   rosterStore.unavailability.forEach((ua) => {
     ua.days.forEach((dayOfMonth) => {
