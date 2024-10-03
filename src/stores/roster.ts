@@ -4,7 +4,8 @@ import type {
   UnavailabilityRow,
   RosterRowLocal,
   Role,
-  ReasonRow
+  ReasonRow,
+  PeopleInsert
 } from '@/types/roster'
 import {
   createNewRosterWithTitle,
@@ -15,11 +16,12 @@ import {
   getRosters,
   getUnavailability,
   saveDate,
-  savePerson,
+  updatePerson,
   saveRoster,
   saveTitle,
   updateArchived,
-  updatePublished
+  updatePublished,
+  savePerson
 } from '@/utils/roster'
 import { defineStore } from 'pinia'
 import { useUserStore } from '@/stores/user'
@@ -108,7 +110,10 @@ export const useRosterStore = defineStore({
     async deleteRoster(id: number) {
       await deleteRoster(id)
     },
-    async savePerson(person: PeopleRow, newName: string): Promise<boolean> {
+    async updatePerson(person: PeopleRow, newName: string): Promise<boolean> {
+      return await updatePerson(person, newName)
+    },
+    async savePerson(person: PeopleInsert, newName: string): Promise<boolean> {
       return await savePerson(person, newName)
     }
   }

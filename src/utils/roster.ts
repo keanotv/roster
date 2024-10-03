@@ -1,5 +1,6 @@
 import { useRosterStore } from '@/stores/roster'
 import {
+  type PeopleInsert,
   type PeopleRow,
   type Role,
   RoleImpl,
@@ -351,7 +352,7 @@ export const deleteRoster = async (id: number) => {
   }
 }
 
-export const savePerson = async (
+export const updatePerson = async (
   person: PeopleRow,
   newName: string
 ): Promise<boolean> => {
@@ -379,6 +380,30 @@ export const savePerson = async (
     rosterStore.people.sort(function (a, b) {
       return a.name < b.name ? -1 : a.name > b.name ? 1 : 0
     })
+    return true
+  }
+}
+
+export const savePerson = async (
+  person: PeopleInsert,
+  newName: string
+): Promise<boolean> => {
+  console.log('Saving person')
+  const { error } = await supabase
+    .from('people')
+    .insert({
+      ...person,
+      name: newName
+    })
+  const globalToast = useGlobalToast()
+  if (error) {
+    // some error handling
+    globalToast.error('Error adding new member :(')
+    return false
+  } else {
+    globalToast.success('Added new member!')
+    const rosterStore = useRosterStore()
+    rosterStore.getPeople()
     return true
   }
 }

@@ -5,6 +5,7 @@ type Tables = Database['public']['Tables']
 // Static-ish tables
 type PeopleTable = Tables['people']
 export type PeopleRow = PeopleTable['Row']
+export type PeopleInsert = PeopleTable['Insert']
 
 type RoleTable = Tables['role']
 export type RoleRow = RoleTable['Row']
