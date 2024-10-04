@@ -486,3 +486,21 @@ export const saveRole = async (
     return true
   }
 }
+
+export const deleteRole = async (
+  id: number
+): Promise<boolean> => {
+  console.log('Deleting role')
+  const { error } = await supabase.from('role').delete().eq('id', id)
+  const globalToast = useGlobalToast()
+  if (error) {
+    // some error handling
+    globalToast.error('Error deleting role :(')
+    return false
+  } else {
+    globalToast.success('Deleted role!')
+    const rosterStore = useRosterStore()
+    rosterStore.getRoles()
+    return true
+  }
+}

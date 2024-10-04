@@ -57,13 +57,18 @@ const nameSearch = ref('')
       </colgroup>
       <BThead>
         <BTr>
-          <BTh><div class="flex justify-between">
-            <div class="my-auto"><b>Name</b> &nbsp;&nbsp;&nbsp;<BInput
-            placeholder="Search"
-            id="nameSearch"
-            class="inline-block w-28 h-10 mr-1.5"
-            v-model="nameSearch"
-          /></div> <BButton @click.prevent="
+          <BTh
+            ><div class="flex justify-between">
+              <div class="my-auto">
+                <b>Name</b> &nbsp;&nbsp;&nbsp;<BInput
+                  placeholder="Search"
+                  id="nameSearch"
+                  class="inline-block w-28 h-10 mr-1.5"
+                  v-model="nameSearch"
+                />
+              </div>
+              <BButton
+                @click.prevent="
                       () => {
                         newPerson = {
                           active: true,
@@ -71,23 +76,28 @@ const nameSearch = ref('')
                         } as PeopleRow
                         addPerson = true
                       }
-                    " variant="success" class="px-1.5 ml-2 mr-1"><line-md:account-add class="my-auto w-6 h-6"/></BButton>
-          </div></BTh>
+                    "
+                variant="success"
+                class="px-1.5 ml-2 mr-1"
+                ><line-md:account-add class="my-auto w-6 h-6"
+              /></BButton></div
+          ></BTh>
         </BTr>
       </BThead>
       <BTbody>
-        <template v-for="person in rosterStore.people.filter(
-            (person) =>
-              person.name
-                .toLowerCase()
-                .split(' ')
-                .some((subname) =>
-                  nameSearch
-                    .toLowerCase()
-                    .split(' ')
-                    .some((subnamesearch) => subname.startsWith(subnamesearch))
-                )
-          )">
+        <template
+          v-for="person in rosterStore.people.filter((person) =>
+            person.name
+              .toLowerCase()
+              .split(' ')
+              .some((subname) =>
+                nameSearch
+                  .toLowerCase()
+                  .split(' ')
+                  .some((subnamesearch) => subname.startsWith(subnamesearch))
+              )
+          )"
+        >
           <BTr>
             <BTd>
               <div class="flex justify-between">
@@ -180,9 +190,7 @@ const nameSearch = ref('')
         v-model="addPerson"
         no-close-on-backdrop
       >
-        <p>
-          Add new member
-        </p>
+        <p>Add new member</p>
         <hr class="my-2" />
         <div class="flex my-3">
           <p class="my-auto">Name:</p>
@@ -197,18 +205,18 @@ const nameSearch = ref('')
           <BFormCheckbox switch v-model="newPerson.active" />
         </div>
         <span class="text-sm"
-          >This person is {{ newPerson.active ? '' : 'in' }}active. Their
-          name will {{ newPerson.active ? '' : ' not ' }} appear in
-          drop-down lists.</span
+          >This person is {{ newPerson.active ? '' : 'in' }}active. Their name
+          will {{ newPerson.active ? '' : ' not ' }} appear in drop-down
+          lists.</span
         >
         <div class="flex mt-3">
           <p class="mr-2 pt-0.5">Server:</p>
           <BFormCheckbox switch v-model="newPerson.server" />
         </div>
         <span class="text-sm"
-          >This person is {{ newPerson.server ? '' : ' not ' }} a server.
-          Their name will {{ newPerson.server ? '' : ' not ' }} appear in
-          the drop-down list when submitting unavailable dates.</span
+          >This person is {{ newPerson.server ? '' : ' not ' }} a server. Their
+          name will {{ newPerson.server ? '' : ' not ' }} appear in the
+          drop-down list when submitting unavailable dates.</span
         >
         <div class="mt-4 flex justify-between">
           <BButton

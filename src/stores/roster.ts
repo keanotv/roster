@@ -24,7 +24,8 @@ import {
   updatePublished,
   savePerson,
   updateRole,
-  saveRole
+  saveRole,
+  deleteRole
 } from '@/utils/roster'
 import { defineStore } from 'pinia'
 import { useUserStore } from '@/stores/user'
@@ -127,6 +128,9 @@ export const useRosterStore = defineStore({
     },
     async saveRole(role: RoleInsert, newTitle: string): Promise<boolean> {
       return await saveRole(role, newTitle)
+    },
+    async deleteRole(id: number): Promise<boolean> {
+      return await deleteRole(id)
     }
   }
 })
