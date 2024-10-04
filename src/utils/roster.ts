@@ -4,8 +4,7 @@ import {
   type PeopleRow,
   type Role,
   RoleImpl,
-  type RoleInsert,
-  type RoleRow,
+  type RoleTemplate,
   type RosterRow,
   ServiceImpl,
   type Slot
@@ -127,12 +126,13 @@ export const getPeople = async () => {
 
 export const getRoles = async () => {
   console.log('Fetching all roles')
-  const { data, error } = await supabase.from('role').select('*')
+  const { data, error } = await supabase.from('roles').select('*').limit(1)
   if (error) {
     // some error handling
   } else {
+    const roles = JSON.parse(data[0].roles) as RoleTemplate[]
     const rosterStore = useRosterStore()
-    rosterStore.roles = data.sort((a, b) => a.order - b.order) ?? []
+    rosterStore.roles = roles.sort((a, b) => a.order - b.order) ?? []
   }
 }
 
@@ -433,18 +433,15 @@ export const savePerson = async (
   }
 }
 
-export const updateRole = async (
-  role: RoleRow,
-  newTitle: string
-): Promise<boolean> => {
-  console.log('Updating role')
+export const updateRoles = async (roles: RoleTemplate[]): Promise<boolean> => {
+  console.log('Updating roles')
+  const rolesString = JSON.stringify(roles)
   const { error } = await supabase
-    .from('role')
+    .from('roles')
     .update({
-      ...role,
-      title: newTitle.length ? newTitle : role.title
+      roles: rolesString
     })
-    .eq('id', role.id)
+    .eq('id', 1)
   const globalToast = useGlobalToast()
   if (error) {
     // some error handling
@@ -452,21 +449,12 @@ export const updateRole = async (
     return false
   } else {
     globalToast.success('Update successful!')
-    const rosterStore = useRosterStore()
-
-    rosterStore.roles = rosterStore.roles.filter(
-      (role) => role.id !== role.id
-    )
-    rosterStore.roles.push(role)
-    rosterStore.roles.sort(function (a, b) {
-      return a.title < b.title ? -1 : a.title > b.title ? 1 : 0
-    })
     return true
   }
 }
 
 export const saveRole = async (
-  role: RoleInsert,
+  role: RoleTemplate,
   newTitle: string
 ): Promise<boolean> => {
   console.log('Saving role')
@@ -487,9 +475,7 @@ export const saveRole = async (
   }
 }
 
-export const deleteRole = async (
-  id: number
-): Promise<boolean> => {
+export const deleteRole = async (id: number): Promise<boolean> => {
   console.log('Deleting role')
   const { error } = await supabase.from('role').delete().eq('id', id)
   const globalToast = useGlobalToast()

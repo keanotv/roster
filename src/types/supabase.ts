@@ -51,21 +51,18 @@ export type Database = {
         }
         Relationships: []
       }
-      role: {
+      roles: {
         Row: {
           id: number
-          order: number
-          title: string
+          roles: string
         }
         Insert: {
           id?: number
-          order: number
-          title: string
+          roles?: string
         }
         Update: {
           id?: number
-          order?: number
-          title?: string
+          roles?: string
         }
         Relationships: []
       }

@@ -295,7 +295,7 @@ watchEffect(async () => {
                     resetOrder()
                   }" class="border-none px-0.5 mr-0.5"><line-md:chevron-left class="my-auto w-6 h-6" /></BButton>
               </template>
-              <BInput class="font-bold text-md text-center w-100 mx-0.5 px-0" v-model="role.title" />
+              <BInput class="font-bold text-md text-center w-100 mx-0.5 px-0" v-model="role.title" :state="role.title.length ? null : false" />
               <BButton @click.prevent="
                   () => {
                     action = ACTIONS.DELETE_ROLE

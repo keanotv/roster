@@ -1,53 +1,85 @@
 <script setup lang="ts">
 import { useRosterStore } from '@/stores/roster'
-import { RoleInsert, RoleRow } from '@/types/roster'
+import { RoleTemplate } from '@/types/roster'
 import { ref, watchEffect } from 'vue'
+import draggable from 'vuedraggable'
 
 const rosterStore = useRosterStore()
 const editRole = ref(false)
 const deleteRole = ref(false)
 const addRole = ref(false)
-const selectedRole = ref({} as RoleRow)
-const newRole = ref({} as RoleInsert)
+const selectedRole = ref({} as RoleTemplate)
 const newTitle = ref('')
 const duplicateTitle = ref(false)
 
 const handleUpdate = async () => {
-  const success = await rosterStore.updateRole(
-    selectedRole.value,
-    newTitle.value.trim()
-  )
+  const updatedRoles = rosterStore.roles.map(role => {
+    if (role.order == selectedRole.value.order) {
+      return selectedRole.value
+    } else {
+      return role
+    }
+  })
+  const success = await rosterStore.updateRoles(updatedRoles)
   if (success) {
     editRole.value = false
-    selectedRole.value = {} as RoleRow
+    selectedRole.value = {} as RoleTemplate
     newTitle.value = ''
+    rosterStore.roles = updatedRoles
   } else {
     editRole.value = true
   }
 }
 
 const handleSave = async () => {
-  const success = await rosterStore.saveRole(
-    newRole.value,
-    newTitle.value.trim()
-  )
+  const updatedRoles = [... rosterStore.roles]
+  updatedRoles.unshift({
+    title: newTitle.value,
+    order: 0
+  })
+  resetUpdatedRolesOrder(updatedRoles)
+  const success = await rosterStore.updateRoles(updatedRoles)
   if (success) {
     addRole.value = false
-    newRole.value = {} as RoleRow
     newTitle.value = ''
+    rosterStore.roles = updatedRoles
   } else {
     addRole.value = true
   }
 }
 
 const handleDelete = async () => {
-  const success = await rosterStore.deleteRole(selectedRole.value.id)
+  const updatedRoles = rosterStore.roles.filter(role => role.order !== selectedRole.value.order)
+  resetUpdatedRolesOrder(updatedRoles)
+  const success = await rosterStore.updateRoles(updatedRoles)
   if (success) {
     deleteRole.value = false
-    selectedRole.value = {} as RoleRow
+    selectedRole.value = {} as RoleTemplate
+    rosterStore.roles = updatedRoles
   } else {
     deleteRole.value = true
   }
+}
+
+const resetUpdatedRolesOrder = (updatedRoles: RoleTemplate[]) => {
+  let order = 1
+  updatedRoles.forEach(role => {
+    role.order = order
+    order++
+  })
+}
+
+const handleReorder = () => {
+  resetOrder()
+  rosterStore.updateRoles(rosterStore.roles)
+}
+
+const resetOrder = () => {
+  let order = 1
+  rosterStore.roles.forEach(role => {
+    role.order = order
+    order++
+  })
 }
 
 watchEffect(() => {
@@ -57,11 +89,17 @@ watchEffect(() => {
 })
 
 const titleSearch = ref('')
+const drag = ref(false)
+const reorderMode = ref(false)
 </script>
 
 <template>
   <div id="roles" class="py-8 px-4 w-[100vw]">
-    <h1 class="my-3 text-center">Roles</h1>
+    <h1 class="my-3 text-center">Roles {{ reorderMode ? '(Reorder)' : '(Edit)' }}</h1>
+    <div class="mb-4 flex place-content-center">
+      <span class="mt-auto">Reordering mode:</span>
+      <div class="ml-2 text-xl"><BFormCheckbox v-model="reorderMode" switch /></div>
+    </div>
     <BTableSimple hover responsive>
       <colgroup>
         <col />
@@ -70,8 +108,9 @@ const titleSearch = ref('')
         <BTr>
           <BTh
             ><div class="flex justify-between">
-              <div class="my-auto">
+              <div>
                 <b>Title</b> &nbsp;&nbsp;&nbsp;<BInput
+                  v-if="!reorderMode"
                   placeholder="Search"
                   id="titleSearch"
                   class="inline-block w-28 h-10 mr-1.5"
@@ -79,9 +118,9 @@ const titleSearch = ref('')
                 />
               </div>
               <BButton
+                v-if="!reorderMode"
                 @click.prevent="
                       () => {
-                        newRole = {} as RoleRow
                         addRole = true
                       }
                     "
@@ -93,7 +132,7 @@ const titleSearch = ref('')
         </BTr>
       </BThead>
       <BTbody>
-        <template v-for="role in rosterStore.roles.filter((role) =>
+        <template v-if="!reorderMode" v-for="role in rosterStore.roles.filter((role) =>
             role.title
               .toLowerCase()
               .split(' ')
@@ -138,6 +177,30 @@ const titleSearch = ref('')
             </BTd>
           </BTr>
         </template>
+        <template v-else>
+          <draggable
+            v-model="rosterStore.roles"
+            @start="drag=true" 
+            @end="drag=false"
+            item-key="order"
+            @change="handleReorder"
+          >
+            <template #item="{element}">
+              <div class="draggable">
+                <BTr>
+                  <BTd>
+                    <div class="flex align-center">
+                      <ci:drag-vertical class="w-5 h-5 inline"/>
+                      <p class="mb-0 ml-2 inline">
+                        {{ element.title }}
+                      </p>
+                    </div>
+                  </BTd>
+                </BTr>
+              </div>
+            </template>
+          </draggable>
+        </template>
       </BTbody>
       <BModal
         centered
@@ -169,7 +232,7 @@ const titleSearch = ref('')
           <BButton
             @click.prevent="() => {
             editRole = false
-            selectedRole = {} as RoleRow
+            selectedRole = {} as RoleTemplate
             newTitle = ''
           }"
             >Cancel</BButton
@@ -185,6 +248,7 @@ const titleSearch = ref('')
       >
         <p><b>Add new role</b></p>
         <hr class="my-2" />
+        <p>New role will be added to the top. Reorder after adding if needed.</p>
         <div class="flex my-3">
           <p class="my-auto">Title:</p>
           <BInput
@@ -204,7 +268,6 @@ const titleSearch = ref('')
           <BButton
             @click.prevent="() => {
             addRole = false
-            newRole = {} as RoleRow
             newTitle = ''
           }"
             >Cancel</BButton
@@ -234,7 +297,7 @@ const titleSearch = ref('')
           <BButton
             @click.prevent="() => {
             deleteRole = false
-            selectedRole = {} as RoleRow
+            selectedRole = {} as RoleTemplate
           }"
             >Cancel</BButton
           >
@@ -247,6 +310,7 @@ const titleSearch = ref('')
 <style scoped>
 th {
   font-weight: bold;
+  align-content: center;
 }
 
 .form-switch {
@@ -257,5 +321,19 @@ th {
   @media (min-width: 600px) {
     width: 600px;
   }
+}
+
+.draggable {
+    cursor: move; /* fallback if grab cursor is unsupported */
+    cursor: grab;
+    cursor: -moz-grab;
+    cursor: -webkit-grab;
+}
+
+ /* (Optional) Apply a "closed-hand" cursor during drag operation. */
+.draggable:active {
+    cursor: grabbing;
+    cursor: -moz-grabbing;
+    cursor: -webkit-grabbing;
 }
 </style>

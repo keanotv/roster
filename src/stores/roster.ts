@@ -1,12 +1,11 @@
 import type {
-  RoleRow,
   PeopleRow,
   UnavailabilityRow,
   RosterRowLocal,
   Role,
   ReasonRow,
   PeopleInsert,
-  RoleInsert
+  RoleTemplate
 } from '@/types/roster'
 import {
   createNewRosterWithTitle,
@@ -23,9 +22,7 @@ import {
   updateArchived,
   updatePublished,
   savePerson,
-  updateRole,
-  saveRole,
-  deleteRole
+  updateRoles
 } from '@/utils/roster'
 import { defineStore } from 'pinia'
 import { useUserStore } from '@/stores/user'
@@ -37,7 +34,7 @@ export const useRosterStore = defineStore({
     lastUpdated: 0,
     services: 3,
     people: [] as PeopleRow[],
-    roles: [] as RoleRow[],
+    roles: [] as RoleTemplate[],
     unavailability: [] as UnavailabilityRow[],
     reasons: [] as ReasonRow[],
     isInitializing: false,
@@ -123,14 +120,8 @@ export const useRosterStore = defineStore({
     async savePerson(person: PeopleInsert, newName: string): Promise<boolean> {
       return await savePerson(person, newName)
     },
-    async updateRole(role: RoleRow, newTitle: string): Promise<boolean> {
-      return await updateRole(role, newTitle)
-    },
-    async saveRole(role: RoleInsert, newTitle: string): Promise<boolean> {
-      return await saveRole(role, newTitle)
-    },
-    async deleteRole(id: number): Promise<boolean> {
-      return await deleteRole(id)
+    async updateRoles(roles: RoleTemplate[]): Promise<boolean> {
+      return await updateRoles(roles)
     }
   }
 })

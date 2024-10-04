@@ -39,6 +39,7 @@ declare module 'vue' {
     BThead: typeof import('bootstrap-vue-next')['BThead']
     BTr: typeof import('bootstrap-vue-next')['BTr']
     'Ci:addRow': typeof import('~icons/ci/add-row')['default']
+    'Ci:dragVertical': typeof import('~icons/ci/drag-vertical')['default']
     DirectionalShadow: typeof import('./src/components/common/DirectionalShadow.vue')['default']
     Legend: typeof import('./src/components/roster/Legend.vue')['default']
     'LineMd:accountAdd': typeof import('~icons/line-md/account-add')['default']

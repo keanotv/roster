@@ -7,9 +7,8 @@ type PeopleTable = Tables['people']
 export type PeopleRow = PeopleTable['Row']
 export type PeopleInsert = PeopleTable['Insert']
 
-type RoleTable = Tables['role']
-export type RoleRow = RoleTable['Row']
-export type RoleInsert = RoleTable['Insert']
+type RolesTable = Tables['roles']
+export type RolesRow = RolesTable['Row']
 
 // Fluid tables
 type RosterTable = Tables['roster']
@@ -26,6 +25,11 @@ export type UnavailabilityInsert = UnavailabilityTable['Insert']
 type ReasonTable = Tables['reason']
 export type ReasonRow = ReasonTable['Row']
 export type ReasonInsert = ReasonTable['Insert']
+
+export type RoleTemplate = {
+  order: number
+  title: string
+}
 
 export type Role = {
   order: number
