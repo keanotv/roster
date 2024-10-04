@@ -299,7 +299,7 @@ watchEffect(async () => {
               <BButton @click.prevent="
                   () => {
                     action = ACTIONS.DELETE_ROLE
-                    prompt = PROMPT_MAP.get(action)!.concat(role.title)
+                    prompt = PROMPT_MAP.get(action)!.concat(role.title.length ? role.title : '(empty)')
                     roleActionedOnOrder = role.order
                     confirmation = true
                   }" variant="danger" class="px-1 mx-0.5"><material-symbols:delete-outline class="my-auto w-5 h-5" /></BButton>
