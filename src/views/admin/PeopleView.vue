@@ -58,7 +58,7 @@ const nameSearch = ref('')
       <BThead>
         <BTr>
           <BTh><div class="flex justify-between">
-            <div><b>Name</b> &nbsp;&nbsp;&nbsp;<BInput
+            <div class="my-auto"><b>Name</b> &nbsp;&nbsp;&nbsp;<BInput
             placeholder="Search"
             id="nameSearch"
             class="inline-block w-28 h-10 mr-1.5"

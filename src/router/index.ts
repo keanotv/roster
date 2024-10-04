@@ -4,6 +4,7 @@ import LoginView from '@/views/LoginView.vue'
 import NewRosterView from '@/views/roster/NewRosterView.vue'
 import RosterView from '@/views/roster/RosterView.vue'
 import PeopleView from '@/views/admin/PeopleView.vue'
+import RolesView from '@/views/admin/RolesView.vue'
 import NameSelectionView from '@/views/NameSelectionView.vue'
 import UnavailableDatesView from '@/views/UnavailableDatesView.vue'
 import ViewRostersView from '@/views/roster/ViewRostersView.vue'
@@ -76,6 +77,15 @@ const router = createRouter({
           path: ADMIN_ROUTE_NAMES.PEOPLE,
           name: ADMIN_ROUTE_NAMES.PEOPLE,
           component: PeopleView,
+          meta: {
+            requiresAuth: true,
+            requiresAdmin: true
+          }
+        },
+        {
+          path: ADMIN_ROUTE_NAMES.ROLES,
+          name: ADMIN_ROUTE_NAMES.ROLES,
+          component: RolesView,
           meta: {
             requiresAuth: true,
             requiresAdmin: true

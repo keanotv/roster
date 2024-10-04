@@ -9,6 +9,7 @@ export type PeopleInsert = PeopleTable['Insert']
 
 type RoleTable = Tables['role']
 export type RoleRow = RoleTable['Row']
+export type RoleInsert = RoleTable['Insert']
 
 // Fluid tables
 type RosterTable = Tables['roster']

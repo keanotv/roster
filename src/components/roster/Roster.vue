@@ -66,8 +66,9 @@ const rosterAction = async () => {
       break
     case ACTIONS.SYNC:
       await getRosterById(roster.value.id).then(() => {
-        if (roster.value.roster !== null) {
-          roster.value.unsavedRoster = JSON.parse(roster.value.roster)
+        const storeRoster = rosterStore.rosters.find(storeRoster => storeRoster.id === roster.value.id)
+        if (storeRoster != undefined && storeRoster.roster != null) {
+          roster.value.unsavedRoster = JSON.parse(storeRoster.roster)
         }
       })
       break

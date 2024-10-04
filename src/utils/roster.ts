@@ -4,6 +4,8 @@ import {
   type PeopleRow,
   type Role,
   RoleImpl,
+  type RoleInsert,
+  type RoleRow,
   type RosterRow,
   ServiceImpl,
   type Slot
@@ -427,6 +429,60 @@ export const savePerson = async (
     globalToast.success('Added new member!')
     const rosterStore = useRosterStore()
     rosterStore.getPeople()
+    return true
+  }
+}
+
+export const updateRole = async (
+  role: RoleRow,
+  newTitle: string
+): Promise<boolean> => {
+  console.log('Updating role')
+  const { error } = await supabase
+    .from('role')
+    .update({
+      ...role,
+      title: newTitle.length ? newTitle : role.title
+    })
+    .eq('id', role.id)
+  const globalToast = useGlobalToast()
+  if (error) {
+    // some error handling
+    globalToast.error('Error updating role :(')
+    return false
+  } else {
+    globalToast.success('Update successful!')
+    const rosterStore = useRosterStore()
+
+    rosterStore.roles = rosterStore.roles.filter(
+      (role) => role.id !== role.id
+    )
+    rosterStore.roles.push(role)
+    rosterStore.roles.sort(function (a, b) {
+      return a.title < b.title ? -1 : a.title > b.title ? 1 : 0
+    })
+    return true
+  }
+}
+
+export const saveRole = async (
+  role: RoleInsert,
+  newTitle: string
+): Promise<boolean> => {
+  console.log('Saving role')
+  const { error } = await supabase.from('role').insert({
+    ...role,
+    title: newTitle
+  })
+  const globalToast = useGlobalToast()
+  if (error) {
+    // some error handling
+    globalToast.error('Error adding new role :(')
+    return false
+  } else {
+    globalToast.success('Added new role!')
+    const rosterStore = useRosterStore()
+    rosterStore.getRoles()
     return true
   }
 }

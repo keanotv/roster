@@ -59,6 +59,10 @@ const routerLinks = [
       {
         title: 'People',
         path: path(ROUTE_NAMES.ADMIN) + path(ADMIN_ROUTE_NAMES.PEOPLE)
+      },
+      {
+        title: 'Roles',
+        path: path(ROUTE_NAMES.ADMIN) + path(ADMIN_ROUTE_NAMES.ROLES)
       }
     ]
   },
