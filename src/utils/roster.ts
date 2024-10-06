@@ -215,6 +215,9 @@ export const getRosterById = async (id: number) => {
           unsavedRoster: JSON.parse(data[0].roster!) as Role[]
         })
       }
+      rosterStore.rosters.sort(
+        (a, b) => new Date(a.date!).getTime() - new Date(b.date!).getTime()
+      )
     }
   }
 }
@@ -240,7 +243,7 @@ export const refreshUnavailabilityByDateList = () => {
   console.log('Refreshing unavailability by date list')
   const rosterStore = useRosterStore()
   const months = getSundaysInNextTwoMonths()
-  rosterStore.unavailabilityByDate = [new Map<string, Set<number>>([])]
+  rosterStore.unavailabilityByDate = new Map<string, Set<number>>([])
   months.forEach((month) => {
     month.days.forEach((dayOfMonth) => {
       const date = [
@@ -248,7 +251,7 @@ export const refreshUnavailabilityByDateList = () => {
         month.month.toString().length === 1 ? '0' + month.month : month.month,
         dayOfMonth.toString().length === 1 ? '0' + dayOfMonth : dayOfMonth
       ].join('-')
-      rosterStore.unavailabilityByDate[0].set(date, new Set<number>())
+      rosterStore.unavailabilityByDate.set(date, new Set<number>())
     })
   })
   rosterStore.unavailability.forEach((ua) => {
@@ -258,7 +261,7 @@ export const refreshUnavailabilityByDateList = () => {
         ua.month.toString().length === 1 ? '0' + ua.month : ua.month,
         dayOfMonth.toString().length === 1 ? '0' + dayOfMonth : dayOfMonth
       ].join('-')
-      rosterStore.unavailabilityByDate[0].get(date)?.add(ua.people_id)
+      rosterStore.unavailabilityByDate.get(date)?.add(ua.people_id)
     })
   })
 }
@@ -280,6 +283,10 @@ export const saveDate = async (id: number, date: string) => {
     } else {
       globalToast.success('Saved updated date')
     }
+    const rosterStore = useRosterStore()
+    rosterStore.rosters.sort(
+      (a, b) => new Date(a.date!).getTime() - new Date(b.date!).getTime()
+    )
   }
 }
 

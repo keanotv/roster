@@ -21,8 +21,7 @@ if (!rosterStore.unavailability.length || !rosterStore.people.length) {
   await rosterStore.getUnavailability()
   await rosterStore.getPeople()
 } else if (
-  !rosterStore.unavailabilityByDate.length ||
-  !!rosterStore.unavailabilityByDate[0]
+  !rosterStore.unavailabilityByDate.size
 ) {
   refreshUnavailabilityByDateList()
 }
@@ -94,7 +93,7 @@ onMounted(() => {
   rosterStore.people.forEach(person => {
     personToRoleOrderMap.value.set(person.id, new Set<number>())
   })
-  roster.value.unsavedRoster?.forEach(role => {
+  roster.value?.unsavedRoster?.forEach(role => {
     role.services.forEach(service => {
       service.slot.forEach(slot => {
         personToRoleOrderMap.value.get(slot.id)?.add(role.order)
@@ -119,13 +118,13 @@ const resetOrder = () => {
 }
 
 watchEffect(async () => {
-  if (roster.value.id !== props.id) {
+  if (roster.value?.id !== props.id) {
     roster.value = rosterStore.getRosterById(props.id)
     personToRoleOrderMap.value = new Map<number, Set<number>>()
       rosterStore.people.forEach(person => {
     personToRoleOrderMap.value.set(person.id, new Set<number>())
   })
-  roster.value.unsavedRoster?.forEach(role => {
+  roster.value?.unsavedRoster?.forEach(role => {
     role.services.forEach(service => {
       service.slot.forEach(slot => {
         personToRoleOrderMap.value.get(slot.id)?.add(role.order)
@@ -143,9 +142,9 @@ watchEffect(async () => {
         <BInputGroup prepend="Title">
           <BInput
             v-model="roster.title"
-            @change="
-              (e) => {
-                rosterStore.saveTitle(roster.id, e.target.value)
+            @change.prevent="
+              async (e) => {
+                await rosterStore.saveTitle(roster.id, e.target.value)
               }
             "
           />
@@ -155,9 +154,9 @@ watchEffect(async () => {
             <BInputGroup prepend="Date">
               <BFormInput
                 @blur="
-                  (e) => {
+                  async (e) => {
                     if (previousDate != e.target.value) {
-                      rosterStore.saveDate(roster.id, e.target.value || '')
+                      await rosterStore.saveDate(roster.id, e.target.value || '')
                       previousDate = e.target.value
                     }
                   }
@@ -167,10 +166,10 @@ watchEffect(async () => {
               />
               <template #append>
                 <BInputGroupText>
-                  <div @click="() => {
+                  <div @click.prevent="async () => {
                     if (previousDate != '') {
                       roster.date = ''
-                      rosterStore.saveDate(roster.id, roster.date)
+                      await rosterStore.saveDate(roster.id, roster.date)
                       previousDate = ''
                     }
                   }">
@@ -367,13 +366,13 @@ watchEffect(async () => {
                                 no-flip
                                 :text="slot.name"
                                 :variant="
-                                      rosterStore.unavailabilityByDate[0]
-                                        .get(roster.date || '')
-                                        ?.has(slot.id)
-                                        ? 'danger'
-                                        : personToRoleOrderMap.get(slot.id) !== undefined && personToRoleOrderMap.get(slot.id)!.size > 1
-                                        ? 'warning'
-                                        : 'dark'
+                                        rosterStore.unavailabilityByDate
+                                          .get(roster.date || '')
+                                          ?.has(slot.id)
+                                          ? 'danger'
+                                          : personToRoleOrderMap.get(slot.id) !== undefined && personToRoleOrderMap.get(slot.id)!.size > 1
+                                          ? 'warning'
+                                          : 'dark'
                                     "
                               >
                                 <BDropdownItem
@@ -391,7 +390,7 @@ watchEffect(async () => {
                                 >
                                   <BDropdownItem
                                     :variant="
-                                      rosterStore.unavailabilityByDate[0]
+                                      rosterStore.unavailabilityByDate
                                         .get(roster.date || '')
                                         ?.has(person.id)
                                         ? 'danger'

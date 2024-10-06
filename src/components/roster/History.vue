@@ -8,7 +8,6 @@ const rosterStore = useRosterStore()
 const personIdToNameMap = new Map<string, string>()
 
 onMounted(() => {
-  rosterStore.crunchHistoryData()
   rosterStore.people.forEach((person) =>
     personIdToNameMap.set(person.id.toString(), person.name)
   )
@@ -65,7 +64,6 @@ onMounted(() => {
     .attr('dy', '5')
     .attr('transform', 'rotate(90)')
     .style('text-anchor', 'start')
-    .style('font-weight', 'bold')
     .select('.domain')
     .remove()
 
@@ -80,7 +78,6 @@ onMounted(() => {
     .attr('dy', '5')
     .attr('transform', 'rotate(90)')
     .style('text-anchor', 'start')
-    .style('font-weight', 'bold')
     .select('.domain')
     .remove()
 

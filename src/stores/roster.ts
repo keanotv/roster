@@ -39,9 +39,12 @@ export const useRosterStore = defineStore({
     reasons: [] as ReasonRow[],
     isInitializing: false,
     rosters: [] as RosterRowLocal[],
-    unavailabilityByDate: [] as Map<string, Set<number>>[],
+    unavailabilityByDate: new Map([]) as Map<string, Set<number>>,
     history: [] as Array<Array<string>>
   }),
+  share: {
+    omit: ['unavailabilityByDate', 'history']
+  },
   actions: {
     async initializeRosterStore() {
       const userStore = useUserStore()
@@ -69,7 +72,8 @@ export const useRosterStore = defineStore({
       this.unavailability = []
       this.reasons = []
       this.rosters = []
-      this.unavailabilityByDate = []
+      this.unavailabilityByDate = new Map([])
+      this.history = []
     },
     async createNewRosterWithTitle(title: string) {
       const roster = await createNewRosterWithTitle(title)
@@ -153,12 +157,12 @@ export const useRosterStore = defineStore({
         }
       })
       const idList = this.people.map((person) => person.id).reverse()
-      dateToIdMap.forEach((idSet, date) => {
+      dateToIdMap.forEach((idSet, key) => {
         idList.forEach((id) => {
           if (idSet.has(id)) {
-            result.push([date, id.toString(), '1'])
+            result.push([key, id.toString(), '1'])
           } else {
-            result.push([date, id.toString(), '0'])
+            result.push([key, id.toString(), '0'])
           }
         })
       })

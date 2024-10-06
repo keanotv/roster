@@ -20,6 +20,7 @@
     "d3": "^7.9.0",
     "pinia": "^2.0.11",
     "pinia-plugin-persistedstate": "^3.2.0",
+    "pinia-shared-state": "^0.5.1",
     "televue": "^1.0.0-alpha.1",
     "vue": "^3.4.27",
     "vue-router": "^4.0.12",
