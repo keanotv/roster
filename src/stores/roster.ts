@@ -39,7 +39,8 @@ export const useRosterStore = defineStore({
     reasons: [] as ReasonRow[],
     isInitializing: false,
     rosters: [] as RosterRowLocal[],
-    unavailabilityByDate: [] as Map<string, Set<number>>[]
+    unavailabilityByDate: [] as Map<string, Set<number>>[],
+    history: [] as Array<Array<string>>
   }),
   actions: {
     async initializeRosterStore() {
@@ -122,6 +123,46 @@ export const useRosterStore = defineStore({
     },
     async updateRoles(roles: RoleTemplate[]): Promise<boolean> {
       return await updateRoles(roles)
+    },
+    crunchHistoryData() {
+      const result = [] as Array<Array<string>>
+      const dateToIdMap = new Map<string, Set<number>>()
+      const now = new Date().getTime()
+      const sixWeeksAgo = new Date().getTime() - 3628800000
+      this.rosters.forEach((rosterObj) => {
+        if (
+          rosterObj.date != null &&
+          rosterObj.roster != null &&
+          ((rosterObj.published &&
+            new Date(rosterObj.date).getTime() > sixWeeksAgo) ||
+            new Date(rosterObj.date).getTime() > now)
+        ) {
+          let key = rosterObj.date + ' — ' + rosterObj.title
+          dateToIdMap.set(key, new Set<number>())
+          const idList = this.people.map((person) => person.id)
+          const roster = JSON.parse(rosterObj.roster) as Role[]
+          roster.forEach((role) => {
+            role.services.forEach((slot) => {
+              slot.slot.forEach((slot) => {
+                if (idList.some((id) => id == slot.id)) {
+                  dateToIdMap.get(key)?.add(slot.id)
+                }
+              })
+            })
+          })
+        }
+      })
+      const idList = this.people.map((person) => person.id).reverse()
+      dateToIdMap.forEach((idSet, date) => {
+        idList.forEach((id) => {
+          if (idSet.has(id)) {
+            result.push([date, id.toString(), '1'])
+          } else {
+            result.push([date, id.toString(), '0'])
+          }
+        })
+      })
+      this.history = result
     }
   }
 })

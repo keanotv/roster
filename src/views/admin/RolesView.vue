@@ -184,13 +184,14 @@ const reorderMode = ref(false)
             @end="drag=false"
             item-key="order"
             @change="handleReorder"
+            handle=".handle"
           >
             <template #item="{element}">
-              <div class="draggable">
+              <div>
                 <BTr>
                   <BTd>
                     <div class="flex align-center">
-                      <ci:drag-vertical class="w-5 h-5 inline"/>
+                      <ci:drag-vertical class="w-5 h-5 inline handle"/>
                       <p class="mb-0 ml-2 inline">
                         {{ element.title }}
                       </p>
@@ -323,7 +324,7 @@ th {
   }
 }
 
-.draggable {
+.handle {
     cursor: move; /* fallback if grab cursor is unsupported */
     cursor: grab;
     cursor: -moz-grab;
@@ -331,7 +332,7 @@ th {
 }
 
  /* (Optional) Apply a "closed-hand" cursor during drag operation. */
-.draggable:active {
+.handle:active {
     cursor: grabbing;
     cursor: -moz-grabbing;
     cursor: -webkit-grabbing;

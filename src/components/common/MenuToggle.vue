@@ -35,18 +35,22 @@ const routerLinks = [
     admin: true,
     subLinks: [
       {
-        title: 'View Unavailability',
-        path:
-          path(ROUTE_NAMES.UNAVAILABILITY) +
-          path(UNAVAILABILITY_ROUTE_NAMES.VIEW)
-      },
-      {
         title: 'Edit Rosters',
         path: path(ROUTE_NAMES.ROSTER) + path(ROSTER_ROUTE_NAMES.VIEW)
       },
       {
         title: 'Create New Roster',
         path: path(ROUTE_NAMES.ROSTER) + path(ROSTER_ROUTE_NAMES.NEW)
+      },
+      {
+        title: 'View Unavailability',
+        path:
+          path(ROUTE_NAMES.UNAVAILABILITY) +
+          path(UNAVAILABILITY_ROUTE_NAMES.VIEW)
+      },
+      {
+        title: 'View History',
+        path: path(ROUTE_NAMES.ROSTER) + path(ROSTER_ROUTE_NAMES.HISTORY)
       }
     ]
   },

@@ -38,7 +38,7 @@ export const enum ADMIN_ROUTE_NAMES {
 export const enum ROSTER_ROUTE_NAMES {
   NEW = 'new',
   VIEW = 'view',
-  ARCHIVED = 'archived',
+  HISTORY = 'history'
 }
 
 export const enum UNAVAILABILITY_ROUTE_NAMES {

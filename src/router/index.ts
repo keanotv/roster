@@ -1,14 +1,12 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import HomeView from '@/views/HomeView.vue'
 import LoginView from '@/views/LoginView.vue'
-import NewRosterView from '@/views/roster/NewRosterView.vue'
-import RosterView from '@/views/roster/RosterView.vue'
-import PeopleView from '@/views/admin/PeopleView.vue'
-import RolesView from '@/views/admin/RolesView.vue'
 import NameSelectionView from '@/views/NameSelectionView.vue'
 import UnavailableDatesView from '@/views/UnavailableDatesView.vue'
-import ViewRostersView from '@/views/roster/ViewRostersView.vue'
-import UnavailabilityView from '@/views/roster/UnavailabilityView.vue'
+import { useGlobalToast } from '@/utils/toast'
+import { nextTick } from 'vue'
+import { USER_ROLES, useUserStore } from '@/stores/user'
+import { getRosterById } from '@/utils/roster'
 import {
   path,
   ROUTE_NAMES,
@@ -45,8 +43,9 @@ const router = createRouter({
       children: [
         {
           path: UNAVAILABILITY_ROUTE_NAMES.VIEW,
-          component: UnavailabilityView,
+          component: () => import('@/views/roster/UnavailabilityView.vue'),
           meta: {
+            title: 'Unavailability',
             requiresAuth: true,
             requiresAdmin: true
           }
@@ -76,7 +75,7 @@ const router = createRouter({
         {
           path: ADMIN_ROUTE_NAMES.PEOPLE,
           name: ADMIN_ROUTE_NAMES.PEOPLE,
-          component: PeopleView,
+          component: () => import('@/views/admin/PeopleView.vue'),
           meta: {
             requiresAuth: true,
             requiresAdmin: true
@@ -85,7 +84,7 @@ const router = createRouter({
         {
           path: ADMIN_ROUTE_NAMES.ROLES,
           name: ADMIN_ROUTE_NAMES.ROLES,
-          component: RolesView,
+          component: () => import('@/views/admin/RolesView.vue'),
           meta: {
             requiresAuth: true,
             requiresAdmin: true
@@ -96,7 +95,24 @@ const router = createRouter({
     {
       path: path(ROUTE_NAMES.ROSTER),
       children: [
-        { path: ROSTER_ROUTE_NAMES.NEW, component: NewRosterView },
+        {
+          path: ROSTER_ROUTE_NAMES.NEW,
+          component: () => import('@/views/roster/NewRosterView.vue'),
+          meta: {
+            title: 'History',
+            requiresAuth: true,
+            requiresAdmin: true
+          }
+        },
+        {
+          path: ROSTER_ROUTE_NAMES.HISTORY,
+          component: () => import('@/views/roster/HistoryView.vue'),
+          meta: {
+            title: 'History',
+            requiresAuth: true,
+            requiresAdmin: true
+          }
+        },
         // { path: ROSTER_ROUTE_NAMES.ARCHIVED, component: HomeView },
         {
           path: ROSTER_ROUTE_NAMES.VIEW,
@@ -104,7 +120,7 @@ const router = createRouter({
             {
               path: ':id(\\d+)',
               name: hyphenate([ROUTE_NAMES.ROSTER, ROSTER_ROUTE_NAMES.VIEW]),
-              component: RosterView,
+              component: () => import('@/views/roster/RosterView.vue'),
               meta: {
                 requiresAuth: true,
                 requiresAdmin: true
@@ -113,7 +129,7 @@ const router = createRouter({
             },
             {
               path: '',
-              component: ViewRostersView,
+              component: () => import('@/views/roster/ViewRostersView.vue'),
               meta: {
                 requiresAuth: true,
                 requiresAdmin: true
@@ -144,10 +160,6 @@ const router = createRouter({
 })
 
 // toast and toggle dark stuffs
-import { useGlobalToast } from '@/utils/toast'
-import { nextTick } from 'vue'
-import { USER_ROLES, useUserStore } from '@/stores/user'
-import { getRosterById } from '@/utils/roster'
 
 const globalToast = useGlobalToast()
 
