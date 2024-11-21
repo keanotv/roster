@@ -9,7 +9,7 @@ import {
 } from '@/constants/constants'
 import router from '@/router'
 import { useRosterStore } from '@/stores/roster'
-import { SlotImpl } from '@/types/roster'
+import { type PeopleRow, SlotImpl } from '@/types/roster'
 import { createNewRole, createNewRosterWithTitleAndRosterData, getRosterById, refreshUnavailabilityByDateList } from '@/utils/roster'
 import { onMounted, ref, watchEffect } from 'vue'
 const props = defineProps<{
@@ -143,7 +143,7 @@ watchEffect(async () => {
           <BInput
             v-model="roster.title"
             @change.prevent="
-              async (e) => {
+              async (e: any) => {
                 await rosterStore.saveTitle(roster.id, e.target.value)
               }
             "
@@ -154,7 +154,7 @@ watchEffect(async () => {
             <BInputGroup prepend="Date">
               <BFormInput
                 @blur="
-                  async (e) => {
+                  async (e: any) => {
                     if (previousDate != e.target.value) {
                       await rosterStore.saveDate(roster.id, e.target.value || '')
                       previousDate = e.target.value
@@ -275,7 +275,7 @@ watchEffect(async () => {
           cols-xxl="5"
           style="--bs-gutter-x: 0"
         >
-          <template v-for="role, index in roster.unsavedRoster" :key="index">
+          <template v-for="(role, index) in roster.unsavedRoster" :key="index">
             <BCol
               style="
                 border: 1px solid currentColor;
@@ -313,7 +313,7 @@ watchEffect(async () => {
               </template>
             </div>
               <BContainer style="--bs-gutter-x: 0">
-                <template v-for="service in role.services">
+                <template v-for="service in role.services" :key="service.no">
                   <div>
                     <BRow cols="1" style="--bs-gutter-x: 0">
                       <div class="flex justify-between">
@@ -354,7 +354,7 @@ watchEffect(async () => {
                         </div>
                       </div>
                       <div class="my-1">
-                        <template v-for="slot in service.slot">
+                        <template v-for="slot in service.slot" :key="slot.no">
                           <div class="flex my-1">
                             <BInput
                               v-model="slot.segments"
@@ -382,11 +382,12 @@ watchEffect(async () => {
                                     slot.name = ''
                                     slot.id = 0
                                   }"
-                                >{{`<empty>`}}</BDropdownItem>
+                                >{{`--empty--`}}</BDropdownItem>
                                 <template
                                   v-for="person in rosterStore.people.filter(
-                                    (person) => person.active
+                                    (p: PeopleRow) => p.active
                                   )"
+                                  :key="person.id"
                                 >
                                   <BDropdownItem
                                     :variant="

@@ -47,7 +47,7 @@ const sundays = getSundaysInNextTwoMonths()
 <template>
   <div id="unavailability" class="p-8 w-[100vw]">
     <h1 class="my-2 text-center">Unavailability</h1>
-    <template v-for="sunday in sundays">
+    <template v-for="(sunday, index) in sundays" :key="index">
       <p class="text-lg font-bold m-1">
         {{ MONTHS[sunday.month - 1] }} {{ sunday.year }}
       </p>
@@ -65,7 +65,7 @@ const sundays = getSundaysInNextTwoMonths()
           </BTr>
         </BThead>
         <BTbody class="text-sm">
-          <template v-for="unavailability in unavailabilities">
+          <template v-for="(unavailability, index) in unavailabilities" :key="index">
             <template
               v-if="
                 sunday.year === unavailability.year &&
