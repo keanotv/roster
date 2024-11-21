@@ -1,10 +1,12 @@
 <script setup lang="ts">
 import { useRosterStore } from '@/stores/roster'
+import { useSettingsStore } from '@/stores/settings';
 import * as d3 from 'd3'
 import { onMounted, ref } from 'vue'
 
 const dataRef = ref(null)
 const rosterStore = useRosterStore()
+const settingStore = useSettingsStore()
 const personIdToNameMap = new Map<string, string>()
 
 onMounted(() => {
@@ -13,7 +15,7 @@ onMounted(() => {
   )
   // set the dimensions and margins of the graph
   const margin = { top: 80, right: 0, bottom: 300, left: 90 },
-    width = 350 - margin.left - margin.right,
+    width = (settingStore.screenWidth < 900 ? 350 : 480) - margin.left - margin.right,
     height = rosterStore.people.length * 28 - margin.top - margin.bottom
 
   // append the svg object to the body of the page

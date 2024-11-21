@@ -3,6 +3,13 @@ import HomeView from '@/views/HomeView.vue'
 import LoginView from '@/views/LoginView.vue'
 import NameSelectionView from '@/views/NameSelectionView.vue'
 import UnavailableDatesView from '@/views/UnavailableDatesView.vue'
+import HistoryView from '@/views/roster/HistoryView.vue'
+import NewRosterView from '@/views/roster/NewRosterView.vue'
+import RolesView from '@/views/admin/RolesView.vue'
+import PeopleView from '@/views/admin/PeopleView.vue'
+import UnavailabilityView from '@/views/roster/UnavailabilityView.vue'
+import RosterView from '@/views/roster/RosterView.vue'
+import ViewRostersView from '@/views/roster/ViewRostersView.vue'
 import { useGlobalToast } from '@/utils/toast'
 import { nextTick } from 'vue'
 import { USER_ROLES, useUserStore } from '@/stores/user'
@@ -43,7 +50,7 @@ const router = createRouter({
       children: [
         {
           path: UNAVAILABILITY_ROUTE_NAMES.VIEW,
-          component: () => import('@/views/roster/UnavailabilityView.vue'),
+          component: UnavailabilityView,
           meta: {
             title: 'Unavailability',
             requiresAuth: true,
@@ -75,7 +82,7 @@ const router = createRouter({
         {
           path: ADMIN_ROUTE_NAMES.PEOPLE,
           name: ADMIN_ROUTE_NAMES.PEOPLE,
-          component: () => import('@/views/admin/PeopleView.vue'),
+          component: PeopleView,
           meta: {
             requiresAuth: true,
             requiresAdmin: true
@@ -84,7 +91,7 @@ const router = createRouter({
         {
           path: ADMIN_ROUTE_NAMES.ROLES,
           name: ADMIN_ROUTE_NAMES.ROLES,
-          component: () => import('@/views/admin/RolesView.vue'),
+          component: RolesView,
           meta: {
             requiresAuth: true,
             requiresAdmin: true
@@ -97,7 +104,7 @@ const router = createRouter({
       children: [
         {
           path: ROSTER_ROUTE_NAMES.NEW,
-          component: () => import('@/views/roster/NewRosterView.vue'),
+          component: NewRosterView,
           meta: {
             title: 'History',
             requiresAuth: true,
@@ -106,21 +113,20 @@ const router = createRouter({
         },
         {
           path: ROSTER_ROUTE_NAMES.HISTORY,
-          component: () => import('@/views/roster/HistoryView.vue'),
+          component: HistoryView,
           meta: {
             title: 'History',
             requiresAuth: true,
             requiresAdmin: true
           }
         },
-        // { path: ROSTER_ROUTE_NAMES.ARCHIVED, component: HomeView },
         {
           path: ROSTER_ROUTE_NAMES.VIEW,
           children: [
             {
               path: ':id(\\d+)',
               name: hyphenate([ROUTE_NAMES.ROSTER, ROSTER_ROUTE_NAMES.VIEW]),
-              component: () => import('@/views/roster/RosterView.vue'),
+              component: RosterView,
               meta: {
                 requiresAuth: true,
                 requiresAdmin: true
@@ -129,7 +135,7 @@ const router = createRouter({
             },
             {
               path: '',
-              component: () => import('@/views/roster/ViewRostersView.vue'),
+              component: ViewRostersView,
               meta: {
                 requiresAuth: true,
                 requiresAdmin: true

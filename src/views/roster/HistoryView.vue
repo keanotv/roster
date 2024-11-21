@@ -1,13 +1,16 @@
 <script setup lang="ts">
 import History from '@/components/roster/History.vue'
 import { useRosterStore } from '@/stores/roster'
+import { ref } from 'vue';
 
 const rosterStore = useRosterStore()
 
 const refreshData = () => {
   rosterStore.crunchHistoryData()
-  location.reload()
+  reloadKey.value += 1
 }
+
+const reloadKey = ref(0)
 </script>
 
 <template>
@@ -35,7 +38,7 @@ const refreshData = () => {
         >Load/Refresh Data</BButton
       >
     </div>
-    <History />
+    <History :key="reloadKey" />
   </div>
 </template>
 
@@ -43,6 +46,10 @@ const refreshData = () => {
 #history {
   @media (min-width: 480px) {
     width: 480px;
+  }
+
+  @media (min-width: 900px) {
+    width: 720px;
   }
 }
 </style>

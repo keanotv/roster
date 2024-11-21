@@ -8,8 +8,7 @@ const install = (app: App) => {
   pinia.use(piniaPluginPersistedState)
   pinia.use(PiniaSharedState({
     enable: true,
-    initialize: true,
-    type: 'localstorage'
+    initialize: true
   }))
   app.use(pinia)
 }
