@@ -22,7 +22,7 @@ export const useUserStore = defineStore({
       await logout()
     },
     async refreshToken() {
-      if (Date.now() - 3_600_000> this.lastRefreshed) {
+      if (Date.now() - 86_400_000 > this.lastRefreshed) {
         this.lastRefreshed = Date.now()
         await refreshToken()
       }
