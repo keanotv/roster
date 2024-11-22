@@ -113,7 +113,7 @@ watchEffect(() => {
           :disabled="isSubmitting || disabled"
           class="mt-2"
           :pressed="false"
-          variant="success"
+          variant="outline-success"
           >Submit</BButton
         >
       </template>
@@ -121,7 +121,7 @@ watchEffect(() => {
         <p class="text-xs my-3 text-orange-500">Past cut-off date for submission! Please let Chanel or Flynn know if you would like to change unavailable dates.</p>
       </template>
     </template>
-    <BModal centered hide-footer hide-header v-model="confirmation">
+    <BModal centered no-footer no-header v-model="confirmation">
       <p>
         Thank you for serving, {{ unavailabilityStore.selectedPersonName }}!
       </p>
@@ -150,11 +150,11 @@ watchEffect(() => {
       <div class="mt-4 flex justify-between">
         <BButton
           @click.prevent="submitUnavailability"
-          variant="primary"
+          variant="outline-primary"
           class="capitalize"
           >Submit</BButton
         >
-        <BButton @click.prevent="confirmation = false">Cancel</BButton>
+        <BButton @click.prevent="confirmation = false" variant="outline-secondary">Cancel</BButton>
       </div>
     </BModal>
   </div>

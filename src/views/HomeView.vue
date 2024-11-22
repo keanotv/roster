@@ -3,7 +3,7 @@ import PublishedRoster from '@/components/roster/PublishedRoster.vue'
 import { useRosterStore } from '@/stores/roster'
 import { BTabs } from 'bootstrap-vue-next'
 import { ref } from 'vue'
-import Legend from '@/components/roster/Legend.vue'
+import LegendTable from '@/components/roster/LegendTable.vue'
 
 const rosterStore = useRosterStore()
 const seeAll = ref(false)
@@ -40,7 +40,7 @@ const seeAll = ref(false)
       </template>
     </BTabs>
     </div>
-    <Legend class="mt-4" />
+    <LegendTable class="mt-4" />
   </div>
 </template>
 

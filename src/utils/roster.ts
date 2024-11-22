@@ -22,7 +22,7 @@ export const createNewRosterWithTitle = async (
     globalToast.error('Please enter a title!')
     return null
   } else {
-    let roster = await initializeNewRoster(title).then((roster) => {
+    return await initializeNewRoster(title).then((roster) => {
       if (roster !== null && roster.id != 0) {
         globalToast.success('Created new roster!')
         return roster
@@ -30,7 +30,6 @@ export const createNewRosterWithTitle = async (
         return null
       }
     })
-    return roster
   }
 }
 
@@ -456,44 +455,6 @@ export const updateRoles = async (roles: RoleTemplate[]): Promise<boolean> => {
     return false
   } else {
     globalToast.success('Update successful!')
-    return true
-  }
-}
-
-export const saveRole = async (
-  role: RoleTemplate,
-  newTitle: string
-): Promise<boolean> => {
-  console.log('Saving role')
-  const { error } = await supabase.from('role').insert({
-    ...role,
-    title: newTitle
-  })
-  const globalToast = useGlobalToast()
-  if (error) {
-    // some error handling
-    globalToast.error('Error adding new role :(')
-    return false
-  } else {
-    globalToast.success('Added new role!')
-    const rosterStore = useRosterStore()
-    rosterStore.getRoles()
-    return true
-  }
-}
-
-export const deleteRole = async (id: number): Promise<boolean> => {
-  console.log('Deleting role')
-  const { error } = await supabase.from('role').delete().eq('id', id)
-  const globalToast = useGlobalToast()
-  if (error) {
-    // some error handling
-    globalToast.error('Error deleting role :(')
-    return false
-  } else {
-    globalToast.success('Deleted role!')
-    const rosterStore = useRosterStore()
-    rosterStore.getRoles()
     return true
   }
 }

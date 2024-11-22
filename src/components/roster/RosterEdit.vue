@@ -10,8 +10,14 @@ import {
 import router from '@/router'
 import { useRosterStore } from '@/stores/roster'
 import { type PeopleRow, SlotImpl } from '@/types/roster'
-import { createNewRole, createNewRosterWithTitleAndRosterData, getRosterById, refreshUnavailabilityByDateList } from '@/utils/roster'
+import {
+  createNewRole,
+  createNewRosterWithTitleAndRosterData,
+  getRosterById,
+  refreshUnavailabilityByDateList
+} from '@/utils/roster'
 import { onMounted, ref, watchEffect } from 'vue'
+
 const props = defineProps<{
   id: number
 }>()
@@ -20,9 +26,7 @@ const rosterStore = useRosterStore()
 if (!rosterStore.unavailability.length || !rosterStore.people.length) {
   await rosterStore.getUnavailability()
   await rosterStore.getPeople()
-} else if (
-  !rosterStore.unavailabilityByDate.size
-) {
+} else if (!rosterStore.unavailabilityByDate.size) {
   refreshUnavailabilityByDateList()
 }
 const roster = ref(rosterStore.getRosterById(props.id))
@@ -52,20 +56,26 @@ const rosterAction = async () => {
       }
       break
     case ACTIONS.COPY:
-    if (roster.value.unsavedRoster != null) {
+      if (roster.value.unsavedRoster != null) {
         await createNewRosterWithTitleAndRosterData(
           roster.value.title,
           JSON.stringify(roster.value.unsavedRoster)
         ).then((id) => {
           if (id !== null) {
-            router.push(path(ROUTE_NAMES.ROSTER) + path(ROSTER_ROUTE_NAMES.VIEW) + path(id.toString()))
+            router.push(
+              path(ROUTE_NAMES.ROSTER) +
+                path(ROSTER_ROUTE_NAMES.VIEW) +
+                path(id.toString())
+            )
           }
         })
       }
       break
     case ACTIONS.SYNC:
       await getRosterById(roster.value.id).then(() => {
-        const storeRoster = rosterStore.rosters.find(storeRoster => storeRoster.id === roster.value.id)
+        const storeRoster = rosterStore.rosters.find(
+          (storeRoster) => storeRoster.id === roster.value.id
+        )
         if (storeRoster != undefined && storeRoster.roster != null) {
           roster.value.unsavedRoster = JSON.parse(storeRoster.roster)
         }
@@ -77,7 +87,9 @@ const rosterAction = async () => {
       })
       break
     case ACTIONS.DELETE_ROLE:
-      roster.value.unsavedRoster = roster.value.unsavedRoster!.filter(role => role.order != roleActionedOnOrder.value)
+      roster.value.unsavedRoster = roster.value.unsavedRoster!.filter(
+        (role) => role.order != roleActionedOnOrder.value
+      )
       roleActionedOnOrder.value = -1
       resetOrder()
       break
@@ -90,12 +102,12 @@ const rosterAction = async () => {
 
 const personToRoleOrderMap = ref(new Map<number, Set<number>>())
 onMounted(() => {
-  rosterStore.people.forEach(person => {
+  rosterStore.people.forEach((person) => {
     personToRoleOrderMap.value.set(person.id, new Set<number>())
   })
-  roster.value?.unsavedRoster?.forEach(role => {
-    role.services.forEach(service => {
-      service.slot.forEach(slot => {
+  roster.value?.unsavedRoster?.forEach((role) => {
+    role.services.forEach((service) => {
+      service.slot.forEach((slot) => {
         personToRoleOrderMap.value.get(slot.id)?.add(role.order)
       })
     })
@@ -111,7 +123,7 @@ const removeRoleOrderFromPersonMap = (id: number, order: number) => {
 
 const resetOrder = () => {
   let order = 1
-  roster.value.unsavedRoster?.forEach(role => {
+  roster.value.unsavedRoster?.forEach((role) => {
     role.order = order
     order++
   })
@@ -121,16 +133,16 @@ watchEffect(async () => {
   if (roster.value?.id !== props.id) {
     roster.value = rosterStore.getRosterById(props.id)
     personToRoleOrderMap.value = new Map<number, Set<number>>()
-      rosterStore.people.forEach(person => {
-    personToRoleOrderMap.value.set(person.id, new Set<number>())
-  })
-  roster.value?.unsavedRoster?.forEach(role => {
-    role.services.forEach(service => {
-      service.slot.forEach(slot => {
-        personToRoleOrderMap.value.get(slot.id)?.add(role.order)
+    rosterStore.people.forEach((person) => {
+      personToRoleOrderMap.value.set(person.id, new Set<number>())
+    })
+    roster.value?.unsavedRoster?.forEach((role) => {
+      role.services.forEach((service) => {
+        service.slot.forEach((slot) => {
+          personToRoleOrderMap.value.get(slot.id)?.add(role.order)
+        })
       })
     })
-  })
   }
 })
 </script>
@@ -156,7 +168,10 @@ watchEffect(async () => {
                 @blur="
                   async (e: any) => {
                     if (previousDate != e.target.value) {
-                      await rosterStore.saveDate(roster.id, e.target.value || '')
+                      await rosterStore.saveDate(
+                        roster.id,
+                        e.target.value || ''
+                      )
                       previousDate = e.target.value
                     }
                   }
@@ -166,13 +181,17 @@ watchEffect(async () => {
               />
               <template #append>
                 <BInputGroupText>
-                  <div @click.prevent="async () => {
-                    if (previousDate != '') {
-                      roster.date = ''
-                      await rosterStore.saveDate(roster.id, roster.date)
-                      previousDate = ''
-                    }
-                  }">
+                  <div
+                    @click.prevent="
+                      async () => {
+                        if (previousDate != '') {
+                          roster.date = ''
+                          await rosterStore.saveDate(roster.id, roster.date)
+                          previousDate = ''
+                        }
+                      }
+                    "
+                  >
                     <mdi:clear-outline />
                   </div>
                 </BInputGroupText>
@@ -181,25 +200,25 @@ watchEffect(async () => {
           </div>
         </div>
         <div class="my-3 flex justify-between">
-            <div class="flex place-items-center">
-              <span class="ml-1 mr-2 font-bold text-sm">LIVE</span>
-              <BFormCheckbox
-                class="mb-1"
-                v-model="roster.published"
-                :disabled="roster.date === null"
-                switch
-                @click="rosterStore.updatePublished(roster.id, !roster.published)"
-              />
-            </div>
-            <div class="flex place-items-center">
-              <span class="ml-3 mr-2 font-bold text-sm">ARCHIVE</span>
-              <BFormCheckbox
-                class="mb-1"
-                v-model="roster.archived"
-                switch
-                @click="rosterStore.updateArchived(roster.id, !roster.archived)"
-              />
-            </div>
+          <div class="flex place-items-center">
+            <span class="ml-1 mr-2 font-bold text-sm">LIVE</span>
+            <BFormCheckbox
+              class="mb-1"
+              v-model="roster.published"
+              :disabled="roster.date === null"
+              switch
+              @click="rosterStore.updatePublished(roster.id, !roster.published)"
+            />
+          </div>
+          <div class="flex place-items-center">
+            <span class="ml-3 mr-2 font-bold text-sm">ARCHIVE</span>
+            <BFormCheckbox
+              class="mb-1"
+              v-model="roster.archived"
+              switch
+              @click="rosterStore.updateArchived(roster.id, !roster.archived)"
+            />
+          </div>
         </div>
         <div class="my-2">
           <BButtonToolbar class="justify-between">
@@ -208,29 +227,29 @@ watchEffect(async () => {
                 <BButton
                   class="capitalize"
                   @click.prevent="
-                  () => {
-                    action = ACTIONS.SAVE
-                    prompt = PROMPT_MAP.get(action)!
-                    confirmation = true
-                  }
-                "
-                  variant="success"
-                  >{{ ACTIONS.SAVE }}</BButton
-                >
+                    () => {
+                      action = ACTIONS.SAVE
+                      prompt = PROMPT_MAP.get(action)!
+                      confirmation = true
+                    }
+                  "
+                  variant="outline-success"
+                  >{{ ACTIONS.SAVE }}
+                </BButton>
               </BButtonGroup>
               <BButtonGroup class="mx-2">
                 <BButton
                   class="capitalize"
                   @click.prevent="
-                  () => {
-                    action = ACTIONS.COPY
-                    prompt = PROMPT_MAP.get(action)!
-                    confirmation = true
-                  }
-                "
-                  variant="primary"
-                  >{{ ACTIONS.COPY }}</BButton
-                >
+                    () => {
+                      action = ACTIONS.COPY
+                      prompt = PROMPT_MAP.get(action)!
+                      confirmation = true
+                    }
+                  "
+                  variant="outline-primary"
+                  >{{ ACTIONS.COPY }}
+                </BButton>
               </BButtonGroup>
             </div>
             <div>
@@ -238,29 +257,29 @@ watchEffect(async () => {
                 <BButton
                   class="capitalize"
                   @click.prevent="
-                  () => {
-                    action = ACTIONS.SYNC
-                    prompt = PROMPT_MAP.get(action)!
-                    confirmation = true
-                  }
-                "
-                  variant="warning"
-                  >{{ ACTIONS.SYNC }}</BButton
-                >
+                    () => {
+                      action = ACTIONS.SYNC
+                      prompt = PROMPT_MAP.get(action)!
+                      confirmation = true
+                    }
+                  "
+                  variant="outline-warning"
+                  >{{ ACTIONS.SYNC }}
+                </BButton>
               </BButtonGroup>
               <BButtonGroup>
                 <BButton
                   class="capitalize"
                   @click.prevent="
-                  () => {
-                    action = ACTIONS.DELETE
-                    prompt = PROMPT_MAP.get(action)!
-                    confirmation = true
-                  }
-                "
-                  variant="danger"
-                  >{{ ACTIONS.DELETE }}</BButton
-                >
+                    () => {
+                      action = ACTIONS.DELETE
+                      prompt = PROMPT_MAP.get(action)!
+                      confirmation = true
+                    }
+                  "
+                  variant="outline-danger"
+                  >{{ ACTIONS.DELETE }}
+                </BButton>
               </BButtonGroup>
             </div>
           </BButtonToolbar>
@@ -284,34 +303,63 @@ watchEffect(async () => {
               "
               class="p-2"
             >
-            <div class="mb-3 flex justify-between">
-              <template v-if="index != 0">
-                <BButton @click.prevent="
-                  () => {
-                    const temp = roster.unsavedRoster![index]
-                    roster.unsavedRoster![index] = roster.unsavedRoster![index - 1]
-                    roster.unsavedRoster![index - 1] = temp
-                    resetOrder()
-                  }" class="border-none px-0.5 mr-0.5"><line-md:chevron-left class="my-auto w-6 h-6" /></BButton>
-              </template>
-              <BInput class="font-bold text-md text-center w-100 mx-0.5 px-0" v-model="role.title" :state="role.title.length ? null : false" />
-              <BButton @click.prevent="
-                  () => {
-                    action = ACTIONS.DELETE_ROLE
-                    prompt = PROMPT_MAP.get(action)!.concat(role.title.length ? role.title : '(empty)')
-                    roleActionedOnOrder = role.order
-                    confirmation = true
-                  }" variant="danger" class="px-1 mx-0.5"><material-symbols:delete-outline class="my-auto w-5 h-5" /></BButton>
-                <template v-if="index != (roster.unsavedRoster!.length! - 1)">
-                <BButton @click.prevent="
-                  () => {
-                    const temp = roster.unsavedRoster![index]
-                    roster.unsavedRoster![index] = roster.unsavedRoster![index + 1]
-                    roster.unsavedRoster![index + 1] = temp
-                    resetOrder()
-                  }" class="border-none px-0.5 ml-0.5"><line-md:chevron-right class="my-auto w-6 h-6" /></BButton>
-              </template>
-            </div>
+              <div class="mb-3 flex justify-between">
+                <template v-if="index != 0">
+                  <BButton
+                    @click.prevent="
+                      () => {
+                        const temp = roster.unsavedRoster![index]
+                        roster.unsavedRoster![index] =
+                          roster.unsavedRoster![index - 1]
+                        roster.unsavedRoster![index - 1] = temp
+                        resetOrder()
+                      }
+                    "
+                    variant="outline-dark"
+                    class="border-none px-0.5 mr-0.5"
+                  >
+                    <line-md:chevron-left class="my-auto w-6 h-6" />
+                  </BButton>
+                </template>
+                <BInput
+                  class="font-bold text-md text-center w-100 mx-0.5 px-0"
+                  v-model="role.title"
+                  :state="role.title.length ? null : false"
+                />
+                <BButton
+                  @click.prevent="
+                    () => {
+                      action = ACTIONS.DELETE_ROLE
+                      prompt = PROMPT_MAP.get(action)!.concat(
+                        role.title.length ? role.title : '(empty)'
+                      )
+                      roleActionedOnOrder = role.order
+                      confirmation = true
+                    }
+                  "
+                  variant="outline-danger"
+                  class="px-1 mx-0.5"
+                >
+                  <material-symbols:delete-outline class="my-auto w-5 h-5" />
+                </BButton>
+                <template v-if="index != roster.unsavedRoster!.length! - 1">
+                  <BButton
+                    @click.prevent="
+                      () => {
+                        const temp = roster.unsavedRoster![index]
+                        roster.unsavedRoster![index] =
+                          roster.unsavedRoster![index + 1]
+                        roster.unsavedRoster![index + 1] = temp
+                        resetOrder()
+                      }
+                    "
+                    variant="outline-dark"
+                    class="border-none px-0.5 ml-0.5"
+                  >
+                    <line-md:chevron-right class="my-auto w-6 h-6" />
+                  </BButton>
+                </template>
+              </div>
               <BContainer style="--bs-gutter-x: 0">
                 <template v-for="service in role.services" :key="service.no">
                   <div>
@@ -332,8 +380,10 @@ watchEffect(async () => {
                               padding-bottom: 0.15rem;
                             "
                             class="px-1.5 mx-1.5"
-                            ><line-md:minus class="w-4"
-                          /></BButton>
+                            variant="outline-dark"
+                          >
+                            <line-md:minus class="w-4" />
+                          </BButton>
                           <BButton
                             @click.prevent="
                               () => {
@@ -349,8 +399,10 @@ watchEffect(async () => {
                               padding-bottom: 0.15rem;
                             "
                             class="px-1.5"
-                            ><line-md:plus class="w-4"
-                          /></BButton>
+                            variant="outline-dark"
+                          >
+                            <line-md:plus class="w-4" />
+                          </BButton>
                         </div>
                       </div>
                       <div class="my-1">
@@ -366,23 +418,32 @@ watchEffect(async () => {
                                 no-flip
                                 :text="slot.name"
                                 :variant="
-                                        rosterStore.unavailabilityByDate
-                                          .get(roster.date || '')
-                                          ?.has(slot.id)
-                                          ? 'danger'
-                                          : personToRoleOrderMap.get(slot.id) !== undefined && personToRoleOrderMap.get(slot.id)!.size > 1
-                                          ? 'warning'
-                                          : 'dark'
-                                    "
+                                  rosterStore.unavailabilityByDate
+                                    .get(roster.date || '')
+                                    ?.has(slot.id)
+                                    ? 'outline-danger'
+                                    : personToRoleOrderMap.get(slot.id) !==
+                                          undefined &&
+                                        personToRoleOrderMap.get(slot.id)!
+                                          .size > 1
+                                      ? 'outline-warning'
+                                      : 'outline-dark'
+                                "
                               >
                                 <BDropdownItem
                                   variant="secondary"
-                                  @click.prevent="() => {
-                                    removeRoleOrderFromPersonMap(slot.id, role.order)
-                                    slot.name = ''
-                                    slot.id = 0
-                                  }"
-                                >{{`--empty--`}}</BDropdownItem>
+                                  @click.prevent="
+                                    () => {
+                                      removeRoleOrderFromPersonMap(
+                                        slot.id,
+                                        role.order
+                                      )
+                                      slot.name = ''
+                                      slot.id = 0
+                                    }
+                                  "
+                                  >{{ `--empty--` }}
+                                </BDropdownItem>
                                 <template
                                   v-for="person in rosterStore.people.filter(
                                     (p: PeopleRow) => p.active
@@ -395,18 +456,25 @@ watchEffect(async () => {
                                         .get(roster.date || '')
                                         ?.has(person.id)
                                         ? 'danger'
-                                        : personToRoleOrderMap.get(person.id)!.size > 0
-                                        ? 'warning'
-                                        : 'dark'
+                                        : personToRoleOrderMap.get(person.id)!
+                                              .size > 0
+                                          ? 'warning'
+                                          : 'dark'
                                     "
                                     @click.prevent="
                                       () => {
                                         if (slot.id !== 0) {
-                                          removeRoleOrderFromPersonMap(slot.id, role.order)
+                                          removeRoleOrderFromPersonMap(
+                                            slot.id,
+                                            role.order
+                                          )
                                         }
                                         slot.name = person.name
                                         slot.id = person.id
-                                        addRoleOrderToPersonMap(person.id, role.order)
+                                        addRoleOrderToPersonMap(
+                                          person.id,
+                                          role.order
+                                        )
                                       }
                                     "
                                     >{{ person.name }}
@@ -424,37 +492,52 @@ watchEffect(async () => {
                   <BButton
                     @click.prevent="() => handleAddNewRole(role.order - 1)"
                     class="border-none pl-1 pr-1.5"
-                    ><line-md:chevron-left class="my-auto w-6 h-6 inline" /><line-md:plus-circle class="my-auto w-6 h-6 inline" /></BButton
+                    variant="outline-dark"
                   >
+                    <line-md:chevron-left class="my-auto w-6 h-6 inline" />
+                    <line-md:plus-circle class="my-auto w-6 h-6 inline" />
+                  </BButton>
                   <BButton
                     @click.prevent="() => handleAddNewRole(role.order)"
                     class="border-none pl-1.5 pr-1"
-                    ><line-md:plus-circle class="my-auto w-6 h-6 inline" /><line-md:chevron-right class="my-auto w-6 h-6 inline" /></BButton
+                    variant="outline-dark"
                   >
+                    <line-md:plus-circle class="my-auto w-6 h-6 inline" />
+                    <line-md:chevron-right class="my-auto w-6 h-6 inline" />
+                  </BButton>
                 </div>
               </BContainer>
             </BCol>
           </template>
         </BRow>
-      <span class="text-xs">Created at: {{ new Date(Date.parse(roster.created_at)).toLocaleString('en-SG', {
-            dateStyle: 'medium',
-            timeStyle: 'short'
-          }) }}</span>
+        <span class="text-xs"
+          >Created at:
+          {{
+            new Date(Date.parse(roster.created_at)).toLocaleString('en-SG', {
+              dateStyle: 'medium',
+              timeStyle: 'short'
+            })
+          }}</span
+        >
       </BContainer>
     </template>
     <template v-else>
       <div>Roster does not exist!</div>
     </template>
-    <BModal centered hide-footer hide-header v-model="confirmation">
+    <BModal centered no-footer no-header v-model="confirmation">
       <p class="text-justify">{{ prompt }}</p>
       <div class="mt-4 flex justify-between">
         <BButton
           @click.prevent="rosterAction"
-          variant="primary"
+          variant="outline-primary"
           class="capitalize"
-          >{{ action }}</BButton
+          >{{ action }}
+        </BButton>
+        <BButton
+          @click.prevent="confirmation = false"
+          variant="outline-secondary"
+          >Cancel</BButton
         >
-        <BButton @click.prevent="confirmation = false">Cancel</BButton>
       </div>
     </BModal>
   </div>

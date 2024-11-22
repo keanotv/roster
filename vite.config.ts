@@ -7,6 +7,7 @@ import Icons from 'unplugin-icons/vite'
 import IconsResolver from 'unplugin-icons/resolver'
 import Components from 'unplugin-vue-components/vite'
 import { BootstrapVueNextResolver } from 'bootstrap-vue-next'
+import { viteCommonjs } from '@originjs/vite-plugin-commonjs'
 
 const r = (...args: string[]) => resolve(__dirname, ...args)
 
@@ -19,7 +20,7 @@ export default defineConfig({
   },
   plugins: [
     vue(),
-
+    viteCommonjs(),
     // https://github.com/antfu/unplugin-vue-components
     Components({
       dirs: [r('src/components')],
@@ -35,6 +36,10 @@ export default defineConfig({
     // https://github.com/antfu/unplugin-icons
     Icons(),
   ],
+  optimizeDeps: {
+    noDiscovery: true,
+    include: undefined
+  },
   resolve: {
     alias: {
       '@': fileURLToPath(new URL('./src', import.meta.url)),
@@ -42,5 +47,8 @@ export default defineConfig({
       '@views': fileURLToPath(new URL('./src/views', import.meta.url)),
       '@components': fileURLToPath(new URL('./src/components', import.meta.url)),
     }
+  },
+  ssr: {
+    noExternal: ["*supabase*"]
   }
 })

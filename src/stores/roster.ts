@@ -52,7 +52,7 @@ export const useRosterStore = defineStore({
         new Date().getTime() - 60_000 > this.lastUpdated &&
         userStore.isLoggedIn
       ) {
-        this.lastUpdated = new Date().getTime()
+        this.lastUpdated = Date.now()
         if (!this.isInitializing) {
           this.isInitializing = true
           await Promise.all([
@@ -132,16 +132,16 @@ export const useRosterStore = defineStore({
       const result = [] as Array<Array<string>>
       const dateToIdMap = new Map<string, Set<number>>()
       const now = new Date().getTime()
-      const sixWeeksAgo = new Date().getTime() - 3628800000
+      const twelveWeeksAgo = new Date().getTime() - 7257600000
       this.rosters.forEach((rosterObj) => {
         if (
           rosterObj.date != null &&
           rosterObj.roster != null &&
           ((rosterObj.published &&
-            new Date(rosterObj.date).getTime() > sixWeeksAgo) ||
+            new Date(rosterObj.date).getTime() > twelveWeeksAgo) ||
             new Date(rosterObj.date).getTime() > now)
         ) {
-          let key = rosterObj.date + ' — ' + rosterObj.title
+          const key = rosterObj.date + ' — ' + rosterObj.title
           dateToIdMap.set(key, new Set<number>())
           const idList = this.people.map((person) => person.id)
           const roster = JSON.parse(rosterObj.roster) as Role[]

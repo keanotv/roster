@@ -2,7 +2,7 @@
 import { SERVICE_NO_MAP } from '@/constants/constants'
 import { useRosterStore } from '@/stores/roster'
 import { useUnavailabilityStore } from '@/stores/unavailability'
-import { Role } from '@/types/roster'
+import type { Role } from '@/types/roster'
 import { ref, watchEffect } from 'vue'
 
 const props = defineProps<{
@@ -63,21 +63,21 @@ watchEffect(() => {
                   <p class="font-bold text-lg">{{ role.title }}</p>
                 </BCardTitle>
                 <div class="service-grid text-sm">
-                  <template v-for="service in role.services">
-                    <p class="font-bold">
+                  <template v-for="service in role.services" :key="service.no">
+                    <p class="font-bold pt-0.5">
                       {{ SERVICE_NO_MAP.get(service.no) }}
                     </p>
                     <div>
                       <BListGroup class="inline">
-                        <template v-for="slot in service.slot">
+                        <template v-for="slot in service.slot" :key="slot.no">
                           <BListGroupItem
                             class="py-0.5 px-1.5"
                             :variant="
                               slot.name == unavailabilityStore.selectedPersonName
-                              ? 'danger' 
-                              : personToRoleOrderMap.get(slot.id) !== undefined && personToRoleOrderMap.get(slot.id)!.size > 1
-                              ? 'warning'
+                              ? personToRoleOrderMap.get(slot.id) !== undefined && personToRoleOrderMap.get(slot.id)!.size > 1
+                              ? 'danger'
                               : 'primary'
+                              : 'outline-secondary'
                             "
                           >
                             <p>

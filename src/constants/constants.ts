@@ -14,7 +14,6 @@ export const enum ROUTE_NAMES {
   LOGIN = 'login',
   NAME = 'name',
   LOGOUT = 'logout',
-  PROGRAM = 'program',
   ROSTER = 'roster',
   UNAVAILABILITY = 'unavailability',
   ADMIN = 'admin',

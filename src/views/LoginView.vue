@@ -27,11 +27,12 @@ const isLoggingIn = ref(false)
         >
           <BInput
             id="password"
+            autocomplete="off"
             type="password"
             v-model.lazy="password"
             :disabled="isLoggingIn"
           />
-          <BButton type="submit" :disabled="isLoggingIn">Enter</BButton>
+          <BButton type="submit" :disabled="isLoggingIn" variant="outline-primary">Enter</BButton>
         </BForm>
         <p class="text-center">Please enter password to proceed</p>
       </div>

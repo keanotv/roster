@@ -16,11 +16,15 @@ export const useUnavailabilityStore = defineStore({
     selectedPersonName: ''
   }),
   actions: {
-    selectPerson(id: number, name: string) {
+    async selectPerson(id: number, name: string) {
       this.selectedPersonId = id
       this.selectedPersonName = name
       this.initializeNextMonthUnavailability()
-      router.push(ROUTE_NAMES.HOME)
+      await router.push(ROUTE_NAMES.HOME)
+    },
+    clearPerson() {
+      this.selectedPersonId = 0
+      this.selectedPersonName = ''
     },
     async submitUnavailability(sunday: Sunday, reason: string) {
       const unavailabilityRow: UnavailabilityInsert = {
@@ -42,7 +46,8 @@ export const useUnavailabilityStore = defineStore({
     initializeNextMonthUnavailability() {
       const rosterStore = useRosterStore()
       const month = getNextMonth()
-      if ( // unavailability for month + i not found
+      if (
+        // unavailability for month + i not found
         rosterStore.unavailability.findIndex(
           (item) =>
             item.people_id === this.selectedPersonId &&
@@ -63,19 +68,22 @@ export const useUnavailabilityStore = defineStore({
       const rosterStore = useRosterStore()
       const month = getNextMonth()
       this.initializeNextMonthUnavailability()
-      return rosterStore.unavailability.filter(
-        (item) =>
-          item.people_id === this.selectedPersonId
-        && item.month === month.month
-        && item.year === month.year
-      ).map(item => {
-        return {
-          year: item.year,
-          month: item.month,
-          days: item.days,
-          reason: item.reason
-        }
-      }).sort((a, b) => (a.year * 100 + a.month) - (b.year * 100 + b.month))
+      return rosterStore.unavailability
+        .filter(
+          (item) =>
+            item.people_id === this.selectedPersonId &&
+            item.month === month.month &&
+            item.year === month.year
+        )
+        .map((item) => {
+          return {
+            year: item.year,
+            month: item.month,
+            days: item.days,
+            reason: item.reason
+          }
+        })
+        .sort((a, b) => a.year * 100 + a.month - (b.year * 100 + b.month))
     }
   }
 })

@@ -40,9 +40,15 @@ onMounted(() => {
   function getWidth() {
     settingsStore.screenWidth = window.innerWidth
   }
+
   window.removeEventListener('resize', getWidth)
   window.addEventListener('resize', getWidth)
   isLoading.value = false
+  window.onfocus = async () => {
+    if (userStore.isLoggedIn) {
+      await userStore.refreshToken()
+    }
+  }
 })
 </script>
 
@@ -50,7 +56,7 @@ onMounted(() => {
 @import 'assets/main.css';
 
 @font-face {
-  font-family: PPMori;
-  src: url('@/assets/PPMori-Regular.otf'), url('@/assets/PPMori-SemiBold.otf');
+  font-family: Satoshi;
+  src: url('@/assets/Satoshi-Variable.ttf'), url('@/assets/Satoshi-VariableItalic.ttf');
 }
 </style>

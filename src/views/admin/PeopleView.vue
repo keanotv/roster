@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { useRosterStore } from '@/stores/roster'
-import { PeopleInsert, PeopleRow } from '@/types/roster'
+import type { PeopleInsert, PeopleRow } from '@/types/roster'
 import { ref, watchEffect } from 'vue'
 
 const rosterStore = useRosterStore()
@@ -77,7 +77,7 @@ const nameSearch = ref('')
                         addPerson = true
                       }
                     "
-                variant="success"
+                variant="outline-success"
                 class="px-1.5 ml-2 mr-1"
                 ><line-md:account-add class="my-auto w-6 h-6"
               /></BButton></div
@@ -86,8 +86,8 @@ const nameSearch = ref('')
       </BThead>
       <BTbody>
         <template
-          v-for="person in rosterStore.people.filter((person) =>
-            person.name
+          v-for="person in rosterStore.people.filter((p) =>
+            p.name
               .toLowerCase()
               .split(' ')
               .some((subname) =>
@@ -97,6 +97,7 @@ const nameSearch = ref('')
                   .some((subnamesearch) => subname.startsWith(subnamesearch))
               )
           )"
+          :key="person.id"
         >
           <BTr>
             <BTd>
@@ -119,7 +120,7 @@ const nameSearch = ref('')
                       }
                     "
                     class="py-1 px-1 mx-1"
-                    variant="primary"
+                    variant="outline-primary"
                     ><line-md:edit-twotone-full class="h-5 w-5"
                   /></BButton>
                 </div>
@@ -130,8 +131,8 @@ const nameSearch = ref('')
       </BTbody>
       <BModal
         centered
-        hide-footer
-        hide-header
+        no-footer
+        no-header
         v-model="editPerson"
         no-close-on-backdrop
       >
@@ -168,7 +169,7 @@ const nameSearch = ref('')
         <div class="mt-4 flex justify-between">
           <BButton
             @click.prevent="handleUpdate"
-            variant="primary"
+            variant="outline-primary"
             class="capitalize"
             :disabled="duplicateName"
             >Save</BButton
@@ -179,14 +180,15 @@ const nameSearch = ref('')
             selectedPerson = {} as PeopleRow
             newName = ''
           }"
+            variant="outline-secondary"
             >Cancel</BButton
           >
         </div>
       </BModal>
       <BModal
         centered
-        hide-footer
-        hide-header
+        no-footer
+        no-header
         v-model="addPerson"
         no-close-on-backdrop
       >
@@ -221,7 +223,7 @@ const nameSearch = ref('')
         <div class="mt-4 flex justify-between">
           <BButton
             @click.prevent="handleSave"
-            variant="primary"
+            variant="outline-primary"
             class="capitalize"
             :disabled="duplicateName"
             >Save</BButton
@@ -232,6 +234,7 @@ const nameSearch = ref('')
             newPerson = {} as PeopleRow
             newName = ''
           }"
+            variant="outline-secondary"
             >Cancel</BButton
           >
         </div>
@@ -243,10 +246,6 @@ const nameSearch = ref('')
 <style scoped>
 th {
   font-weight: bold;
-}
-
-.form-switch {
-  text-align: center;
 }
 
 #people {

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import History from '@/components/roster/History.vue'
+import HistoryData from '@/components/roster/HistoryData.vue'
 import { useRosterStore } from '@/stores/roster'
 import { ref } from 'vue';
 
@@ -34,11 +34,11 @@ const reloadKey = ref(0)
       <BButton
         @click.prevent="refreshData"
         class="mt-2"
-        variant="success"
+        variant="outline-success"
         >Load/Refresh Data</BButton
       >
     </div>
-    <History :key="reloadKey" />
+    <HistoryData :key="reloadKey" />
   </div>
 </template>
 

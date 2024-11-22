@@ -12,6 +12,23 @@ export const supabase = createClient<Database>(
   import.meta.env.VITE_SUPABASE_PUBLIC_ANON_KEY
 )
 
+export const refreshToken = async () => {
+  const { data, error } = await supabase.auth.getSession()
+  const globalToast = useGlobalToast()
+  if (error) {
+    // some error handling
+    globalToast.info('You have been logged due to inactivity')
+    await logout()
+  } else {
+    if (!data) {
+      globalToast.info('You have been logged due to inactivity')
+      await logout()
+    } else {
+      console.log(data)
+    }
+  }
+}
+
 export const sendError = async (error: any) => {
   const errorString = `Error: ${error?.toString()} / ${JSON.stringify(
     error,
@@ -30,7 +47,7 @@ export const sendError = async (error: any) => {
 
 export const login = async (password: string) => {
   const { data: loginData, error } = await supabase.functions.invoke('login', {
-    body: { password },
+    body: { password }
   })
   if (error) {
     // some error handling
@@ -54,8 +71,8 @@ export const login = async (password: string) => {
         }
         const rosterStore = useRosterStore()
         rosterStore.lastUpdated = 0
-        rosterStore.initializeRosterStore()
-        router.push(ROUTE_NAMES.NAME)
+        await rosterStore.initializeRosterStore()
+        await router.push(ROUTE_NAMES.NAME)
       }
     } else if (loginData.error) {
       globalToast.error(loginData.error.message)
@@ -71,18 +88,11 @@ export const logout = async () => {
   const unavailabilityStore = useUnavailabilityStore()
   if (error) {
     // some error handling
-    globalToast.error('Error logging out')
-    userStore.isLoggedIn = false
-    userStore.role = []
-    rosterStore.clearStore()
-    unavailabilityStore.selectPerson(0, '')
-    router.push(ROUTE_NAMES.LOGIN)
-  } else {
-    globalToast.success('Logged out successfully!')
-    userStore.isLoggedIn = false
-    userStore.role = []
-    rosterStore.clearStore()
-    unavailabilityStore.selectPerson(0, '')
-    router.push(ROUTE_NAMES.LOGIN)
   }
+  globalToast.success('Logged out successfully!')
+  userStore.isLoggedIn = false
+  userStore.role = []
+  rosterStore.clearStore()
+  unavailabilityStore.clearPerson()
+  await router.push(ROUTE_NAMES.LOGIN)
 }

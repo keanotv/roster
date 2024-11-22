@@ -8,7 +8,7 @@ import NewRosterView from '@/views/roster/NewRosterView.vue'
 import RolesView from '@/views/admin/RolesView.vue'
 import PeopleView from '@/views/admin/PeopleView.vue'
 import UnavailabilityView from '@/views/roster/UnavailabilityView.vue'
-import RosterView from '@/views/roster/RosterView.vue'
+import EditRosterView from '@/views/roster/EditRosterView.vue'
 import ViewRostersView from '@/views/roster/ViewRostersView.vue'
 import { useGlobalToast } from '@/utils/toast'
 import { nextTick } from 'vue'
@@ -126,7 +126,7 @@ const router = createRouter({
             {
               path: ':id(\\d+)',
               name: hyphenate([ROUTE_NAMES.ROSTER, ROSTER_ROUTE_NAMES.VIEW]),
-              component: RosterView,
+              component: EditRosterView,
               meta: {
                 requiresAuth: true,
                 requiresAdmin: true
@@ -173,7 +173,7 @@ const globalToast = useGlobalToast()
 router.beforeEach(async (to, from, next) => {
   const userStore = useUserStore()
   if (to.name === ROUTE_NAMES.LOGOUT) {
-    userStore.logout()
+    await userStore.logout()
     next({ name: ROUTE_NAMES.HOME })
   } else if (to.matched.some((record) => record.meta.requiresAuth)) {
     if (to.meta.requiresAuth) {

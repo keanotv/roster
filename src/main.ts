@@ -18,7 +18,7 @@ import { POSITION, type PluginOptions } from 'vue-toastification'
 const options: PluginOptions = {
   position: POSITION.TOP_RIGHT,
   transition: 'Vue-Toastification__fade',
-  maxToasts: 3,
+  maxToasts: 1,
   pauseOnHover: false,
   pauseOnFocusLoss: false,
   timeout: 5000
