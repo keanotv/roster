@@ -2,7 +2,8 @@ export const sleep = async (ms: number) => {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
 
-export const focusAndOpenKeyboard = (el: HTMLInputElement | HTMLTextAreaElement) => {
+export const focusAndOpenKeyboard = (elementId: string) => {
+  const el = document.getElementById(elementId)
   if (el) {
     // Align temp input element approximately where the input element is
     // so the cursor doesn't jump around
@@ -22,6 +23,6 @@ export const focusAndOpenKeyboard = (el: HTMLInputElement | HTMLTextAreaElement)
       el.click();
       // Remove the temp element
       document.body.removeChild(__tempEl__);
-    }, 222);
+    }, 50);
   }
 }

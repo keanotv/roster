@@ -17,6 +17,7 @@ import {
   refreshUnavailabilityByDateList
 } from '@/utils/roster'
 import { onMounted, ref, watchEffect } from 'vue'
+import { focusAndOpenKeyboard } from '@/utils/common.ts'
 
 const props = defineProps<{
   id: number
@@ -47,8 +48,8 @@ const handleAddNewRole = (order: number) => {
 
 const focusNameSearch = () => {
   setTimeout(() => {
-    document.getElementById("nameSearch")?.focus()
-  }, 100)
+    focusAndOpenKeyboard('nameSearch')
+  }, 70)
 }
 
 const rosterAction = async () => {
