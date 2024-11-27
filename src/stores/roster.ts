@@ -49,8 +49,8 @@ export const useRosterStore = defineStore({
     async initializeRosterStore() {
       const userStore = useUserStore()
       if (
-        new Date().getTime() - 60_000 > this.lastUpdated &&
-        userStore.isLoggedIn
+        (new Date().getTime() - 60_000 > this.lastUpdated || this.someDataIsEmpty())
+        && userStore.isLoggedIn
       ) {
         this.lastUpdated = Date.now()
         if (!this.isInitializing) {
@@ -74,6 +74,9 @@ export const useRosterStore = defineStore({
       this.rosters = []
       this.unavailabilityByDate = new Map([])
       this.history = []
+    },
+    someDataIsEmpty() {
+      return !this.people.length || !this.unavailability.length || !this.rosters.length;
     },
     async createNewRosterWithTitle(title: string) {
       const roster = await createNewRosterWithTitle(title)
