@@ -10,7 +10,13 @@ const show = ref(false)
 const nameSearch = ref(unavailabilityStore.selectedPersonName)
 
 const focusInput = () => {
-  document.getElementById('nameSearch')?.focus()
+  setTimeout(() => {
+    const el = (document.getElementById('nameSearch') as HTMLInputElement | null)
+    if (el) {
+      el.focus()
+      el.click()
+    }
+  }, 77)
   show.value = true
 }
 
@@ -35,10 +41,19 @@ const blurInput = () => {
         v-model="show"
         :text="unavailabilityStore.selectedPersonName"
         :variant="
-          !unavailabilityStore.selectedPersonId ? 'outline-danger' : 'success'
+          !unavailabilityStore.selectedPersonId ? 'outline-danger' : 'outline-success'
         "
         toggle-class="text-lg"
       >
+        <template #button-content>Name</template>
+        <BDropdownHeader>
+          <BInput
+            placeholder="Name"
+            id="nameSearch"
+            v-model="nameSearch"
+            @click.prevent="(e: MouseEvent) => e.stopPropagation()"
+          />
+        </BDropdownHeader>
         <template
           v-for="person in rosterStore.people.filter(
             (p) =>
@@ -66,14 +81,6 @@ const blurInput = () => {
             "
             >{{ person.name }}</BDropdownItem
           >
-        </template>
-        <template #button-content>
-          <BInput
-            placeholder="Name"
-            id="nameSearch"
-            class="inline-block w-28 h-10 mr-1.5"
-            v-model="nameSearch"
-          />
         </template>
       </BDropdown>
     </div>

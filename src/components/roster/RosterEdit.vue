@@ -17,7 +17,6 @@ import {
   refreshUnavailabilityByDateList
 } from '@/utils/roster'
 import { onMounted, ref, watchEffect } from 'vue'
-import { focusAndOpenKeyboard } from '@/utils/common.ts'
 
 const props = defineProps<{
   id: number
@@ -48,8 +47,12 @@ const handleAddNewRole = (order: number) => {
 
 const focusNameSearch = () => {
   setTimeout(() => {
-    focusAndOpenKeyboard('nameSearch')
-  }, 70)
+    const el = document.getElementById('nameSearch') as HTMLInputElement | null
+    if (el) {
+      el.focus()
+      el.click()
+    }
+  }, 77)
 }
 
 const rosterAction = async () => {
@@ -330,13 +333,13 @@ watchEffect(async () => {
                       }
                     "
                     variant="outline-dark"
-                    class="border-none px-0.5 mr-0.5"
+                    class="border-none px-0.5 mr-0.5 h-8"
                   >
-                    <line-md:chevron-left class="my-auto w-6 h-6" />
+                    <line-md:chevron-left class="my-auto w-5 h-5" />
                   </BButton>
                 </template>
                 <BInput
-                  class="font-bold text-md text-center w-100 mx-0.5 px-0"
+                  class="font-bold text-center w-100 mx-0.5 px-0 h-8"
                   v-model="role.title"
                   :state="role.title.length ? null : false"
                 />
@@ -352,7 +355,7 @@ watchEffect(async () => {
                     }
                   "
                   variant="outline-danger"
-                  class="px-1 mx-0.5"
+                  class="px-1 mx-0.5 h-8"
                 >
                   <material-symbols:delete-outline class="my-auto w-5 h-5" />
                 </BButton>
@@ -368,9 +371,9 @@ watchEffect(async () => {
                       }
                     "
                     variant="outline-dark"
-                    class="border-none px-0.5 ml-0.5"
+                    class="border-none px-0.5 ml-0.5 h-8"
                   >
-                    <line-md:chevron-right class="my-auto w-6 h-6" />
+                    <line-md:chevron-right class="my-auto w-5 h-5" />
                   </BButton>
                 </template>
               </div>
@@ -379,9 +382,7 @@ watchEffect(async () => {
                   <div>
                     <BRow cols="1" style="--bs-gutter-x: 0">
                       <div class="flex justify-between">
-                        <p class="font-bold my-auto">
-                          {{ SERVICE_NO_MAP.get(service.no) }} Service
-                        </p>
+                        <p>{{ SERVICE_NO_MAP.get(service.no) }} Service</p>
                         <div class="flex my-auto">
                           <BButton
                             @click.prevent="
@@ -421,10 +422,10 @@ watchEffect(async () => {
                       </div>
                       <div class="my-1">
                         <template v-for="slot in service.slot" :key="slot.no">
-                          <div class="flex my-1">
+                          <div class="flex mb-1">
                             <BInput
                               v-model="slot.segments"
-                              class="w-14 mr-2 px-1 text-center"
+                              class="w-14 mr-2 px-1 text-center h-8"
                             />
                             <BCol @click.prevent="focusNameSearch">
                               <BDropdown
@@ -451,7 +452,9 @@ watchEffect(async () => {
                                     placeholder="Name"
                                     id="nameSearch"
                                     v-model="nameSearch"
-                                    @click.prevent="(e: MouseEvent) => e.stopPropagation()"
+                                    @click.prevent="
+                                      (e: MouseEvent) => e.stopPropagation()
+                                    "
                                   />
                                 </BDropdownHeader>
                                 <BDropdownItem
@@ -480,7 +483,9 @@ watchEffect(async () => {
                                           nameSearch
                                             .toLowerCase()
                                             .split(' ')
-                                            .some((subnamesearch) => subname.startsWith(subnamesearch))
+                                            .some((subnamesearch) =>
+                                              subname.startsWith(subnamesearch)
+                                            )
                                         )
                                   )"
                                   :key="person.id"
@@ -530,16 +535,16 @@ watchEffect(async () => {
                     class="border-none pl-1 pr-1.5"
                     variant="outline-dark"
                   >
-                    <line-md:chevron-left class="my-auto w-6 h-6 inline" />
-                    <line-md:plus-circle class="my-auto w-6 h-6 inline" />
+                    <line-md:chevron-left class="my-auto pb-0.5 w-5 h-5 inline" />
+                    <line-md:plus-circle class="my-auto pb-0.5 w-5 h-5 inline" />
                   </BButton>
                   <BButton
                     @click.prevent="() => handleAddNewRole(role.order)"
                     class="border-none pl-1.5 pr-1"
                     variant="outline-dark"
                   >
-                    <line-md:plus-circle class="my-auto w-6 h-6 inline" />
-                    <line-md:chevron-right class="my-auto w-6 h-6 inline" />
+                    <line-md:plus-circle class="my-auto pb-0.5 w-5 h-5 inline" />
+                    <line-md:chevron-right class="my-auto pb-0.5 w-5 h-5 inline" />
                   </BButton>
                 </div>
               </BContainer>
@@ -572,8 +577,8 @@ watchEffect(async () => {
         <BButton
           @click.prevent="confirmation = false"
           variant="outline-secondary"
-          >Cancel</BButton
-        >
+          >Cancel
+        </BButton>
       </div>
     </BModal>
   </div>

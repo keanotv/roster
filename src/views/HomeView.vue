@@ -12,10 +12,17 @@ const seeAll = ref(false)
 <template>
   <div id="home" class="my-8 mx-4">
     <h1 class="my-2 text-center">Rosters</h1>
-    <div class="mb-4 flex place-content-center">
-      <span class="mt-auto">Show all roles:</span>
-      <div class="ml-2 text-xl"><BFormCheckbox v-model="seeAll" switch /></div>
-    </div>
+    <template v-if="rosterStore.rosters.some((roster) => roster.published && !roster.archived)">
+      <div class="mb-4 flex place-content-center">
+        <span class="mt-auto">Show all roles:</span>
+        <div class="ml-2 text-xl"><BFormCheckbox v-model="seeAll" switch /></div>
+      </div>
+    </template>
+    <template v-else>
+      <div class="my-4 flex place-content-center">
+        <p>There are no rosters available now</p>
+      </div>
+    </template>
     <div class="flex place-content-start">
       <BTabs>
       <template
