@@ -41,10 +41,10 @@ const blurInput = () => {
       >
         <template
           v-for="person in rosterStore.people.filter(
-            (person) =>
-              person.active &&
-              person.server &&
-              person.name
+            (p) =>
+              p.active &&
+              p.server &&
+              p.name
                 .toLowerCase()
                 .split(' ')
                 .some((subname) =>

@@ -23,7 +23,7 @@ const reloadKey = ref(0)
       </p>
       <div class="my-2">
         <p><b>Historical, actual</b></p>
-        <p><mdi:dot class="w-7 h-7 inline" />Roster date > 6 weeks ago</p>
+        <p><mdi:dot class="w-7 h-7 inline" />Roster date > 12 weeks ago</p>
         <p><mdi:dot class="w-7 h-7 inline" />Roster is published</p>
       </div>
       <div class="my-2">

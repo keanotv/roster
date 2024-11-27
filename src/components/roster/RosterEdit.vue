@@ -45,6 +45,12 @@ const handleAddNewRole = (order: number) => {
   resetOrder()
 }
 
+const focusNameSearch = () => {
+  setTimeout(() => {
+    document.getElementById("nameSearch")?.focus()
+  }, 100)
+}
+
 const rosterAction = async () => {
   switch (action.value) {
     case ACTIONS.SAVE:
@@ -100,6 +106,11 @@ const rosterAction = async () => {
   confirmation.value = false
 }
 
+const nameSearch = ref('')
+const clearNameSearch = () => {
+  nameSearch.value = ''
+}
+
 const personToRoleOrderMap = ref(new Map<number, Set<number>>())
 onMounted(() => {
   rosterStore.people.forEach((person) => {
@@ -112,6 +123,8 @@ onMounted(() => {
       })
     })
   })
+  document.removeEventListener('click', clearNameSearch)
+  document.addEventListener('click', clearNameSearch)
 })
 const addRoleOrderToPersonMap = (id: number, order: number) => {
   personToRoleOrderMap.value.get(id)?.add(order)
@@ -412,9 +425,11 @@ watchEffect(async () => {
                               v-model="slot.segments"
                               class="w-14 mr-2 px-1 text-center"
                             />
-                            <BCol>
+                            <BCol @click.prevent="focusNameSearch">
                               <BDropdown
                                 lazy
+                                no-animation
+                                unmount-lazy
                                 no-flip
                                 :text="slot.name"
                                 :variant="
@@ -430,8 +445,17 @@ watchEffect(async () => {
                                       : 'outline-dark'
                                 "
                               >
+                                <BDropdownHeader>
+                                  <BInput
+                                    placeholder="Name"
+                                    id="nameSearch"
+                                    v-model="nameSearch"
+                                    @click.prevent="(e: MouseEvent) => e.stopPropagation()"
+                                  />
+                                </BDropdownHeader>
                                 <BDropdownItem
                                   variant="secondary"
+                                  v-if="!nameSearch.length"
                                   @click.prevent="
                                     () => {
                                       removeRoleOrderFromPersonMap(
@@ -446,7 +470,17 @@ watchEffect(async () => {
                                 </BDropdownItem>
                                 <template
                                   v-for="person in rosterStore.people.filter(
-                                    (p: PeopleRow) => p.active
+                                    (p: PeopleRow) =>
+                                      p.active &&
+                                      p.name
+                                        .toLowerCase()
+                                        .split(' ')
+                                        .some((subname) =>
+                                          nameSearch
+                                            .toLowerCase()
+                                            .split(' ')
+                                            .some((subnamesearch) => subname.startsWith(subnamesearch))
+                                        )
                                   )"
                                   :key="person.id"
                                 >
@@ -475,6 +509,7 @@ watchEffect(async () => {
                                           person.id,
                                           role.order
                                         )
+                                        clearNameSearch()
                                       }
                                     "
                                     >{{ person.name }}
