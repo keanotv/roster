@@ -318,236 +318,243 @@ watchEffect(async () => {
                 margin-right: -1px;
                 margin-bottom: -1px;
               "
-              class="p-2"
+              class="p-2 flex flex-col justify-between"
             >
-              <div class="mb-3 flex justify-between">
-                <template v-if="index != 0">
+              <div>
+                <div class="mb-3 flex justify-between">
+                  <template v-if="index != 0">
+                    <BButton
+                      @click.prevent="
+                        () => {
+                          const temp = roster.unsavedRoster![index]
+                          roster.unsavedRoster![index] =
+                            roster.unsavedRoster![index - 1]
+                          roster.unsavedRoster![index - 1] = temp
+                          resetOrder()
+                        }
+                      "
+                      variant="outline-dark"
+                      class="border-none px-0.5 mr-0.5 h-8"
+                    >
+                      <line-md:chevron-left class="my-auto w-5 h-5" />
+                    </BButton>
+                  </template>
+                  <BInput
+                    class="font-bold text-center w-100 mx-0.5 px-0 h-8"
+                    v-model="role.title"
+                    :state="role.title.length ? null : false"
+                  />
                   <BButton
                     @click.prevent="
                       () => {
-                        const temp = roster.unsavedRoster![index]
-                        roster.unsavedRoster![index] =
-                          roster.unsavedRoster![index - 1]
-                        roster.unsavedRoster![index - 1] = temp
-                        resetOrder()
+                        action = ACTIONS.DELETE_ROLE
+                        prompt = PROMPT_MAP.get(action)!.concat(
+                          role.title.length ? role.title : '(empty)'
+                        )
+                        roleActionedOnOrder = role.order
+                        confirmation = true
                       }
                     "
-                    variant="outline-dark"
-                    class="border-none px-0.5 mr-0.5 h-8"
+                    variant="outline-danger"
+                    class="px-1 mx-0.5 h-8"
                   >
-                    <line-md:chevron-left class="my-auto w-5 h-5" />
+                    <material-symbols:delete-outline class="my-auto w-5 h-5" />
                   </BButton>
-                </template>
-                <BInput
-                  class="font-bold text-center w-100 mx-0.5 px-0 h-8"
-                  v-model="role.title"
-                  :state="role.title.length ? null : false"
-                />
-                <BButton
-                  @click.prevent="
-                    () => {
-                      action = ACTIONS.DELETE_ROLE
-                      prompt = PROMPT_MAP.get(action)!.concat(
-                        role.title.length ? role.title : '(empty)'
-                      )
-                      roleActionedOnOrder = role.order
-                      confirmation = true
-                    }
-                  "
-                  variant="outline-danger"
-                  class="px-1 mx-0.5 h-8"
-                >
-                  <material-symbols:delete-outline class="my-auto w-5 h-5" />
-                </BButton>
-                <template v-if="index != roster.unsavedRoster!.length! - 1">
-                  <BButton
-                    @click.prevent="
-                      () => {
-                        const temp = roster.unsavedRoster![index]
-                        roster.unsavedRoster![index] =
-                          roster.unsavedRoster![index + 1]
-                        roster.unsavedRoster![index + 1] = temp
-                        resetOrder()
-                      }
-                    "
-                    variant="outline-dark"
-                    class="border-none px-0.5 ml-0.5 h-8"
-                  >
-                    <line-md:chevron-right class="my-auto w-5 h-5" />
-                  </BButton>
-                </template>
-              </div>
-              <BContainer style="--bs-gutter-x: 0">
-                <template v-for="service in role.services" :key="service.no">
-                  <div>
-                    <BRow cols="1" style="--bs-gutter-x: 0">
-                      <div class="flex justify-between">
-                        <p>{{ SERVICE_NO_MAP.get(service.no) }} Service</p>
-                        <div class="flex my-auto">
-                          <BButton
-                            @click.prevent="
-                              () => {
-                                if (service.slot.length > 1) service.slot.pop()
-                              }
-                            "
-                            style="
-                              padding-top: 0.15rem;
-                              padding-bottom: 0.15rem;
-                            "
-                            class="px-1.5 mx-1.5"
-                            variant="outline-dark"
-                          >
-                            <line-md:minus class="w-4" />
-                          </BButton>
-                          <BButton
-                            @click.prevent="
-                              () => {
-                                if (service.slot.length < 5) {
-                                  service.slot.push(
-                                    new SlotImpl(service.slot.length + 1)
-                                  )
+                  <template v-if="index != roster.unsavedRoster!.length! - 1">
+                    <BButton
+                      @click.prevent="
+                        () => {
+                          const temp = roster.unsavedRoster![index]
+                          roster.unsavedRoster![index] =
+                            roster.unsavedRoster![index + 1]
+                          roster.unsavedRoster![index + 1] = temp
+                          resetOrder()
+                        }
+                      "
+                      variant="outline-dark"
+                      class="border-none px-0.5 ml-0.5 h-8"
+                    >
+                      <line-md:chevron-right class="my-auto w-5 h-5" />
+                    </BButton>
+                  </template>
+                </div>
+                <BContainer style="--bs-gutter-x: 0">
+                  <template v-for="service in role.services" :key="service.no">
+                    <div>
+                      <BRow cols="1" style="--bs-gutter-x: 0">
+                        <div class="flex justify-between">
+                          <p>{{ SERVICE_NO_MAP.get(service.no) }} Service</p>
+                          <div class="flex my-auto">
+                            <BButton
+                              @click.prevent="
+                                () => {
+                                  if (service.slot.length > 1)
+                                    service.slot.pop()
                                 }
-                              }
-                            "
-                            style="
-                              padding-top: 0.15rem;
-                              padding-bottom: 0.15rem;
-                            "
-                            class="px-1.5"
-                            variant="outline-dark"
-                          >
-                            <line-md:plus class="w-4" />
-                          </BButton>
+                              "
+                              style="
+                                padding-top: 0.15rem;
+                                padding-bottom: 0.15rem;
+                              "
+                              class="px-1.5 mx-1.5"
+                              variant="outline-dark"
+                            >
+                              <line-md:minus class="w-4" />
+                            </BButton>
+                            <BButton
+                              @click.prevent="
+                                () => {
+                                  if (service.slot.length < 7) {
+                                    service.slot.push(
+                                      new SlotImpl(service.slot.length + 1)
+                                    )
+                                  }
+                                }
+                              "
+                              style="
+                                padding-top: 0.15rem;
+                                padding-bottom: 0.15rem;
+                              "
+                              class="px-1.5"
+                              variant="outline-dark"
+                            >
+                              <line-md:plus class="w-4" />
+                            </BButton>
+                          </div>
                         </div>
-                      </div>
-                      <div class="my-1">
-                        <template v-for="slot in service.slot" :key="slot.no">
-                          <div class="flex mb-1">
-                            <BInput
-                              v-model="slot.segments"
-                              class="w-14 mr-2 px-1 text-center h-8"
-                            />
-                            <BCol @click.prevent="focusNameSearch">
-                              <BDropdown
-                                lazy
-                                no-animation
-                                unmount-lazy
-                                no-flip
-                                :text="slot.name"
-                                :variant="
-                                  rosterStore.unavailabilityByDate
-                                    .get(roster.date || '')
-                                    ?.has(slot.id)
-                                    ? 'outline-danger'
-                                    : personToRoleOrderMap.get(slot.id) !==
-                                          undefined &&
-                                        personToRoleOrderMap.get(slot.id)!
-                                          .size > 1
-                                      ? 'outline-warning'
-                                      : 'outline-dark'
-                                "
-                              >
-                                <BDropdownHeader>
-                                  <BInput
-                                    placeholder="Name"
-                                    id="nameSearch"
-                                    v-model="nameSearch"
-                                    @click.prevent="
-                                      (e: MouseEvent) => e.stopPropagation()
-                                    "
-                                  />
-                                </BDropdownHeader>
-                                <BDropdownItem
-                                  variant="secondary"
-                                  v-if="!nameSearch.length"
-                                  @click.prevent="
-                                    () => {
-                                      removeRoleOrderFromPersonMap(
-                                        slot.id,
-                                        role.order
-                                      )
-                                      slot.name = ''
-                                      slot.id = 0
-                                    }
+                        <div class="my-1">
+                          <template v-for="slot in service.slot" :key="slot.no">
+                            <div class="flex mb-1">
+                              <BInput
+                                v-model="slot.segments"
+                                class="w-14 mr-2 px-1 text-center h-8"
+                              />
+                              <BCol @click.prevent="focusNameSearch">
+                                <BDropdown
+                                  lazy
+                                  no-animation
+                                  unmount-lazy
+                                  no-flip
+                                  :text="slot.name"
+                                  :variant="
+                                    rosterStore.unavailabilityByDate
+                                      .get(roster.date || '')
+                                      ?.has(slot.id)
+                                      ? 'outline-danger'
+                                      : personToRoleOrderMap.get(slot.id) !==
+                                            undefined &&
+                                          personToRoleOrderMap.get(slot.id)!
+                                            .size > 1
+                                        ? 'outline-warning'
+                                        : 'outline-dark'
                                   "
-                                  >{{ `--empty--` }}
-                                </BDropdownItem>
-                                <template
-                                  v-for="person in rosterStore.people.filter(
-                                    (p: PeopleRow) =>
-                                      p.active &&
-                                      p.name
-                                        .toLowerCase()
-                                        .split(' ')
-                                        .some((subname) =>
-                                          nameSearch
-                                            .toLowerCase()
-                                            .split(' ')
-                                            .some((subnamesearch) =>
-                                              subname.startsWith(subnamesearch)
-                                            )
-                                        )
-                                  )"
-                                  :key="person.id"
                                 >
+                                  <BDropdownHeader>
+                                    <BInput
+                                      placeholder="Name"
+                                      id="nameSearch"
+                                      v-model="nameSearch"
+                                      @click.prevent="
+                                        (e: MouseEvent) => e.stopPropagation()
+                                      "
+                                    />
+                                  </BDropdownHeader>
                                   <BDropdownItem
-                                    :variant="
-                                      rosterStore.unavailabilityByDate
-                                        .get(roster.date || '')
-                                        ?.has(person.id)
-                                        ? 'danger'
-                                        : personToRoleOrderMap.get(person.id)!
-                                              .size > 0
-                                          ? 'warning'
-                                          : 'dark'
-                                    "
+                                    variant="secondary"
+                                    v-if="!nameSearch.length"
                                     @click.prevent="
                                       () => {
-                                        if (slot.id !== 0) {
-                                          removeRoleOrderFromPersonMap(
-                                            slot.id,
-                                            role.order
-                                          )
-                                        }
-                                        slot.name = person.name
-                                        slot.id = person.id
-                                        addRoleOrderToPersonMap(
-                                          person.id,
+                                        removeRoleOrderFromPersonMap(
+                                          slot.id,
                                           role.order
                                         )
-                                        clearNameSearch()
+                                        slot.name = ''
+                                        slot.id = 0
                                       }
                                     "
-                                    >{{ person.name }}
+                                    >{{ `--empty--` }}
                                   </BDropdownItem>
-                                </template>
-                              </BDropdown>
-                            </BCol>
-                          </div>
-                        </template>
-                      </div>
-                    </BRow>
-                  </div>
-                </template>
-                <div class="w-100 flex justify-between">
-                  <BButton
-                    @click.prevent="() => handleAddNewRole(role.order - 1)"
-                    class="border-none pl-1 pr-1.5"
-                    variant="outline-dark"
-                  >
-                    <line-md:chevron-left class="my-auto pb-0.5 w-5 h-5 inline" />
-                    <line-md:plus-circle class="my-auto pb-0.5 w-5 h-5 inline" />
-                  </BButton>
-                  <BButton
-                    @click.prevent="() => handleAddNewRole(role.order)"
-                    class="border-none pl-1.5 pr-1"
-                    variant="outline-dark"
-                  >
-                    <line-md:plus-circle class="my-auto pb-0.5 w-5 h-5 inline" />
-                    <line-md:chevron-right class="my-auto pb-0.5 w-5 h-5 inline" />
-                  </BButton>
-                </div>
-              </BContainer>
+                                  <template
+                                    v-for="person in rosterStore.people.filter(
+                                      (p: PeopleRow) =>
+                                        p.active &&
+                                        p.name
+                                          .toLowerCase()
+                                          .split(' ')
+                                          .some((subname) =>
+                                            nameSearch
+                                              .toLowerCase()
+                                              .split(' ')
+                                              .some((subnamesearch) =>
+                                                subname.startsWith(
+                                                  subnamesearch
+                                                )
+                                              )
+                                          )
+                                    )"
+                                    :key="person.id"
+                                  >
+                                    <BDropdownItem
+                                      :variant="
+                                        rosterStore.unavailabilityByDate
+                                          .get(roster.date || '')
+                                          ?.has(person.id)
+                                          ? 'danger'
+                                          : personToRoleOrderMap.get(person.id)!
+                                                .size > 0
+                                            ? 'warning'
+                                            : 'dark'
+                                      "
+                                      @click.prevent="
+                                        () => {
+                                          if (slot.id !== 0) {
+                                            removeRoleOrderFromPersonMap(
+                                              slot.id,
+                                              role.order
+                                            )
+                                          }
+                                          slot.name = person.name
+                                          slot.id = person.id
+                                          addRoleOrderToPersonMap(
+                                            person.id,
+                                            role.order
+                                          )
+                                          clearNameSearch()
+                                        }
+                                      "
+                                      >{{ person.name }}
+                                    </BDropdownItem>
+                                  </template>
+                                </BDropdown>
+                              </BCol>
+                            </div>
+                          </template>
+                        </div>
+                      </BRow>
+                    </div>
+                  </template>
+                </BContainer>
+              </div>
+              <div class="w-100 flex justify-between">
+                <BButton
+                  @click.prevent="() => handleAddNewRole(role.order - 1)"
+                  class="border-none pl-1 pr-1.5"
+                  variant="outline-dark"
+                >
+                  <line-md:chevron-left class="my-auto pb-0.5 w-5 h-5 inline" />
+                  <line-md:plus-circle class="my-auto pb-0.5 w-5 h-5 inline" />
+                </BButton>
+                <BButton
+                  @click.prevent="() => handleAddNewRole(role.order)"
+                  class="border-none pl-1.5 pr-1"
+                  variant="outline-dark"
+                >
+                  <line-md:plus-circle class="my-auto pb-0.5 w-5 h-5 inline" />
+                  <line-md:chevron-right
+                    class="my-auto pb-0.5 w-5 h-5 inline"
+                  />
+                </BButton>
+              </div>
             </BCol>
           </template>
         </BRow>
