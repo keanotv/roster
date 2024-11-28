@@ -35,7 +35,7 @@ const initializeRoster = async () => {
           placeholder="e.g. 23 June 2024 draft"
         />
       </BInputGroup>
-      <BButton type="submit" :disabled="isLoading">Create</BButton>
+      <BButton type="submit" :disabled="isLoading" variant="outline-primary">Create</BButton>
     </BForm>
   </div>
 </template>
