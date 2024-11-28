@@ -55,15 +55,21 @@ watchEffect(() => {
       </p>
       <p class="my-2">
         Let us know which Sundays you are not available to serve in the month of
-        {{ MONTHS[sundays[0].month - 1] }} by
-        <u
-          >15th
-          {{
-            MONTHS[sundays[0].month - 2] !== undefined
-              ? MONTHS[sundays[0].month - 2]
-              : MONTHS[11]
-          }}!</u
-        >
+        {{ MONTHS[sundays[0].month - 1] }}
+        <template v-if="rosterStore.config[0].isAutomaticCutOff">
+          by
+          <u
+            >15th
+            {{
+              MONTHS[sundays[0].month - 2] !== undefined
+                ? MONTHS[sundays[0].month - 2]
+                : MONTHS[11]
+            }}!</u
+          >
+        </template>
+        <template v-else>
+          as soon as you know!
+        </template>
       </p>
       <p>Thank you for serving! 😊</p>
     </div>
@@ -161,8 +167,8 @@ watchEffect(() => {
         <BButton
           @click.prevent="confirmation = false"
           variant="outline-secondary"
-          >Cancel</BButton
-        >
+          >Cancel
+        </BButton>
       </div>
     </BModal>
   </div>
