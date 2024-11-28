@@ -10,18 +10,19 @@ import PeopleView from '@/views/admin/PeopleView.vue'
 import UnavailabilityView from '@/views/roster/UnavailabilityView.vue'
 import EditRosterView from '@/views/roster/EditRosterView.vue'
 import ViewRostersView from '@/views/roster/ViewRostersView.vue'
+import ConfigurationView from '@/views/admin/ConfigurationView.vue'
 import { useGlobalToast } from '@/utils/toast'
 import { nextTick } from 'vue'
 import { USER_ROLES, useUserStore } from '@/stores/user'
 import { getRosterById } from '@/utils/roster'
 import {
-  path,
-  ROUTE_NAMES,
+  ADMIN_ROUTE_NAMES,
   DEFAULT_TITLE,
-  ROSTER_ROUTE_NAMES,
   hyphenate,
-  UNAVAILABILITY_ROUTE_NAMES,
-  ADMIN_ROUTE_NAMES
+  path,
+  ROSTER_ROUTE_NAMES,
+  ROUTE_NAMES,
+  UNAVAILABILITY_ROUTE_NAMES
 } from '@/constants/constants'
 
 const router = createRouter({
@@ -92,6 +93,15 @@ const router = createRouter({
           path: ADMIN_ROUTE_NAMES.ROLES,
           name: ADMIN_ROUTE_NAMES.ROLES,
           component: RolesView,
+          meta: {
+            requiresAuth: true,
+            requiresAdmin: true
+          }
+        },
+        {
+          path: ADMIN_ROUTE_NAMES.CONFIGURATION,
+          name: ADMIN_ROUTE_NAMES.CONFIGURATION,
+          component: ConfigurationView,
           meta: {
             requiresAuth: true,
             requiresAdmin: true

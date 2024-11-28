@@ -35,9 +35,12 @@ const submitUnavailability = async () => {
 const today = new Date()
 const isWithinCutOffDate = today.getDate() > 0 && today.getDate() < 16
 
-const disabled = ref(false)
+const disabled = ref(rosterStore.config[0].isAutomaticCutOff)
 watchEffect(() => {
-  disabled.value = !isWithinCutOffDate && !userStore.role.some(role => role === USER_ROLES.ADMIN)
+  disabled.value =
+    rosterStore.config[0].isAutomaticCutOff &&
+    !isWithinCutOffDate &&
+    !userStore.role.some((role) => role === USER_ROLES.ADMIN)
   updateUnavailableSundays()
 })
 </script>
@@ -82,15 +85,13 @@ watchEffect(() => {
         <p class="mt-2 text-sm">Reason:</p>
         <BFormInput
           v-model="reason"
-          :disabled="
-            !unavailableSundays[index].days.length || disabled
-          "
+          :disabled="!unavailableSundays[index].days.length || disabled"
           :placeholder="
             !unavailableSundays[index].days.length
               ? 'Not required'
               : unavailableSundays[index].reason
-              ? 'Not required as already submitted'
-              : 'Not submitted yet'
+                ? 'Not required as already submitted'
+                : 'Not submitted yet'
           "
         />
         <template v-if="unavailableSundays[index].reason && reason.length"
@@ -114,11 +115,14 @@ watchEffect(() => {
           class="mt-2"
           :pressed="false"
           variant="outline-success"
-          >Submit</BButton
-        >
+          >Submit
+        </BButton>
       </template>
       <template v-else>
-        <p class="text-xs my-3 text-orange-500">Past cut-off date for submission! Please let Chanel or Flynn know if you would like to change unavailable dates.</p>
+        <p class="text-xs my-3 text-orange-500">
+          Past cut-off date for submission! Please let Chanel or Flynn know if
+          you would like to change unavailable dates.
+        </p>
       </template>
     </template>
     <BModal centered no-footer no-header v-model="confirmation">
@@ -140,10 +144,10 @@ watchEffect(() => {
           !unavailableSundays[0].days.length
             ? 'N/A'
             : reason.length
-            ? reason
-            : unavailableSundays[0].reason
-            ? '(already submitted)'
-            : '(reason not provided)'
+              ? reason
+              : unavailableSundays[0].reason
+                ? '(already submitted)'
+                : '(reason not provided)'
         }}
       </p>
       <hr class="my-2" />
@@ -152,9 +156,13 @@ watchEffect(() => {
           @click.prevent="submitUnavailability"
           variant="outline-primary"
           class="capitalize"
-          >Submit</BButton
+          >Submit
+        </BButton>
+        <BButton
+          @click.prevent="confirmation = false"
+          variant="outline-secondary"
+          >Cancel</BButton
         >
-        <BButton @click.prevent="confirmation = false" variant="outline-secondary">Cancel</BButton>
       </div>
     </BModal>
   </div>

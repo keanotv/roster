@@ -9,6 +9,21 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      config: {
+        Row: {
+          id: number
+          isAutomaticCutOff: boolean
+        }
+        Insert: {
+          id?: number
+          isAutomaticCutOff?: boolean
+        }
+        Update: {
+          id?: number
+          isAutomaticCutOff?: boolean
+        }
+        Relationships: []
+      }
       people: {
         Row: {
           active: boolean

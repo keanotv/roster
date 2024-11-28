@@ -1,5 +1,6 @@
 import { useRosterStore } from '@/stores/roster'
 import {
+  type ConfigRow,
   type PeopleInsert,
   type PeopleRow,
   type Role,
@@ -132,6 +133,17 @@ export const getRoles = async () => {
     const roles = JSON.parse(data[0].roles) as RoleTemplate[]
     const rosterStore = useRosterStore()
     rosterStore.roles = roles.sort((a, b) => a.order - b.order) ?? []
+  }
+}
+
+export const getConfig = async () => {
+  console.log('Fetching config')
+  const { data, error } = await supabase.from('config').select('*').limit(1)
+  if (error) {
+    // some error handling
+  } else {
+    const rosterStore = useRosterStore()
+    rosterStore.config[0] = data[0]
   }
 }
 
@@ -454,7 +466,24 @@ export const updateRoles = async (roles: RoleTemplate[]): Promise<boolean> => {
     globalToast.error('Error updating role :(')
     return false
   } else {
-    globalToast.success('Update successful!')
+    globalToast.success('Update roles successful!')
+    return true
+  }
+}
+
+export const updateConfig = async (config: ConfigRow): Promise<boolean> => {
+  console.log('Updating configs')
+  const { error } = await supabase
+    .from('config')
+    .update(config)
+    .eq('id', 1)
+  const globalToast = useGlobalToast()
+  if (error) {
+    // some error handling
+    globalToast.error('Error updating config :(')
+    return false
+  } else {
+    globalToast.success('Update config successful!')
     return true
   }
 }

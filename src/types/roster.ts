@@ -7,8 +7,8 @@ type PeopleTable = Tables['people']
 export type PeopleRow = PeopleTable['Row']
 export type PeopleInsert = PeopleTable['Insert']
 
-type RolesTable = Tables['roles']
-export type RolesRow = RolesTable['Row']
+type ConfigTable = Tables['config']
+export type ConfigRow = ConfigTable['Row']
 
 // Fluid tables
 type RosterTable = Tables['roster']

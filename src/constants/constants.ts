@@ -31,7 +31,8 @@ export const enum ACTIONS {
 
 export const enum ADMIN_ROUTE_NAMES {
   PEOPLE = 'people',
-  ROLES = 'roles'
+  ROLES = 'roles',
+  CONFIGURATION = 'configuration'
 }
 
 export const enum ROSTER_ROUTE_NAMES {

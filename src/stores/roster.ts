@@ -5,7 +5,8 @@ import type {
   Role,
   ReasonRow,
   PeopleInsert,
-  RoleTemplate
+  RoleTemplate,
+  ConfigRow
 } from '@/types/roster'
 import {
   createNewRosterWithTitle,
@@ -13,6 +14,7 @@ import {
   getPeople,
   getReasons,
   getRoles,
+  getConfig,
   getRosters,
   getUnavailability,
   saveDate,
@@ -22,7 +24,8 @@ import {
   updateArchived,
   updatePublished,
   savePerson,
-  updateRoles
+  updateRoles,
+  updateConfig
 } from '@/utils/roster'
 import { defineStore } from 'pinia'
 import { useUserStore } from '@/stores/user'
@@ -35,6 +38,7 @@ export const useRosterStore = defineStore({
     services: 3,
     people: [] as PeopleRow[],
     roles: [] as RoleTemplate[],
+    config: [] as ConfigRow[],
     unavailability: [] as UnavailabilityRow[],
     reasons: [] as ReasonRow[],
     isInitializing: false,
@@ -49,8 +53,9 @@ export const useRosterStore = defineStore({
     async initializeRosterStore() {
       const userStore = useUserStore()
       if (
-        (new Date().getTime() - 60_000 > this.lastUpdated || this.someDataIsEmpty())
-        && userStore.isLoggedIn
+        (new Date().getTime() - 60_000 > this.lastUpdated ||
+          this.someDataIsEmpty()) &&
+        userStore.isLoggedIn
       ) {
         this.lastUpdated = Date.now()
         if (!this.isInitializing) {
@@ -58,6 +63,7 @@ export const useRosterStore = defineStore({
           await Promise.all([
             getPeople(),
             getRoles(),
+            getConfig(),
             getUnavailability(),
             getRosters(),
             getReasons()
@@ -69,6 +75,7 @@ export const useRosterStore = defineStore({
     clearStore() {
       this.people = []
       this.roles = []
+      this.config = []
       this.unavailability = []
       this.reasons = []
       this.rosters = []
@@ -76,7 +83,11 @@ export const useRosterStore = defineStore({
       this.history = []
     },
     someDataIsEmpty() {
-      return !this.people.length || !this.unavailability.length || !this.rosters.length;
+      return (
+        !this.people.length ||
+        !this.unavailability.length ||
+        !this.rosters.length
+      )
     },
     async createNewRosterWithTitle(title: string) {
       const roster = await createNewRosterWithTitle(title)
@@ -92,16 +103,11 @@ export const useRosterStore = defineStore({
     async getPeople() {
       if (!this.isInitializing) await getPeople()
     },
-    async getRoles() {
-      if (!this.isInitializing) await getRoles()
-    },
-    async getRosters() {
-      if (!this.isInitializing) await getRosters()
-    },
     async getReasons() {
       if (!this.isInitializing) await getReasons()
     },
     getRosterById(id: number) {
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       return this.rosters.find((roster) => roster.id === id)!
     },
     async saveDate(id: number, date: string) {
@@ -130,6 +136,9 @@ export const useRosterStore = defineStore({
     },
     async updateRoles(roles: RoleTemplate[]): Promise<boolean> {
       return await updateRoles(roles)
+    },
+    async updateConfig(config: ConfigRow): Promise<boolean> {
+      return await updateConfig(config)
     },
     crunchHistoryData() {
       const result = [] as Array<Array<string>>
