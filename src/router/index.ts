@@ -86,7 +86,8 @@ const router = createRouter({
           component: PeopleView,
           meta: {
             requiresAuth: true,
-            requiresAdmin: true
+            requiresAdmin: true,
+            title: 'People'
           }
         },
         {
@@ -95,7 +96,8 @@ const router = createRouter({
           component: RolesView,
           meta: {
             requiresAuth: true,
-            requiresAdmin: true
+            requiresAdmin: true,
+            title: 'Roles'
           }
         },
         {
@@ -104,7 +106,8 @@ const router = createRouter({
           component: ConfigurationView,
           meta: {
             requiresAuth: true,
-            requiresAdmin: true
+            requiresAdmin: true,
+            title: 'Configuration'
           }
         }
       ]
