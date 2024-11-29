@@ -35,10 +35,10 @@ const submitUnavailability = async () => {
 const today = new Date()
 const isWithinCutOffDate = today.getDate() > 0 && today.getDate() < 16
 
-const disabled = ref(rosterStore.config[0].isAutomaticCutOff)
+const disabled = ref(rosterStore.config.isAutomaticCutOff)
 watchEffect(() => {
   disabled.value =
-    rosterStore.config[0].isAutomaticCutOff &&
+    rosterStore.config.isAutomaticCutOff &&
     !isWithinCutOffDate &&
     !userStore.role.some((role) => role === USER_ROLES.ADMIN)
   updateUnavailableSundays()
@@ -56,7 +56,7 @@ watchEffect(() => {
       <p class="my-2">
         Let us know which Sundays you are not available to serve in the month of
         {{ MONTHS[sundays[0].month - 1] }}
-        <template v-if="rosterStore.config[0].isAutomaticCutOff">
+        <template v-if="rosterStore.config.isAutomaticCutOff">
           by
           <u
             >15th

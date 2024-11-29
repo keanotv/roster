@@ -12,17 +12,17 @@ const rosterStore = useRosterStore()
       <div class="flex justify-content-between">
         <span class="font-bold">Close unavailability form after 15th:</span>
         <BFormCheckbox
-          v-model="rosterStore.config[0].isAutomaticCutOff"
+          v-model="rosterStore.config.isAutomaticCutOff"
           switch
           @click="
             rosterStore.updateConfig({
-              ...rosterStore.config[0],
-              isAutomaticCutOff: !rosterStore.config[0].isAutomaticCutOff
+              ...rosterStore.config,
+              isAutomaticCutOff: !rosterStore.config.isAutomaticCutOff
             })
           "
         />
       </div>
-      <template v-if="rosterStore.config[0].isAutomaticCutOff">
+      <template v-if="rosterStore.config.isAutomaticCutOff">
         <p class="my-1 text-orange-500">
           Servers cannot submit/change unavailable dates after 15th
         </p>
