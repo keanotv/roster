@@ -13,7 +13,6 @@ export type ConfigRow = ConfigTable['Row']
 // Fluid tables
 type RosterTable = Tables['roster']
 export type RosterRow = RosterTable['Row']
-export type RosterInsert = RosterTable['Insert']
 export interface RosterRowLocal extends RosterRow {
   unsavedRoster: Role[] | null
 }
@@ -47,6 +46,15 @@ export type Slot = {
   segments: string
   name: string
   id: number
+}
+
+export class ConfigRowImpl implements ConfigRow {
+  id: number
+  isAutomaticCutOff: boolean
+  constructor(id: number, isAutomaticCutOff: boolean) {
+    this.id = id
+    this.isAutomaticCutOff = isAutomaticCutOff
+  }
 }
 
 export class RoleImpl implements Role {

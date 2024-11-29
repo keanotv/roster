@@ -1,12 +1,13 @@
-import type {
-  PeopleRow,
-  UnavailabilityRow,
-  RosterRowLocal,
-  Role,
-  ReasonRow,
-  PeopleInsert,
-  RoleTemplate,
-  ConfigRow
+import {
+  type PeopleRow,
+  type UnavailabilityRow,
+  type RosterRowLocal,
+  type Role,
+  type ReasonRow,
+  type PeopleInsert,
+  type RoleTemplate,
+  type ConfigRow,
+  ConfigRowImpl
 } from '@/types/roster'
 import {
   createNewRosterWithTitle,
@@ -38,7 +39,7 @@ export const useRosterStore = defineStore({
     services: 3,
     people: [] as PeopleRow[],
     roles: [] as RoleTemplate[],
-    config: [] as ConfigRow[],
+    config: new ConfigRowImpl(1, true),
     unavailability: [] as UnavailabilityRow[],
     reasons: [] as ReasonRow[],
     isInitializing: false,
@@ -75,7 +76,7 @@ export const useRosterStore = defineStore({
     clearStore() {
       this.people = []
       this.roles = []
-      this.config = []
+      this.config = new ConfigRowImpl(1, true)
       this.unavailability = []
       this.reasons = []
       this.rosters = []

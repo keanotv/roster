@@ -143,7 +143,7 @@ export const getConfig = async () => {
     // some error handling
   } else {
     const rosterStore = useRosterStore()
-    rosterStore.config[0] = data[0]
+    rosterStore.config = data[0]
   }
 }
 
@@ -168,10 +168,14 @@ export const getRosters = async () => {
           unsavedRoster: rosterStore.rosters[index].unsavedRoster
         }
       } else {
-        rosterStore.rosters.push({
-          ...rosterRow,
-          unsavedRoster: JSON.parse(rosterRow.roster!) as Role[]
-        })
+        if (rosterRow.roster != null) {
+          rosterStore.rosters.push({
+            ...rosterRow,
+            unsavedRoster: JSON.parse(rosterRow.roster) as Role[]
+          })
+        } else {
+          // do some error logging
+        }
       }
     })
     rosterStore.rosters.sort(
