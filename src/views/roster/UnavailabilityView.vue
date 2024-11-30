@@ -131,7 +131,6 @@ watchEffect(() => {
         <BThead>
           <BTr>
             <BTh class="w-20">Name</BTh>
-            <BTh class="w-0"></BTh>
             <BTh class="w-24">Date(s)</BTh>
             <BTh class="min-w-[120px]">Reason</BTh>
           </BTr>
@@ -149,12 +148,8 @@ watchEffect(() => {
             >
               <BTr>
                 <BTd>
-                  {{ unavailability.name }}
-                </BTd>
-                <BTd>
-                  <BButton
-                    class="py-1 px-1 mx-1"
-                    variant="outline-primary"
+                  <a
+                    class="title underline underline-offset-2"
                     @click.prevent="
                       () => {
                         selectedPerson = rosterStore.people.find(
@@ -167,9 +162,8 @@ watchEffect(() => {
                         editPerson = true
                       }
                     "
+                    >{{ unavailability.name }}</a
                   >
-                    <line-md:edit-twotone-full class="h-3 w-3" />
-                  </BButton>
                 </BTd>
                 <BTd>
                   {{ unavailability.days.join(', ') }}

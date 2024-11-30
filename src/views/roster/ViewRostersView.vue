@@ -58,16 +58,13 @@ const viewPath = path(ROUTE_NAMES.ROSTER) + path(ROSTER_ROUTE_NAMES.VIEW)
       </BThead>
       <BTbody class="text-sm">
         <template
-          v-for="roster in rosterStore.rosters.filter(
-            (roster) => roster.archived
-          )"
+          v-for="roster in rosterStore.rosters.filter((r) => r.archived)"
+          :key="roster.id"
         >
           <BTr>
             <BTd class="title underline underline-offset-2">
               <RouterLink :to="viewPath + path(roster.id.toString())">
-                <div>
-                  {{ roster.title }}
-                </div>
+                {{ roster.title }}
               </RouterLink>
             </BTd>
             <BTd>{{ roster.date || '-' }}</BTd>
