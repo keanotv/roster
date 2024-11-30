@@ -133,7 +133,7 @@ watchEffect(() => {
             <BTh class="w-20">Name</BTh>
             <BTh class="w-0"></BTh>
             <BTh class="w-24">Date(s)</BTh>
-            <BTh>Reason</BTh>
+            <BTh class="min-w-[120px]">Reason</BTh>
           </BTr>
         </BThead>
         <BTbody class="text-sm">
