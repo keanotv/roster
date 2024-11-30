@@ -18,8 +18,8 @@ const viewPath = path(ROUTE_NAMES.ROSTER) + path(ROSTER_ROUTE_NAMES.VIEW)
       <BThead>
         <BTr>
           <BTh>Title</BTh>
-          <BTh>Date</BTh>
-          <BTh>Live</BTh>
+          <BTh class="date-table-header">Date</BTh>
+          <BTh class="live-table-header">Live</BTh>
         </BTr>
       </BThead>
       <BTbody class="text-sm">
@@ -52,8 +52,8 @@ const viewPath = path(ROUTE_NAMES.ROSTER) + path(ROSTER_ROUTE_NAMES.VIEW)
       <BThead>
         <BTr>
           <BTh>Title</BTh>
-          <BTh>Date</BTh>
-          <BTh>Live</BTh>
+          <BTh class="date-table-header">Date</BTh>
+          <BTh class="live-table-header">Live</BTh>
         </BTr>
       </BThead>
       <BTbody class="text-sm">
@@ -86,7 +86,21 @@ th {
 
 #view-rosters {
   @media (min-width: 600px) {
-    width: 600px;
+    width: 540px;
+  }
+}
+
+.date-table-header {
+  width: 100px;
+  @media (min-width: 600px) {
+    width: 120px;
+  }
+}
+
+.live-table-header {
+  width: 48px;
+  @media (min-width: 600px) {
+    width: 80px;
   }
 }
 </style>

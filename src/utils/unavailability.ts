@@ -68,7 +68,7 @@ export const getSundaysInNextTwoMonths = (): Sunday[] => {
       i <= new Date(month.year, month.month - 1, 0).getDate();
       i++
     ) {
-      let date = new Date(month.year, month.month - 1, i)
+      const date = new Date(month.year, month.month - 1, i)
       if (date.getDay() == 0) {
         days.push(i)
       }
@@ -91,7 +91,7 @@ export const getSundaysInNextMonth = (): Sunday => {
     i <= new Date(month.year, month.month - 1, 0).getDate();
     i++
   ) {
-    let date = new Date(month.year, month.month - 1, i)
+    const date = new Date(month.year, month.month - 1, i)
     if (date.getDay() == 0) {
       days.push(i)
     }
@@ -101,6 +101,21 @@ export const getSundaysInNextMonth = (): Sunday => {
     month: month.month,
     days: days,
     reason: false
+  }
+}
+
+export const getSundaysInTheMonthOf = (month: number, year: number): Sunday => {
+  const days: number[] = []
+  for (let i = 1; i <= new Date(year, month - 1, 0).getDate(); i++) {
+    const date = new Date(year, month - 1, i)
+    if (date.getDay() == 0) {
+      days.push(i)
+    }
+  }
+  return {
+    year,
+    month,
+    days
   }
 }
 

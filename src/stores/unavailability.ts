@@ -1,8 +1,7 @@
-import { submitUnavailability } from '@/utils/unavailability'
+import { getNextMonth, submitUnavailability } from '@/utils/unavailability'
 import { defineStore } from 'pinia'
 import { useRosterStore } from './roster'
-import { getNextMonth } from '@/utils/unavailability'
-import type { Sunday } from '@/types/unavailability'
+import type { Month, Sunday } from '@/types/unavailability'
 import type { ReasonInsert, UnavailabilityInsert } from '@/types/roster'
 import { getUnavailability } from '@/utils/roster'
 import router from '@/router'
@@ -40,8 +39,12 @@ export const useUnavailabilityStore = defineStore({
         year: sunday.year,
         text: reason
       }
-      await submitUnavailability(unavailabilityRow, reasonRow)
-      await getUnavailability()
+      const success = await submitUnavailability(unavailabilityRow, reasonRow)
+      if (success) {
+        return await getUnavailability()
+      } else {
+        return false
+      }
     },
     initializeNextMonthUnavailability() {
       const rosterStore = useRosterStore()
@@ -72,6 +75,26 @@ export const useUnavailabilityStore = defineStore({
         .filter(
           (item) =>
             item.people_id === this.selectedPersonId &&
+            item.month === month.month &&
+            item.year === month.year
+        )
+        .map((item) => {
+          return {
+            year: item.year,
+            month: item.month,
+            days: item.days,
+            reason: item.reason
+          }
+        })
+        .sort((a, b) => a.year * 100 + a.month - (b.year * 100 + b.month))
+    },
+    getUnavailableSundaysForIdInTheMonthOf(id: number, month: Month): Sunday[] {
+      const rosterStore = useRosterStore()
+      this.initializeNextMonthUnavailability()
+      return rosterStore.unavailability
+        .filter(
+          (item) =>
+            item.people_id === id &&
             item.month === month.month &&
             item.year === month.year
         )

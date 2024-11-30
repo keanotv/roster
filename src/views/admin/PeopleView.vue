@@ -69,14 +69,14 @@ const nameSearch = ref('')
               </div>
               <BButton
                 @click.prevent="
-                      () => {
-                        newPerson = {
-                          active: true,
-                          server: true
-                        } as PeopleRow
-                        addPerson = true
-                      }
-                    "
+                  () => {
+                    newPerson = {
+                      active: true,
+                      server: true
+                    } as PeopleRow
+                    addPerson = true
+                  }
+                "
                 variant="outline-success"
                 class="px-1.5 ml-2 mr-1"
                 ><line-md:account-add class="my-auto w-6 h-6"
@@ -171,15 +171,17 @@ const nameSearch = ref('')
             @click.prevent="handleUpdate"
             variant="outline-primary"
             class="capitalize"
-            :disabled="duplicateName"
+            :disabled="duplicateName || !newName.length"
             >Save</BButton
           >
           <BButton
-            @click.prevent="() => {
-            editPerson = false
-            selectedPerson = {} as PeopleRow
-            newName = ''
-          }"
+            @click.prevent="
+              () => {
+                editPerson = false
+                selectedPerson = {} as PeopleRow
+                newName = ''
+              }
+            "
             variant="outline-secondary"
             >Cancel</BButton
           >
@@ -229,11 +231,13 @@ const nameSearch = ref('')
             >Save</BButton
           >
           <BButton
-            @click.prevent="() => {
-            addPerson = false
-            newPerson = {} as PeopleRow
-            newName = ''
-          }"
+            @click.prevent="
+              () => {
+                addPerson = false
+                newPerson = {} as PeopleRow
+                newName = ''
+              }
+            "
             variant="outline-secondary"
             >Cancel</BButton
           >

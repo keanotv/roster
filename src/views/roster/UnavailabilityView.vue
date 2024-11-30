@@ -1,10 +1,15 @@
 <script setup lang="ts">
 import { useRosterStore } from '@/stores/roster'
 import {
+  getSundaysInNextMonth,
   getSundaysInNextTwoMonths,
+  getSundaysInTheMonthOf,
   MONTHS
 } from '@/utils/unavailability'
-import { onMounted, ref } from 'vue'
+import { onMounted, ref, watchEffect } from 'vue'
+import type { PeopleRow } from '@/types/roster.ts'
+import type { Month, Sunday } from '@/types/unavailability.ts'
+import { useUnavailabilityStore } from '@/stores/unavailability.ts'
 
 const rosterStore = useRosterStore()
 await Promise.all([
@@ -13,9 +18,11 @@ await Promise.all([
   rosterStore.getReasons()
 ])
 
+const editPerson = ref(false)
+const selectedPerson = ref({} as PeopleRow)
 const unavailabilities = ref([] as any[])
 
-onMounted(() => {
+const refreshUnavailabilities = () => {
   unavailabilities.value = rosterStore.unavailability.map((unavailability) => {
     const person = rosterStore.people.find(
       (person) => person.id === unavailability.people_id
@@ -29,6 +36,7 @@ onMounted(() => {
     if (person !== undefined) {
       return {
         name: person.name,
+        people_id: person.id,
         year: unavailability.year,
         month: unavailability.month,
         days: unavailability.days,
@@ -39,15 +47,79 @@ onMounted(() => {
   unavailabilities.value = unavailabilities.value.sort(function (a, b) {
     return a?.name < b?.name ? -1 : a?.name > b?.name ? 1 : 0
   })
+}
+
+onMounted(() => {
+  refreshUnavailabilities()
 })
 
-const sundays = getSundaysInNextTwoMonths()
+const sundays = ref([getSundaysInNextMonth()])
+const selectedMonth = ref({} as Month)
+const sundaysInNextTwoMonths = getSundaysInNextTwoMonths()
+const unavailableSundays = ref([] as Sunday[])
+const updatedUnavailableSundays = ref([] as Sunday[])
+const originalReason = ref('')
+const updatedReason = ref('')
+const unavailabilityStore = useUnavailabilityStore()
+const updateUnavailableSundays = () => {
+  if (selectedPerson.value != undefined) {
+    sundays.value = [
+      getSundaysInTheMonthOf(
+        selectedMonth.value.month,
+        selectedMonth.value.year
+      )
+    ]
+    unavailableSundays.value =
+      unavailabilityStore.getUnavailableSundaysForIdInTheMonthOf(
+        selectedPerson.value.id,
+        selectedMonth.value
+      )
+    updatedUnavailableSundays.value = [
+      {
+        year: selectedMonth.value.year,
+        month: selectedMonth.value.month,
+        days: [...unavailableSundays.value[0].days]
+      }
+    ]
+    originalReason.value =
+      rosterStore.reasons.find(
+        (reason) =>
+          reason.people_id === selectedPerson.value.id &&
+          reason.year === selectedMonth.value.year &&
+          reason.month === selectedMonth.value.month
+      )?.text ?? ''
+    updatedReason.value = originalReason.value
+  }
+}
+
+const handleUpdate = async () => {
+  console.log(updatedUnavailableSundays.value)
+  console.log(updatedReason.value)
+  const success = await unavailabilityStore.submitUnavailability(
+    updatedUnavailableSundays.value[0],
+    updatedReason.value
+  )
+  if (success) {
+    await rosterStore.getReasons()
+    refreshUnavailabilities()
+    editPerson.value = false
+    selectedPerson.value = {} as PeopleRow
+  } else {
+    editPerson.value = true
+  }
+}
+
+watchEffect(() => {
+  if (editPerson.value) {
+    updateUnavailableSundays()
+  }
+})
 </script>
 
 <template>
   <div id="unavailability" class="p-8 w-[100vw]">
     <h1 class="my-2 text-center">Unavailability</h1>
-    <template v-for="(sunday, index) in sundays" :key="index">
+    <template v-for="(sunday, index) in sundaysInNextTwoMonths" :key="index">
       <p class="text-lg font-bold m-1">
         {{ MONTHS[sunday.month - 1] }} {{ sunday.year }}
       </p>
@@ -60,12 +132,16 @@ const sundays = getSundaysInNextTwoMonths()
         <BThead>
           <BTr>
             <BTh class="w-20">Name</BTh>
+            <BTh class="w-0"></BTh>
             <BTh class="w-24">Date(s)</BTh>
             <BTh>Reason</BTh>
           </BTr>
         </BThead>
         <BTbody class="text-sm">
-          <template v-for="(unavailability, index) in unavailabilities" :key="index">
+          <template
+            v-for="(unavailability, index) in unavailabilities"
+            :key="index"
+          >
             <template
               v-if="
                 sunday.year === unavailability.year &&
@@ -75,6 +151,26 @@ const sundays = getSundaysInNextTwoMonths()
               <BTr>
                 <BTd>
                   {{ unavailability.name }}
+                </BTd>
+                <BTd>
+                  <BButton
+                    class="py-1 px-1 mx-1"
+                    variant="outline-primary"
+                    @click.prevent="
+                      () => {
+                        selectedPerson = rosterStore.people.find(
+                          (p) => p.id === unavailability.people_id
+                        )!
+                        selectedMonth = {
+                          year: sunday.year,
+                          month: sunday.month
+                        }
+                        editPerson = true
+                      }
+                    "
+                  >
+                    <line-md:edit-twotone-full class="h-3 w-3" />
+                  </BButton>
                 </BTd>
                 <BTd>
                   {{ unavailability.days.join(', ') }}
@@ -91,6 +187,67 @@ const sundays = getSundaysInNextTwoMonths()
       </BTableSimple>
     </template>
   </div>
+  <template v-if="editPerson && selectedPerson !== undefined">
+    <BModal
+      v-model="editPerson"
+      centered
+      no-close-on-backdrop
+      no-footer
+      no-header
+    >
+      <p>
+        Currently editing for: <b>{{ selectedPerson.name }}</b>
+      </p>
+      <hr class="my-2" />
+      <div class="my-3">
+        <template v-for="(sunday, index) in sundays" :key="index">
+          <p class="font-bold mb-1">
+            {{ MONTHS[sunday.month - 1] }} {{ sunday.year }} (original)
+          </p>
+          <BFormCheckboxGroup
+            v-model="unavailableSundays[index].days"
+            :options="sunday.days"
+            button-variant="outline-dark"
+            buttons
+            disabled
+            size="lg"
+          >
+          </BFormCheckboxGroup>
+          <p class="my-1">Reason: {{ originalReason }}</p>
+          <p class="font-bold mt-3 mb-1">
+            {{ MONTHS[sunday.month - 1] }} {{ sunday.year }} (updated)
+          </p>
+          <BFormCheckboxGroup
+            v-model="updatedUnavailableSundays[index].days"
+            :options="sunday.days"
+            button-variant="outline-dark"
+            buttons
+            size="lg"
+          >
+          </BFormCheckboxGroup>
+          <div>
+            <p class="my-1">Reason:</p>
+            <BInput v-model="updatedReason"></BInput>
+          </div>
+        </template>
+      </div>
+      <div class="mt-4 flex justify-between">
+        <BButton variant="outline-primary" @click.prevent="handleUpdate"
+          >Save
+        </BButton>
+        <BButton
+          variant="outline-secondary"
+          @click.prevent="
+            () => {
+              editPerson = false
+              selectedPerson = {} as PeopleRow
+            }
+          "
+          >Cancel
+        </BButton>
+      </div>
+    </BModal>
+  </template>
 </template>
 
 <style scoped>

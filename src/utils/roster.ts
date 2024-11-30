@@ -247,11 +247,14 @@ export const getUnavailability = async () => {
     .gte('month', now.getMonth() + 1)
   if (error) {
     // some error handling
+    refreshUnavailabilityByDateList()
+    return false
   } else {
     const rosterStore = useRosterStore()
     rosterStore.unavailability = data
+    refreshUnavailabilityByDateList()
+    return true
   }
-  refreshUnavailabilityByDateList()
 }
 
 export const refreshUnavailabilityByDateList = () => {
@@ -327,6 +330,7 @@ export const saveTitle = async (id: number, title: string) => {
 
 export const updatePublished = async (id: number, published: boolean) => {
   console.log('Changing live flag')
+  const rosterStore = useRosterStore()
   const { error } = await supabase
     .from('roster')
     .update({
@@ -337,6 +341,10 @@ export const updatePublished = async (id: number, published: boolean) => {
   if (error) {
     // some error handling
   } else {
+    const roster = rosterStore.rosters.find((roster) => roster.id === id)
+    if (roster) {
+      roster.published = published
+    }
     if (published) {
       globalToast.success('Roster is live!')
     } else {
@@ -347,6 +355,7 @@ export const updatePublished = async (id: number, published: boolean) => {
 
 export const updateArchived = async (id: number, archived: boolean) => {
   console.log('Changing live flag')
+  const rosterStore = useRosterStore()
   const { error } = await supabase
     .from('roster')
     .update({
@@ -357,6 +366,10 @@ export const updateArchived = async (id: number, archived: boolean) => {
   if (error) {
     // some error handling
   } else {
+    const roster = rosterStore.rosters.find((roster) => roster.id === id)
+    if (roster) {
+      roster.archived = archived
+    }
     if (archived) {
       globalToast.success('Roster is archived!')
     } else {
@@ -477,10 +490,7 @@ export const updateRoles = async (roles: RoleTemplate[]): Promise<boolean> => {
 
 export const updateConfig = async (config: ConfigRow): Promise<boolean> => {
   console.log('Updating configs')
-  const { error } = await supabase
-    .from('config')
-    .update(config)
-    .eq('id', 1)
+  const { error } = await supabase.from('config').update(config).eq('id', 1)
   const globalToast = useGlobalToast()
   if (error) {
     // some error handling
