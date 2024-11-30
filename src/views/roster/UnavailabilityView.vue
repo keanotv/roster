@@ -93,8 +93,7 @@ const updateUnavailableSundays = () => {
 }
 
 const handleUpdate = async () => {
-  console.log(updatedUnavailableSundays.value)
-  console.log(updatedReason.value)
+  updatedUnavailableSundays.value[0].days.sort((a, b) => a - b)
   const success = await unavailabilityStore.submitUnavailability(
     updatedUnavailableSundays.value[0],
     updatedReason.value
@@ -198,40 +197,44 @@ watchEffect(() => {
       <p>
         Currently editing for: <b>{{ selectedPerson.name }}</b>
       </p>
-      <hr class="my-2" />
       <div class="my-3">
         <template v-for="(sunday, index) in sundays" :key="index">
-          <p class="font-bold mb-1">
-            {{ MONTHS[sunday.month - 1] }} {{ sunday.year }} (original)
+          <p class="font-bold">
+            {{ MONTHS[sunday.month - 1] }} {{ sunday.year }}
           </p>
-          <BFormCheckboxGroup
-            v-model="unavailableSundays[index].days"
-            :options="sunday.days"
-            button-variant="outline-dark"
-            buttons
-            disabled
-            size="lg"
-          >
-          </BFormCheckboxGroup>
-          <p class="my-1">Reason: {{ originalReason }}</p>
-          <p class="font-bold mt-3 mb-1">
-            {{ MONTHS[sunday.month - 1] }} {{ sunday.year }} (updated)
-          </p>
-          <BFormCheckboxGroup
-            v-model="updatedUnavailableSundays[index].days"
-            :options="sunday.days"
-            button-variant="outline-dark"
-            buttons
-            size="lg"
-          >
-          </BFormCheckboxGroup>
-          <div>
-            <p class="my-1">Reason:</p>
-            <BInput v-model="updatedReason"></BInput>
-          </div>
+          <BListGroup class="my-1">
+            <BListGroupItem variant="secondary">
+              <p><u>Original</u></p>
+              <BFormCheckboxGroup
+                v-model="unavailableSundays[index].days"
+                :options="sunday.days"
+                button-variant="outline-dark"
+                buttons
+                class="my-1"
+                disabled
+              >
+              </BFormCheckboxGroup>
+              <p class="mt-1">Reason: {{ originalReason }}</p>
+            </BListGroupItem>
+            <BListGroupItem>
+              <p><u>Updated</u></p>
+              <BFormCheckboxGroup
+                v-model="updatedUnavailableSundays[index].days"
+                :options="sunday.days"
+                button-variant="outline-dark"
+                buttons
+                class="my-1"
+              >
+              </BFormCheckboxGroup>
+              <div class="my-1">
+                <p>Reason:</p>
+                <BInput v-model="updatedReason"></BInput>
+              </div>
+            </BListGroupItem>
+          </BListGroup>
         </template>
       </div>
-      <div class="mt-4 flex justify-between">
+      <div class="mt-2 flex justify-between">
         <BButton variant="outline-primary" @click.prevent="handleUpdate"
           >Save
         </BButton>
