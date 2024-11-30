@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { useUserStore } from '@/stores/user'
 import { ref } from 'vue'
+
 const userStore = useUserStore()
 
 const handleSubmitPassword = async () => {
@@ -32,7 +33,16 @@ const isLoggingIn = ref(false)
             v-model.lazy="password"
             :disabled="isLoggingIn"
           />
-          <BButton type="submit" :disabled="isLoggingIn" variant="outline-primary">Enter</BButton>
+          <BButton
+            :disabled="isLoggingIn"
+            type="submit"
+            variant="outline-primary"
+          >
+            <template v-if="!isLoggingIn"> Enter </template>
+            <template v-else>
+              <BSpinner small variant="primary" />
+            </template>
+          </BButton>
         </BForm>
         <p class="text-center">Please enter password to proceed</p>
       </div>
