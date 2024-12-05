@@ -161,7 +161,7 @@ const router = createRouter({
     {
       path: path(ROUTE_NAMES.LOGOUT),
       name: ROUTE_NAMES.LOGOUT,
-      component: HomeView
+      component: LoginView
     },
     {
       path: '/:pathMatch(.*)*',
@@ -187,7 +187,7 @@ router.beforeEach(async (to, from, next) => {
   const userStore = useUserStore()
   if (to.name === ROUTE_NAMES.LOGOUT) {
     await userStore.logout()
-    next({ name: ROUTE_NAMES.HOME })
+    next({ name: ROUTE_NAMES.LOGIN })
   } else if (to.matched.some((record) => record.meta.requiresAuth)) {
     if (to.meta.requiresAuth) {
       if (!userStore.isLoggedIn) {
