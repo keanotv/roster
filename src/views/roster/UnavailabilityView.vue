@@ -25,27 +25,29 @@ const nameSearch = ref('')
 const show = ref([false, false])
 
 const refreshUnavailabilities = () => {
-  unavailabilities.value = rosterStore.unavailability.map((unavailability) => {
-    const person = rosterStore.people.find(
-      (person) => person.id === unavailability.people_id
-    )
-    const reason = rosterStore.reasons.find(
-      (reason) =>
-        reason.people_id === unavailability.people_id &&
-        reason.year === unavailability.year &&
-        reason.month === unavailability.month
-    )?.text
-    if (person !== undefined) {
-      return {
-        name: person.name,
-        people_id: person.id,
-        year: unavailability.year,
-        month: unavailability.month,
-        days: unavailability.days,
-        reason
+  unavailabilities.value = rosterStore.unavailability
+    .map((unavailability) => {
+      const person = rosterStore.people.find(
+        (person) => person.id === unavailability.people_id
+      )
+      const reason = rosterStore.reasons.find(
+        (reason) =>
+          reason.people_id === unavailability.people_id &&
+          reason.year === unavailability.year &&
+          reason.month === unavailability.month
+      )?.text
+      if (person !== undefined && unavailability.days.length) {
+        return {
+          name: person.name,
+          people_id: person.id,
+          year: unavailability.year,
+          month: unavailability.month,
+          days: unavailability.days,
+          reason
+        }
       }
-    }
-  })
+    })
+    .filter(Boolean)
   unavailabilities.value = unavailabilities.value.sort(function (a, b) {
     return a?.name < b?.name ? -1 : a?.name > b?.name ? 1 : 0
   })
@@ -85,11 +87,6 @@ const updateUnavailableSundays = () => {
         }
       ]
     } else {
-      unavailableSundays.value.push({
-        year: selectedMonth.value.year,
-        month: selectedMonth.value.month,
-        days: []
-      })
       updatedUnavailableSundays.value.push({
         year: selectedMonth.value.year,
         month: selectedMonth.value.month,
@@ -291,7 +288,10 @@ const focusInput = () => {
             {{ MONTHS[sunday.month - 1] }} {{ sunday.year }}
           </p>
           <BListGroup class="my-1">
-            <BListGroupItem variant="secondary">
+            <BListGroupItem
+              v-if="unavailableSundays.length"
+              variant="secondary"
+            >
               <p><u>Original</u></p>
               <BFormCheckboxGroup
                 v-model="unavailableSundays[index].days"
@@ -305,7 +305,12 @@ const focusInput = () => {
               <p class="mt-1">Reason: {{ originalReason }}</p>
             </BListGroupItem>
             <BListGroupItem>
-              <p><u>Updated</u></p>
+              <template v-if="unavailableSundays.length">
+                <p><u>Updated</u></p>
+              </template>
+              <template v-else>
+                <p><u>New</u></p>
+              </template>
               <BFormCheckboxGroup
                 v-model="updatedUnavailableSundays[index].days"
                 :options="sunday.days"
@@ -332,6 +337,7 @@ const focusInput = () => {
             () => {
               editPerson = false
               selectedPerson = {} as PeopleRow
+              updatedUnavailableSundays.length = 0
             }
           "
           >Cancel
