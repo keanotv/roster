@@ -25,17 +25,17 @@ export const useUnavailabilityStore = defineStore({
       this.selectedPersonId = 0
       this.selectedPersonName = ''
     },
-    async submitUnavailability(sunday: Sunday, reason: string) {
+    async submitUnavailability(sunday: Sunday, reason: string, id?: number) {
       const unavailabilityRow: UnavailabilityInsert = {
         days: sunday.days,
         month: sunday.month,
-        people_id: this.selectedPersonId,
+        people_id: id ?? this.selectedPersonId,
         year: sunday.year,
         reason: !!reason.length
       }
       const reasonRow: ReasonInsert = {
         month: sunday.month,
-        people_id: this.selectedPersonId,
+        people_id: id ?? this.selectedPersonId,
         year: sunday.year,
         text: reason
       }

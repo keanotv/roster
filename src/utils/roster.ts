@@ -243,8 +243,9 @@ export const getUnavailability = async () => {
   const { data, error } = await supabase
     .from('unavailability')
     .select()
-    .eq('year', now.getFullYear())
-    .gte('month', now.getMonth() + 1)
+    .or(
+      `and(year.eq.${now.getFullYear()}, month.gte.${now.getMonth() + 1}),and(year.gt.${now.getFullYear()})`
+    )
   if (error) {
     // some error handling
     refreshUnavailabilityByDateList()

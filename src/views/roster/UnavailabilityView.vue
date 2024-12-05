@@ -21,6 +21,8 @@ await Promise.all([
 const editPerson = ref(false)
 const selectedPerson = ref({} as PeopleRow)
 const unavailabilities = ref([] as any[])
+const nameSearch = ref('')
+const show = ref([false, false])
 
 const refreshUnavailabilities = () => {
   unavailabilities.value = rosterStore.unavailability.map((unavailability) => {
@@ -74,13 +76,26 @@ const updateUnavailableSundays = () => {
         selectedPerson.value.id,
         selectedMonth.value
       )
-    updatedUnavailableSundays.value = [
-      {
+    if (unavailableSundays.value.length) {
+      updatedUnavailableSundays.value = [
+        {
+          year: selectedMonth.value.year,
+          month: selectedMonth.value.month,
+          days: [...unavailableSundays.value[0].days]
+        }
+      ]
+    } else {
+      unavailableSundays.value.push({
         year: selectedMonth.value.year,
         month: selectedMonth.value.month,
-        days: [...unavailableSundays.value[0].days]
-      }
-    ]
+        days: []
+      })
+      updatedUnavailableSundays.value.push({
+        year: selectedMonth.value.year,
+        month: selectedMonth.value.month,
+        days: []
+      })
+    }
     originalReason.value =
       rosterStore.reasons.find(
         (reason) =>
@@ -96,7 +111,8 @@ const handleUpdate = async () => {
   updatedUnavailableSundays.value[0].days.sort((a, b) => a - b)
   const success = await unavailabilityStore.submitUnavailability(
     updatedUnavailableSundays.value[0],
-    updatedReason.value
+    updatedReason.value,
+    selectedPerson.value.id
   )
   if (success) {
     await rosterStore.getReasons()
@@ -113,15 +129,93 @@ watchEffect(() => {
     updateUnavailableSundays()
   }
 })
+
+const blurInput = (index: number) => {
+  setTimeout(() => {
+    document.getElementById('nameSearch')?.blur()
+    show.value[index] = false
+  }, 100)
+}
+
+const focusInput = () => {
+  setTimeout(() => {
+    const el = document.getElementById('nameSearch') as HTMLInputElement | null
+    if (el) {
+      el.focus()
+      el.click()
+    }
+  }, 77)
+}
 </script>
 
 <template>
   <div id="unavailability" class="p-8 w-[100vw]">
     <h1 class="my-2 text-center">Unavailability</h1>
     <template v-for="(sunday, index) in sundaysInNextTwoMonths" :key="index">
-      <p class="text-lg font-bold m-1">
-        {{ MONTHS[sunday.month - 1] }} {{ sunday.year }}
-      </p>
+      <div class="flex gap-2">
+        <p class="text-lg font-bold m-1">
+          {{ MONTHS[sunday.month - 1] }} {{ sunday.year }}
+        </p>
+        <div class="mb-1" @click="focusInput">
+          <BDropdown
+            v-model="show[index]"
+            :text="unavailabilityStore.selectedPersonName"
+            :variant="
+              !unavailabilityStore.selectedPersonId
+                ? 'outline-danger'
+                : 'outline-success'
+            "
+            lazy
+            no-animation
+            no-flip
+            unmount-lazy
+          >
+            <template #button-content>Name</template>
+            <BDropdownHeader>
+              <BInput
+                id="nameSearch"
+                v-model="nameSearch"
+                placeholder="Name"
+                @click.prevent="(e: MouseEvent) => e.stopPropagation()"
+              />
+            </BDropdownHeader>
+            <template
+              v-for="person in rosterStore.people.filter(
+                (p) =>
+                  p.active &&
+                  p.server &&
+                  p.name
+                    .toLowerCase()
+                    .split(' ')
+                    .some((subname) =>
+                      nameSearch
+                        .toLowerCase()
+                        .split(' ')
+                        .some((subnamesearch) =>
+                          subname.startsWith(subnamesearch)
+                        )
+                    )
+              )"
+              :key="person.id"
+            >
+              <BDropdownItem
+                @click.prevent="
+                  () => {
+                    blurInput(index)
+                    editPerson = true
+                    selectedMonth = { month: sunday.month, year: sunday.year }
+                    selectedPerson = rosterStore.people.find(
+                      (p) => p.id === person.id
+                    )!
+                    nameSearch = ''
+                  }
+                "
+                >{{ person.name }}
+              </BDropdownItem>
+            </template>
+          </BDropdown>
+        </div>
+      </div>
       <BTableSimple hover small responsive>
         <colgroup>
           <col />

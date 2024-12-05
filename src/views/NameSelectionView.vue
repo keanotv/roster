@@ -11,7 +11,7 @@ const nameSearch = ref(unavailabilityStore.selectedPersonName)
 
 const focusInput = () => {
   setTimeout(() => {
-    const el = (document.getElementById('nameSearch') as HTMLInputElement | null)
+    const el = document.getElementById('nameSearch') as HTMLInputElement | null
     if (el) {
       el.focus()
       el.click()
@@ -37,12 +37,17 @@ const blurInput = () => {
     </p>
     <div class="mt-3 w-40" @click="focusInput">
       <BDropdown
+        :variant="
+          !unavailabilityStore.selectedPersonId
+            ? 'outline-danger'
+            : 'outline-success'
+        "
+        lazy
+        no-animation
         no-flip
         v-model="show"
         :text="unavailabilityStore.selectedPersonName"
-        :variant="
-          !unavailabilityStore.selectedPersonId ? 'outline-danger' : 'outline-success'
-        "
+        unmount-lazy
         toggle-class="text-lg"
       >
         <template #button-content>Name</template>
@@ -79,8 +84,8 @@ const blurInput = () => {
                 unavailabilityStore.selectPerson(person.id, person.name)
               }
             "
-            >{{ person.name }}</BDropdownItem
-          >
+            >{{ person.name }}
+          </BDropdownItem>
         </template>
       </BDropdown>
     </div>
