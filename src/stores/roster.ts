@@ -1,32 +1,32 @@
 import {
-  type PeopleRow,
-  type UnavailabilityRow,
-  type RosterRowLocal,
-  type Role,
-  type ReasonRow,
-  type PeopleInsert,
-  type RoleTemplate,
   type ConfigRow,
-  ConfigRowImpl
+  ConfigRowImpl,
+  type PeopleInsert,
+  type PeopleRow,
+  type ReasonRow,
+  type Role,
+  type RoleTemplate,
+  type RosterRowLocal,
+  type UnavailabilityRow
 } from '@/types/roster'
 import {
   createNewRosterWithTitle,
   deleteRoster,
+  getConfig,
   getPeople,
   getReasons,
   getRoles,
-  getConfig,
   getRosters,
   getUnavailability,
   saveDate,
-  updatePerson,
+  savePerson,
   saveRoster,
   saveTitle,
   updateArchived,
+  updateConfig,
+  updatePerson,
   updatePublished,
-  savePerson,
-  updateRoles,
-  updateConfig
+  updateRoles
 } from '@/utils/roster'
 import { defineStore } from 'pinia'
 import { useUserStore } from '@/stores/user'
@@ -61,15 +61,20 @@ export const useRosterStore = defineStore({
         this.lastUpdated = Date.now()
         if (!this.isInitializing) {
           this.isInitializing = true
-          await Promise.all([
-            getPeople(),
-            getRoles(),
-            getConfig(),
-            getUnavailability(),
-            getRosters(),
-            getReasons()
-          ])
-          this.isInitializing = false
+          try {
+            await Promise.all([
+              getPeople(),
+              getRoles(),
+              getConfig(),
+              getUnavailability(),
+              getRosters(),
+              getReasons()
+            ])
+          } catch (e) {
+            // some error handling
+          } finally {
+            this.isInitializing = false
+          }
         }
       }
     },
