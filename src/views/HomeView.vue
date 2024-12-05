@@ -12,10 +12,18 @@ const seeAll = ref(false)
 <template>
   <div id="home" class="my-8 mx-4">
     <h1 class="my-2 text-center">Rosters</h1>
-    <template v-if="rosterStore.rosters.some((roster) => roster.published && !roster.archived)">
+    <template
+      v-if="
+        rosterStore.rosters.some(
+          (roster) => roster.published && !roster.archived
+        )
+      "
+    >
       <div class="mb-4 flex place-content-center">
         <span class="mt-auto">Show all roles:</span>
-        <div class="ml-2 text-xl"><BFormCheckbox v-model="seeAll" switch /></div>
+        <div class="ml-2 text-xl">
+          <BFormCheckbox v-model="seeAll" switch />
+        </div>
       </div>
     </template>
     <template v-else>
@@ -23,8 +31,7 @@ const seeAll = ref(false)
         <p>There are no rosters available now</p>
       </div>
     </template>
-    <div class="flex place-content-start">
-      <BTabs>
+    <BTabs>
       <template
         v-for="publishedRoster in rosterStore.rosters.filter(
           (roster) => roster.published && !roster.archived
@@ -46,7 +53,6 @@ const seeAll = ref(false)
         </BTab>
       </template>
     </BTabs>
-    </div>
     <LegendTable class="mt-4" />
   </div>
 </template>
