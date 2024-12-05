@@ -52,6 +52,7 @@ export const useRosterStore = defineStore({
   },
   actions: {
     async initializeRosterStore() {
+      this.isInitializing = false
       const userStore = useUserStore()
       if (
         (new Date().getTime() - 60_000 > this.lastUpdated ||
@@ -61,20 +62,15 @@ export const useRosterStore = defineStore({
         this.lastUpdated = Date.now()
         if (!this.isInitializing) {
           this.isInitializing = true
-          try {
-            await Promise.all([
-              getPeople(),
-              getRoles(),
-              getConfig(),
-              getUnavailability(),
-              getRosters(),
-              getReasons()
-            ])
-          } catch (e) {
-            // some error handling
-          } finally {
-            this.isInitializing = false
-          }
+          await Promise.all([
+            getPeople(),
+            getRoles(),
+            getConfig(),
+            getUnavailability(),
+            getRosters(),
+            getReasons()
+          ])
+          this.isInitializing = false
         }
       }
     },
