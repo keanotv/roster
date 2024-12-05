@@ -1,7 +1,9 @@
 <template>
   <LoadingScreen :isLoading="isLoading" />
   <template v-if="!isLoading">
-    <template v-if="userStore.isLoggedIn && unavailabilityStore.selectedPersonName">
+    <template
+      v-if="userStore.isLoggedIn && unavailabilityStore.selectedPersonName"
+    >
       <MenuToggle />
     </template>
     <main>
@@ -34,13 +36,12 @@ const isLoading = ref(true)
 const rosterStore = useRosterStore()
 const userStore = useUserStore()
 const unavailabilityStore = useUnavailabilityStore()
-rosterStore.initializeRosterStore()
 settingsStore.applyDarkMode()
-onMounted(() => {
+onMounted(async () => {
+  await rosterStore.initializeRosterStore()
   function getWidth() {
     settingsStore.screenWidth = window.innerWidth
   }
-
   window.removeEventListener('resize', getWidth)
   window.addEventListener('resize', getWidth)
   isLoading.value = false
@@ -57,6 +58,7 @@ onMounted(() => {
 
 @font-face {
   font-family: Satoshi;
-  src: url('@/assets/Satoshi-Variable.ttf'), url('@/assets/Satoshi-VariableItalic.ttf');
+  src: url('@/assets/Satoshi-Variable.ttf'),
+    url('@/assets/Satoshi-VariableItalic.ttf');
 }
 </style>
