@@ -1,6 +1,6 @@
 <template>
-  <LoadingScreen :isLoading="isLoading" />
-  <template v-if="!isLoading">
+  <LoadingScreen :isLoading="rosterStore.isInitializing" />
+  <template v-if="!rosterStore.isInitializing">
     <template
       v-if="userStore.isLoggedIn && unavailabilityStore.selectedPersonName"
     >
@@ -22,7 +22,7 @@
 
 <script setup lang="ts">
 import { RouterView } from 'vue-router'
-import { onMounted, ref } from 'vue'
+import { onMounted } from 'vue'
 
 import { useSettingsStore } from './stores/settings'
 import LoadingScreen from './components/loaders/LoadingScreen.vue'
@@ -32,7 +32,6 @@ import { useUserStore } from './stores/user'
 import { useUnavailabilityStore } from './stores/unavailability'
 
 const settingsStore = useSettingsStore()
-const isLoading = ref(true)
 const rosterStore = useRosterStore()
 const userStore = useUserStore()
 const unavailabilityStore = useUnavailabilityStore()
@@ -44,7 +43,6 @@ onMounted(async () => {
   }
   window.removeEventListener('resize', getWidth)
   window.addEventListener('resize', getWidth)
-  isLoading.value = false
   window.onfocus = async () => {
     if (userStore.isLoggedIn) {
       await userStore.refreshToken()

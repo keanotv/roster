@@ -24,6 +24,7 @@ declare module 'vue' {
     BFormCheckbox: (typeof import('bootstrap-vue-next/components/BFormCheckbox'))['BFormCheckbox']
     BFormCheckboxGroup: (typeof import('bootstrap-vue-next/components/BFormCheckbox'))['BFormCheckboxGroup']
     BFormInput: (typeof import('bootstrap-vue-next/components/BFormInput'))['BFormInput']
+    BFormRadioGroup: (typeof import('bootstrap-vue-next/components/BFormRadio'))['BFormRadioGroup']
     BInput: (typeof import('bootstrap-vue-next/components/BFormInput'))['BInput']
     BInputGroup: (typeof import('bootstrap-vue-next/components/BInputGroup'))['BInputGroup']
     BInputGroupText: (typeof import('bootstrap-vue-next/components/BInputGroup'))['BInputGroupText']

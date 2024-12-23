@@ -6,7 +6,17 @@ import { ref } from 'vue'
 import LegendTable from '@/components/roster/LegendTable.vue'
 
 const rosterStore = useRosterStore()
-const seeAll = ref(false)
+const seeAllRoles = ref(false)
+const seeRolesOptions = [
+  { text: 'My Role', value: false },
+  { text: 'All Roles', value: true }
+]
+
+const scrollView = ref(false)
+const viewOptions = [
+  { text: 'Tabs', value: false },
+  { text: 'Scroll', value: true }
+]
 </script>
 
 <template>
@@ -19,11 +29,21 @@ const seeAll = ref(false)
         )
       "
     >
-      <div class="mb-4 flex place-content-center">
-        <span class="mt-auto">Show all roles:</span>
-        <div class="ml-2 text-xl">
-          <BFormCheckbox v-model="seeAll" switch />
-        </div>
+      <div class="my-3 flex gap-2 place-content-center">
+        <BFormRadioGroup
+          v-model="seeAllRoles"
+          :options="seeRolesOptions"
+          button-variant="outline-secondary"
+          buttons
+          size="sm"
+        />
+        <BFormRadioGroup
+          v-model="scrollView"
+          :options="viewOptions"
+          button-variant="outline-secondary"
+          buttons
+          size="sm"
+        />
       </div>
     </template>
     <template v-else>
@@ -31,28 +51,50 @@ const seeAll = ref(false)
         <p>There are no rosters available now</p>
       </div>
     </template>
-    <BTabs>
+    <template v-if="!scrollView">
+      <BTabs>
+        <template
+          v-for="publishedRoster in rosterStore.rosters.filter(
+            (roster) => roster.published && !roster.archived
+          )"
+          :key="publishedRoster.id"
+        >
+          <BTab lazy>
+            <template #title>
+              {{
+                new Date(publishedRoster.date!).toLocaleDateString('en-SG', {
+                  dateStyle: 'medium'
+                })
+              }}
+            </template>
+            <PublishedRoster
+              :isFilteredByName="!seeAllRoles"
+              :roster="JSON.parse(publishedRoster.roster!)"
+            />
+          </BTab>
+        </template>
+      </BTabs>
+    </template>
+    <template v-else>
       <template
         v-for="publishedRoster in rosterStore.rosters.filter(
           (roster) => roster.published && !roster.archived
         )"
         :key="publishedRoster.id"
       >
-        <BTab lazy>
-          <template #title>
-            {{
-              new Date(publishedRoster.date!).toLocaleDateString('en-SG', {
-                dateStyle: 'medium'
-              })
-            }}
-          </template>
-          <PublishedRoster
-            :isFilteredByName="!seeAll"
-            :roster="JSON.parse(publishedRoster.roster!)"
-          />
-        </BTab>
+        <p class="ml-1 mb-1 mt-4 text-lg">
+          {{
+            new Date(publishedRoster.date!).toLocaleDateString('en-SG', {
+              dateStyle: 'long'
+            })
+          }}
+        </p>
+        <PublishedRoster
+          :isFilteredByName="!seeAllRoles"
+          :roster="JSON.parse(publishedRoster.roster!)"
+        />
       </template>
-    </BTabs>
+    </template>
     <LegendTable class="mt-4" />
   </div>
 </template>
