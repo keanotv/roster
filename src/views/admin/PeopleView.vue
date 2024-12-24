@@ -51,6 +51,9 @@ const nameSearch = ref('')
 <template>
   <div id="people" class="py-8 px-4 w-[100vw]">
     <h1 class="my-3 text-center">People</h1>
+    <p class="text-center my-2">
+      Active servers: {{ rosterStore.people?.length }}
+    </p>
     <BTableSimple hover responsive>
       <colgroup>
         <col />
@@ -60,7 +63,7 @@ const nameSearch = ref('')
           <BTh
             ><div class="flex justify-between">
               <div class="my-auto">
-                <b>Name</b> &nbsp;&nbsp;&nbsp;<BInput
+                <b>Name</b> &nbsp;<BInput
                   placeholder="Search"
                   id="nameSearch"
                   class="inline-block w-28 h-10 mr-1.5"

@@ -81,7 +81,7 @@ const rosterAction = async () => {
         })
       }
       break
-    case ACTIONS.SYNC:
+    case ACTIONS.RESET:
       await getRosterById(roster.value.id).then(() => {
         const storeRoster = rosterStore.rosters.find(
           (storeRoster) => storeRoster.id === roster.value.id
@@ -254,9 +254,12 @@ watchEffect(async () => {
                   >{{ ACTIONS.SAVE }}
                 </BButton>
               </BButtonGroup>
-              <BButtonGroup class="mx-2">
+            </div>
+            <div>
+              <BButtonGroup>
                 <BButton
                   class="capitalize"
+                  variant="outline-primary"
                   @click.prevent="
                     () => {
                       action = ACTIONS.COPY
@@ -264,24 +267,21 @@ watchEffect(async () => {
                       confirmation = true
                     }
                   "
-                  variant="outline-primary"
                   >{{ ACTIONS.COPY }}
                 </BButton>
               </BButtonGroup>
-            </div>
-            <div>
               <BButtonGroup class="mx-2">
                 <BButton
                   class="capitalize"
                   @click.prevent="
                     () => {
-                      action = ACTIONS.SYNC
+                      action = ACTIONS.RESET
                       prompt = PROMPT_MAP.get(action)!
                       confirmation = true
                     }
                   "
                   variant="outline-warning"
-                  >{{ ACTIONS.SYNC }}
+                  >{{ ACTIONS.RESET }}
                 </BButton>
               </BButtonGroup>
               <BButtonGroup>

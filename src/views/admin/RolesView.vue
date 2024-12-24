@@ -118,7 +118,7 @@ const reorderMode = ref(false)
           <BTh>
             <div class="flex justify-between">
               <div>
-                <b>Title</b> &nbsp;&nbsp;&nbsp;<BInput
+                <b>Title</b> &nbsp;<BInput
                   v-if="!reorderMode"
                   placeholder="Search"
                   id="titleSearch"
@@ -351,11 +351,11 @@ th {
 }
 
 .handle {
-    cursor: grab;
+  cursor: grab;
 }
 
 /* (Optional) Apply a "closed-hand" cursor during drag operation. */
 .handle:active {
-    cursor: grabbing;
+  cursor: grabbing;
 }
 </style>

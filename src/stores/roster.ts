@@ -155,7 +155,7 @@ export const useRosterStore = defineStore({
             new Date(rosterObj.date).getTime() > twelveWeeksAgo) ||
             new Date(rosterObj.date).getTime() > now)
         ) {
-          const key = rosterObj.date + ' — ' + rosterObj.title
+          const key = rosterObj.date
           dateToIdMap.set(key, new Set<number>())
           const idList = this.people.map((person) => person.id)
           const roster = JSON.parse(rosterObj.roster) as Role[]

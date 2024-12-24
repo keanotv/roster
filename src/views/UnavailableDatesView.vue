@@ -3,7 +3,7 @@ import { useRosterStore } from '@/stores/roster'
 import { useUnavailabilityStore } from '@/stores/unavailability'
 import { USER_ROLES, useUserStore } from '@/stores/user'
 import type { Sunday } from '@/types/unavailability'
-import { MONTHS, getSundaysInNextMonth } from '@/utils/unavailability'
+import { getSundaysInNextMonth, MONTHS } from '@/utils/unavailability'
 import { ref, watchEffect } from 'vue'
 
 const rosterStore = useRosterStore()
@@ -54,7 +54,7 @@ watchEffect(() => {
         >!
       </p>
       <p class="my-2">
-        Let us know which Sundays you are not available to serve in the month of
+        Please let us know your unavailable dates in the month of
         {{ MONTHS[sundays[0].month - 1] }}
         <template v-if="rosterStore.config.isAutomaticCutOff">
           by
@@ -67,9 +67,7 @@ watchEffect(() => {
             }}!</u
           >
         </template>
-        <template v-else>
-          as soon as you know!
-        </template>
+        <template v-else> as soon as you know!</template>
       </p>
       <p>Thank you for serving! 😊</p>
     </div>

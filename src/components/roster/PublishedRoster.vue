@@ -8,6 +8,7 @@ import { ref, watchEffect } from 'vue'
 const props = defineProps<{
   isFilteredByName: boolean
   roster: Role[]
+  selectedName?: string
 }>()
 
 const rosterStore = useRosterStore()
@@ -31,7 +32,7 @@ watchEffect(() => {
       service.slot.some(
         (slot) =>
           slot.name.toLowerCase().trim() ==
-          unavailabilityStore.selectedPersonName.toLowerCase().trim()
+          props.selectedName?.toLowerCase().trim()
       )
     )
   )
@@ -45,7 +46,14 @@ watchEffect(() => {
         <template v-if="isFilteredByName && filteredRoster.length == 0">
           <BCol>
             <BCard>
-              <p class="text-center">You are not scheduled on this Sunday!</p>
+              <p class="text-center">
+                {{
+                  selectedName == unavailabilityStore.selectedPersonName
+                    ? 'You are'
+                    : selectedName + ' is'
+                }}
+                not scheduled on this Sunday!
+              </p>
             </BCard>
           </BCol>
         </template>
@@ -73,11 +81,13 @@ watchEffect(() => {
                           <BListGroupItem
                             class="py-0.5 px-1.5"
                             :variant="
-                              slot.name == unavailabilityStore.selectedPersonName
-                              ? personToRoleOrderMap.get(slot.id) !== undefined && personToRoleOrderMap.get(slot.id)!.size > 1
-                              ? 'danger'
-                              : 'primary'
-                              : 'outline-secondary'
+                              slot.name == selectedName
+                                ? personToRoleOrderMap.get(slot.id) !==
+                                    undefined &&
+                                  personToRoleOrderMap.get(slot.id)!.size > 1
+                                  ? 'danger'
+                                  : 'primary'
+                                : 'outline-secondary'
                             "
                           >
                             <p>
@@ -85,10 +95,10 @@ watchEffect(() => {
                                 slot.segments && slot.name
                                   ? slot.segments + ': ' + slot.name
                                   : slot.segments && !slot.name
-                                  ? slot.segments
-                                  : slot.name
-                                  ? slot.name
-                                  : '-'
+                                    ? slot.segments
+                                    : slot.name
+                                      ? slot.name
+                                      : '-'
                               }}
                               <!-- {{ slot.name ? slot.name : '-' }} -->
                             </p>

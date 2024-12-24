@@ -4,19 +4,23 @@ import { useRosterStore } from '@/stores/roster'
 import { BTabs } from 'bootstrap-vue-next'
 import { ref } from 'vue'
 import LegendTable from '@/components/roster/LegendTable.vue'
+import { USER_ROLES, useUserStore } from '@/stores/user.ts'
+import { useUnavailabilityStore } from '@/stores/unavailability.ts'
 
 const rosterStore = useRosterStore()
+const userStore = useUserStore()
+const unavailabilityStore = useUnavailabilityStore()
 const seeAllRoles = ref(false)
-const seeRolesOptions = [
-  { text: 'My Role', value: false },
-  { text: 'All Roles', value: true }
-]
 
 const scrollView = ref(false)
 const viewOptions = [
   { text: 'Tabs', value: false },
   { text: 'Scroll', value: true }
 ]
+
+const nameSearch = ref('')
+const show = ref(false)
+const selectedName = ref(unavailabilityStore.selectedPersonName)
 </script>
 
 <template>
@@ -30,13 +34,57 @@ const viewOptions = [
       "
     >
       <div class="my-3 flex gap-2 place-content-center">
-        <BFormRadioGroup
-          v-model="seeAllRoles"
-          :options="seeRolesOptions"
-          button-variant="outline-secondary"
-          buttons
-          size="sm"
-        />
+        <BDropdown
+          v-if="userStore.role.some((role) => role === USER_ROLES.ADMIN)"
+          v-model="show"
+          :text="selectedName"
+          :variant="
+            !unavailabilityStore.selectedPersonId
+              ? 'outline-danger'
+              : 'outline-success'
+          "
+          lazy
+          no-animation
+          no-flip
+          toggle-class="text-lg"
+          unmount-lazy
+        >
+          <BDropdownHeader>
+            <BInput
+              id="nameSearch"
+              v-model="nameSearch"
+              @click.prevent="(e: MouseEvent) => e.stopPropagation()"
+            />
+          </BDropdownHeader>
+          <template
+            v-for="person in rosterStore.people.filter(
+              (p) =>
+                p.active &&
+                p.server &&
+                p.name
+                  .toLowerCase()
+                  .split(' ')
+                  .some((subname) =>
+                    nameSearch
+                      .toLowerCase()
+                      .split(' ')
+                      .some((subnamesearch) =>
+                        subname.startsWith(subnamesearch)
+                      )
+                  )
+            )"
+            :key="person.id"
+          >
+            <BDropdownItem
+              @click.prevent="
+                () => {
+                  selectedName = person.name
+                }
+              "
+              >{{ person.name }}
+            </BDropdownItem>
+          </template>
+        </BDropdown>
         <BFormRadioGroup
           v-model="scrollView"
           :options="viewOptions"
@@ -44,6 +92,12 @@ const viewOptions = [
           buttons
           size="sm"
         />
+        <BButton
+          v-model:pressed="seeAllRoles"
+          size="sm"
+          variant="outline-secondary"
+          >All Roles
+        </BButton>
       </div>
     </template>
     <template v-else>
@@ -70,6 +124,7 @@ const viewOptions = [
             <PublishedRoster
               :isFilteredByName="!seeAllRoles"
               :roster="JSON.parse(publishedRoster.roster!)"
+              :selectedName="selectedName"
             />
           </BTab>
         </template>
@@ -92,6 +147,7 @@ const viewOptions = [
         <PublishedRoster
           :isFilteredByName="!seeAllRoles"
           :roster="JSON.parse(publishedRoster.roster!)"
+          :selectedName="selectedName"
         />
       </template>
     </template>
