@@ -11,6 +11,7 @@ import {
 } from '@/types/roster'
 import {
   createNewRosterWithTitle,
+  deletePerson,
   deleteRoster,
   getConfig,
   getPeople,
@@ -135,6 +136,9 @@ export const useRosterStore = defineStore({
     },
     async savePerson(person: PeopleInsert, newName: string): Promise<boolean> {
       return await savePerson(person, newName)
+    },
+    async deletePerson(person: PeopleRow): Promise<boolean> {
+      return await deletePerson(person)
     },
     async updateRoles(roles: RoleTemplate[]): Promise<boolean> {
       return await updateRoles(roles)

@@ -111,7 +111,10 @@ export const initializeNewRoster = async (
 
 export const getPeople = async () => {
   console.log('Fetching all people')
-  const { data, error } = await supabase.from('people').select('*')
+  const { data, error } = await supabase
+    .from('people')
+    .select('*')
+    .eq('deleted', false)
   if (error) {
     // some error handling
   } else {
@@ -440,6 +443,34 @@ export const updatePerson = async (
       (people) => people.id !== person.id
     )
     rosterStore.people.push(person)
+    rosterStore.people.sort(function (a, b) {
+      return a.name < b.name ? -1 : a.name > b.name ? 1 : 0
+    })
+    return true
+  }
+}
+
+export const deletePerson = async (person: PeopleRow): Promise<boolean> => {
+  console.log('Deleting person')
+  const { error } = await supabase
+    .from('people')
+    .update({
+      ...person,
+      deleted: true,
+      name: person.name + ' deleted ' + new Date().toLocaleString()
+    })
+    .eq('id', person.id)
+  const globalToast = useGlobalToast()
+  if (error) {
+    // some error handling
+    globalToast.error('Error deleting person :(')
+    return false
+  } else {
+    globalToast.success('Deleted ' + person.name + ' successfully')
+    const rosterStore = useRosterStore()
+    rosterStore.people = rosterStore.people.filter(
+      (people) => people.id !== person.id
+    )
     rosterStore.people.sort(function (a, b) {
       return a.name < b.name ? -1 : a.name > b.name ? 1 : 0
     })

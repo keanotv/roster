@@ -27,18 +27,21 @@ export type Database = {
       people: {
         Row: {
           active: boolean
+          deleted: boolean
           id: number
           name: string
           server: boolean
         }
         Insert: {
           active?: boolean
+          deleted?: boolean
           id?: number
           name: string
           server?: boolean
         }
         Update: {
           active?: boolean
+          deleted?: boolean
           id?: number
           name?: string
           server?: boolean
@@ -135,12 +138,12 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: "unavailability_people_id_fkey"
-            columns: ["people_id"]
+            foreignKeyName: 'unavailability_people_id_fkey'
+            columns: ['people_id']
             isOneToOne: false
-            referencedRelation: "people"
-            referencedColumns: ["id"]
-          },
+            referencedRelation: 'people'
+            referencedColumns: ['id']
+          }
         ]
       }
     }
