@@ -87,9 +87,12 @@ const rosterAction = async () => {
           (storeRoster) => storeRoster.id === roster.value.id
         )
         if (storeRoster != undefined && storeRoster.roster != null) {
+          storeRoster.unsavedRoster = JSON.parse(storeRoster.roster)
           roster.value.unsavedRoster = JSON.parse(storeRoster.roster)
         }
       })
+      personToRoleOrderMap.value = new Map<number, Set<number>>()
+      populatePersonToRoleOrderMap()
       break
     case ACTIONS.DELETE:
       await rosterStore.deleteRoster(roster.value.id).then(() => {
@@ -116,7 +119,8 @@ const clearNameSearch = () => {
 }
 
 const personToRoleOrderMap = ref(new Map<number, Set<number>>())
-onMounted(() => {
+
+const populatePersonToRoleOrderMap = () => {
   rosterStore.people.forEach((person) => {
     personToRoleOrderMap.value.set(person.id, new Set<number>())
   })
@@ -127,6 +131,10 @@ onMounted(() => {
       })
     })
   })
+}
+
+onMounted(() => {
+  populatePersonToRoleOrderMap()
   document.removeEventListener('click', clearNameSearch)
   document.addEventListener('click', clearNameSearch)
 })
@@ -150,18 +158,16 @@ watchEffect(async () => {
   if (roster.value?.id !== props.id) {
     roster.value = rosterStore.getRosterById(props.id)
     personToRoleOrderMap.value = new Map<number, Set<number>>()
-    rosterStore.people.forEach((person) => {
-      personToRoleOrderMap.value.set(person.id, new Set<number>())
-    })
-    roster.value?.unsavedRoster?.forEach((role) => {
-      role.services.forEach((service) => {
-        service.slot.forEach((slot) => {
-          personToRoleOrderMap.value.get(slot.id)?.add(role.order)
-        })
-      })
-    })
+    populatePersonToRoleOrderMap()
   }
 })
+
+// copy-paste name feature
+type Person = {
+  id: number
+  name: string
+}
+const copiedPerson = ref({} as Person)
 </script>
 
 <template>
@@ -429,104 +435,152 @@ watchEffect(async () => {
                                 v-model="slot.segments"
                                 class="w-14 mr-2 px-1 text-center h-8"
                               />
-                              <BCol @click.prevent="focusNameSearch">
-                                <BDropdown
-                                  lazy
-                                  no-animation
-                                  unmount-lazy
-                                  no-flip
-                                  :text="slot.name"
-                                  :variant="
-                                    rosterStore.unavailabilityByDate
-                                      .get(roster.date || '')
-                                      ?.has(slot.id)
-                                      ? 'outline-danger'
-                                      : personToRoleOrderMap.get(slot.id) !==
-                                            undefined &&
-                                          personToRoleOrderMap.get(slot.id)!
-                                            .size > 1
-                                        ? 'outline-warning'
-                                        : 'outline-dark'
+                              <div class="flex gap-1.5">
+                                <BCol @click.prevent="focusNameSearch">
+                                  <!-- name dropdown -->
+                                  <BDropdown
+                                    :text="slot.name"
+                                    :variant="
+                                      rosterStore.unavailabilityByDate
+                                        .get(roster.date || '')
+                                        ?.has(slot.id)
+                                        ? 'outline-danger'
+                                        : personToRoleOrderMap.get(slot.id) !==
+                                              undefined &&
+                                            personToRoleOrderMap.get(slot.id)!
+                                              .size > 1
+                                          ? 'outline-warning'
+                                          : 'outline-dark'
+                                    "
+                                    lazy
+                                    no-animation
+                                    no-flip
+                                    unmount-lazy
+                                  >
+                                    <BDropdownHeader>
+                                      <BInput
+                                        id="nameSearch"
+                                        v-model="nameSearch"
+                                        placeholder="Name"
+                                        @click.prevent="
+                                          (e: MouseEvent) => e.stopPropagation()
+                                        "
+                                      />
+                                    </BDropdownHeader>
+                                    <BDropdownItem
+                                      v-if="!nameSearch.length"
+                                      variant="secondary"
+                                      @click.prevent="
+                                        () => {
+                                          removeRoleOrderFromPersonMap(
+                                            slot.id,
+                                            role.order
+                                          )
+                                          slot.name = ''
+                                          slot.id = 0
+                                        }
+                                      "
+                                      >{{ `--empty--` }}
+                                    </BDropdownItem>
+                                    <template
+                                      v-for="person in rosterStore.people.filter(
+                                        (p: PeopleRow) =>
+                                          p.active &&
+                                          p.name
+                                            .toLowerCase()
+                                            .split(' ')
+                                            .some((subname) =>
+                                              nameSearch
+                                                .toLowerCase()
+                                                .split(' ')
+                                                .some((subnamesearch) =>
+                                                  subname.startsWith(
+                                                    subnamesearch
+                                                  )
+                                                )
+                                            )
+                                      )"
+                                      :key="person.id"
+                                    >
+                                      <BDropdownItem
+                                        :variant="
+                                          rosterStore.unavailabilityByDate
+                                            .get(roster.date || '')
+                                            ?.has(person.id)
+                                            ? 'danger'
+                                            : personToRoleOrderMap.get(
+                                                  person.id
+                                                )!.size > 0
+                                              ? 'warning'
+                                              : 'dark'
+                                        "
+                                        @click.prevent="
+                                          () => {
+                                            if (slot.id !== 0) {
+                                              removeRoleOrderFromPersonMap(
+                                                slot.id,
+                                                role.order
+                                              )
+                                            }
+                                            slot.name = person.name
+                                            slot.id = person.id
+                                            addRoleOrderToPersonMap(
+                                              person.id,
+                                              role.order
+                                            )
+                                            clearNameSearch()
+                                          }
+                                        "
+                                        >{{ person.name }}
+                                      </BDropdownItem>
+                                    </template>
+                                  </BDropdown>
+                                </BCol>
+                                <BButton
+                                  v-if="
+                                    slot.name &&
+                                    !(copiedPerson.id && copiedPerson.name)
+                                  "
+                                  class="px-1 h-8"
+                                  variant="outline-primary"
+                                  @click="
+                                    () => {
+                                      copiedPerson.id = slot.id
+                                      copiedPerson.name = slot.name
+                                    }
                                   "
                                 >
-                                  <BDropdownHeader>
-                                    <BInput
-                                      placeholder="Name"
-                                      id="nameSearch"
-                                      v-model="nameSearch"
-                                      @click.prevent="
-                                        (e: MouseEvent) => e.stopPropagation()
-                                      "
-                                    />
-                                  </BDropdownHeader>
-                                  <BDropdownItem
-                                    variant="secondary"
-                                    v-if="!nameSearch.length"
-                                    @click.prevent="
-                                      () => {
+                                  <material-symbols:content-copy-outline
+                                    class="my-auto w-5 h-5"
+                                  />
+                                </BButton>
+                                <BButton
+                                  v-if="copiedPerson.id && copiedPerson.name"
+                                  class="px-1 h-8"
+                                  variant="outline-success"
+                                  @click="
+                                    () => {
+                                      if (slot.id !== 0) {
                                         removeRoleOrderFromPersonMap(
                                           slot.id,
                                           role.order
                                         )
-                                        slot.name = ''
-                                        slot.id = 0
                                       }
-                                    "
-                                    >{{ `--empty--` }}
-                                  </BDropdownItem>
-                                  <template
-                                    v-for="person in rosterStore.people.filter(
-                                      (p: PeopleRow) =>
-                                        p.active &&
-                                        p.name
-                                          .toLowerCase()
-                                          .split(' ')
-                                          .some((subname) =>
-                                            nameSearch
-                                              .toLowerCase()
-                                              .split(' ')
-                                              .some((subnamesearch) =>
-                                                subname.startsWith(
-                                                  subnamesearch
-                                                )
-                                              )
-                                          )
-                                    )"
-                                    :key="person.id"
-                                  >
-                                    <BDropdownItem
-                                      :variant="
-                                        rosterStore.unavailabilityByDate
-                                          .get(roster.date || '')
-                                          ?.has(person.id)
-                                          ? 'danger'
-                                          : personToRoleOrderMap.get(person.id)!
-                                                .size > 0
-                                            ? 'warning'
-                                            : 'dark'
-                                      "
-                                      @click.prevent="
-                                        () => {
-                                          if (slot.id !== 0) {
-                                            removeRoleOrderFromPersonMap(
-                                              slot.id,
-                                              role.order
-                                            )
-                                          }
-                                          slot.name = person.name
-                                          slot.id = person.id
-                                          addRoleOrderToPersonMap(
-                                            person.id,
-                                            role.order
-                                          )
-                                          clearNameSearch()
-                                        }
-                                      "
-                                      >{{ person.name }}
-                                    </BDropdownItem>
-                                  </template>
-                                </BDropdown>
-                              </BCol>
+                                      slot.id = copiedPerson.id
+                                      slot.name = copiedPerson.name
+                                      addRoleOrderToPersonMap(
+                                        copiedPerson.id,
+                                        role.order
+                                      )
+                                      copiedPerson = {} as Person
+                                    }
+                                  "
+                                >
+                                  <material-symbols:content-paste-go-rounded
+                                    class="my-auto w-5 h-5"
+                                  />
+                                </BButton>
+                              </div>
                             </div>
                           </template>
                         </div>

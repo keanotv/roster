@@ -57,6 +57,8 @@ declare module 'vue' {
     'LineMd:plusCircle': (typeof import('~icons/line-md/plus-circle'))['default']
     'LineMd:sunnyOutlineTwotone': (typeof import('~icons/line-md/sunny-outline-twotone'))['default']
     LoadingScreen: (typeof import('./src/components/loaders/LoadingScreen.vue'))['default']
+    'MaterialSymbols:contentCopyOutline': (typeof import('~icons/material-symbols/content-copy-outline'))['default']
+    'MaterialSymbols:contentPasteGoRounded': (typeof import('~icons/material-symbols/content-paste-go-rounded'))['default']
     'MaterialSymbols:deleteOutline': (typeof import('~icons/material-symbols/delete-outline'))['default']
     'Mdi:clearOutline': (typeof import('~icons/mdi/clear-outline'))['default']
     'Mdi:dot': (typeof import('~icons/mdi/dot'))['default']
