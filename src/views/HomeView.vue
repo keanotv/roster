@@ -96,6 +96,11 @@ const selectedName = ref(unavailabilityStore.selectedPersonName)
           v-model:pressed="seeAllRoles"
           size="sm"
           variant="outline-secondary"
+          @click.prevent="
+            (e: PointerEvent) => {
+              ;(e.target as HTMLButtonElement).blur()
+            }
+          "
           >All Roles
         </BButton>
       </div>
