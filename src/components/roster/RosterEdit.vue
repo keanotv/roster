@@ -136,7 +136,9 @@ const populatePersonToRoleOrderMap = () => {
 onMounted(() => {
   populatePersonToRoleOrderMap()
   document.removeEventListener('click', clearNameSearch)
+  document.removeEventListener('keydown', clearCopiedName)
   document.addEventListener('click', clearNameSearch)
+  document.addEventListener('keydown', clearCopiedName)
 })
 const addRoleOrderToPersonMap = (id: number, order: number) => {
   personToRoleOrderMap.value.get(id)?.add(order)
@@ -168,6 +170,15 @@ type Person = {
   name: string
 }
 const copiedPerson = ref({} as Person)
+const clearCopiedName = (e: KeyboardEvent) => {
+  if (e.key === 'Escape') {
+    //if esc key was not pressed in combination with ctrl or alt or shift
+    const isNotCombinedKey = !(e.ctrlKey || e.altKey || e.shiftKey)
+    if (isNotCombinedKey) {
+      copiedPerson.value = {} as Person
+    }
+  }
+}
 </script>
 
 <template>
