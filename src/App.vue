@@ -1,6 +1,6 @@
 <template>
-  <LoadingScreen :isLoading="rosterStore.isInitializing" />
-  <template v-if="!rosterStore.isInitializing">
+  <LoadingScreen :isLoading="isLoading" />
+  <template v-if="!isLoading">
     <template
       v-if="userStore.isLoggedIn && unavailabilityStore.selectedPersonName"
     >
@@ -22,7 +22,7 @@
 
 <script setup lang="ts">
 import { RouterView } from 'vue-router'
-import { onMounted } from 'vue'
+import { onMounted, ref } from 'vue'
 
 import { useSettingsStore } from './stores/settings'
 import LoadingScreen from './components/loaders/LoadingScreen.vue'
@@ -35,6 +35,7 @@ const settingsStore = useSettingsStore()
 const rosterStore = useRosterStore()
 const userStore = useUserStore()
 const unavailabilityStore = useUnavailabilityStore()
+const isLoading = ref(true)
 settingsStore.applyDarkMode()
 onMounted(async () => {
   await rosterStore.initializeRosterStore()
@@ -48,6 +49,7 @@ onMounted(async () => {
       await userStore.refreshToken()
     }
   }
+  isLoading.value = false
 })
 </script>
 
