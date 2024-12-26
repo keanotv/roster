@@ -43,7 +43,6 @@ declare module 'vue' {
     BTr: (typeof import('bootstrap-vue-next/components/BTable'))['BTr']
     'Ci:addRow': (typeof import('~icons/ci/add-row'))['default']
     'Ci:dragVertical': (typeof import('~icons/ci/drag-vertical'))['default']
-    DirectionalShadow: (typeof import('./src/components/common/DirectionalShadow.vue'))['default']
     HistoryData: (typeof import('./src/components/roster/HistoryData.vue'))['default']
     LegendTable: (typeof import('./src/components/roster/LegendTable.vue'))['default']
     'LineMd:accountAdd': (typeof import('~icons/line-md/account-add'))['default']

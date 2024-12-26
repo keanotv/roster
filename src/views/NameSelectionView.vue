@@ -16,7 +16,7 @@ const focusInput = () => {
       el.focus()
       el.click()
     }
-  }, 77)
+  }, 100)
   show.value = true
 }
 

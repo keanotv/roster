@@ -21,6 +21,17 @@ const viewOptions = [
 const nameSearch = ref('')
 const show = ref(false)
 const selectedName = ref(unavailabilityStore.selectedPersonName)
+
+const focusInput = () => {
+  setTimeout(() => {
+    const el = document.getElementById('nameSearch') as HTMLInputElement | null
+    if (el) {
+      el.focus()
+      el.click()
+    }
+  }, 100)
+  show.value = true
+}
 </script>
 
 <template>
@@ -34,57 +45,55 @@ const selectedName = ref(unavailabilityStore.selectedPersonName)
       "
     >
       <div class="my-3 flex gap-2 place-content-center">
-        <BDropdown
-          v-if="userStore.role.some((role) => role === USER_ROLES.ADMIN)"
-          v-model="show"
-          :text="selectedName"
-          :variant="
-            !unavailabilityStore.selectedPersonId
-              ? 'outline-danger'
-              : 'outline-success'
-          "
-          lazy
-          no-animation
-          no-flip
-          toggle-class="text-lg"
-          unmount-lazy
-        >
-          <BDropdownHeader>
-            <BInput
-              id="nameSearch"
-              v-model="nameSearch"
-              @click.prevent="(e: MouseEvent) => e.stopPropagation()"
-            />
-          </BDropdownHeader>
-          <template
-            v-for="person in rosterStore.people.filter(
-              (p) =>
-                p.active &&
-                p.server &&
-                p.name
-                  .toLowerCase()
-                  .split(' ')
-                  .some((subname) =>
-                    nameSearch
-                      .toLowerCase()
-                      .split(' ')
-                      .some((subnamesearch) =>
-                        subname.startsWith(subnamesearch)
-                      )
-                  )
-            )"
-            :key="person.id"
+        <div @click="focusInput">
+          <BDropdown
+            v-if="userStore.role.some((role) => role === USER_ROLES.ADMIN)"
+            v-model="show"
+            :text="selectedName"
+            :variant="'outline-secondary'"
+            lazy
+            no-animation
+            no-flip
+            toggle-class="text-lg"
+            unmount-lazy
           >
-            <BDropdownItem
-              @click.prevent="
-                () => {
-                  selectedName = person.name
-                }
-              "
-              >{{ person.name }}
-            </BDropdownItem>
-          </template>
-        </BDropdown>
+            <BDropdownHeader>
+              <BInput
+                id="nameSearch"
+                v-model="nameSearch"
+                @click.prevent="(e: MouseEvent) => e.stopPropagation()"
+              />
+            </BDropdownHeader>
+            <template
+              v-for="person in rosterStore.people.filter(
+                (p) =>
+                  p.active &&
+                  p.server &&
+                  p.name
+                    .toLowerCase()
+                    .split(' ')
+                    .some((subname) =>
+                      nameSearch
+                        .toLowerCase()
+                        .split(' ')
+                        .some((subnamesearch) =>
+                          subname.startsWith(subnamesearch)
+                        )
+                    )
+              )"
+              :key="person.id"
+            >
+              <BDropdownItem
+                @click.prevent="
+                  () => {
+                    selectedName = person.name
+                  }
+                "
+                >{{ person.name }}
+              </BDropdownItem>
+            </template>
+          </BDropdown>
+        </div>
         <BFormRadioGroup
           v-model="scrollView"
           :options="viewOptions"
@@ -96,11 +105,7 @@ const selectedName = ref(unavailabilityStore.selectedPersonName)
           v-model:pressed="seeAllRoles"
           size="sm"
           variant="outline-secondary"
-          @click.prevent="
-            (e: PointerEvent) => {
-              ;(e.target as HTMLButtonElement).blur()
-            }
-          "
+          :key="seeAllRoles"
           >All Roles
         </BButton>
       </div>
@@ -156,7 +161,7 @@ const selectedName = ref(unavailabilityStore.selectedPersonName)
         />
       </template>
     </template>
-    <LegendTable class="mt-4" />
+    <LegendTable class="mt-4" color="bg-[#50d71e]" />
   </div>
 </template>
 
