@@ -20,7 +20,7 @@ const viewOptions = [
 
 const nameSearch = ref('')
 const show = ref(false)
-const selectedName = ref(unavailabilityStore.selectedPersonName)
+const selectedSearchedName = ref('')
 
 const focusInput = () => {
   setTimeout(() => {
@@ -49,7 +49,7 @@ const focusInput = () => {
           <BDropdown
             v-if="userStore.role.some((role) => role === USER_ROLES.ADMIN)"
             v-model="show"
-            :text="selectedName"
+            :text="selectedSearchedName"
             :variant="'outline-secondary'"
             lazy
             no-animation
@@ -64,6 +64,16 @@ const focusInput = () => {
                 @click.prevent="(e: MouseEvent) => e.stopPropagation()"
               />
             </BDropdownHeader>
+            <BDropdownItem
+              v-if="!nameSearch.length"
+              variant="secondary"
+              @click.prevent="
+                () => {
+                  selectedSearchedName = ''
+                }
+              "
+              >{{ `--empty--` }}
+            </BDropdownItem>
             <template
               v-for="person in rosterStore.people.filter(
                 (p) =>
@@ -86,7 +96,8 @@ const focusInput = () => {
               <BDropdownItem
                 @click.prevent="
                   () => {
-                    selectedName = person.name
+                    selectedSearchedName = person.name
+                    nameSearch = ''
                   }
                 "
                 >{{ person.name }}
@@ -134,7 +145,7 @@ const focusInput = () => {
             <PublishedRoster
               :isFilteredByName="!seeAllRoles"
               :roster="JSON.parse(publishedRoster.roster!)"
-              :selectedName="selectedName"
+              :searchedName="selectedSearchedName"
             />
           </BTab>
         </template>
@@ -157,7 +168,7 @@ const focusInput = () => {
         <PublishedRoster
           :isFilteredByName="!seeAllRoles"
           :roster="JSON.parse(publishedRoster.roster!)"
-          :selectedName="selectedName"
+          :searchedName="selectedSearchedName"
         />
       </template>
     </template>

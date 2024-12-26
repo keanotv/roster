@@ -8,7 +8,7 @@ import { ref, watchEffect } from 'vue'
 const props = defineProps<{
   isFilteredByName: boolean
   roster: Role[]
-  selectedName?: string
+  searchedName?: string
 }>()
 
 const rosterStore = useRosterStore()
@@ -17,6 +17,10 @@ const personToRoleOrderMap = ref(new Map<number, Set<number>>())
 const filteredRoster = ref([] as Role[])
 
 watchEffect(() => {
+  const name =
+    props.searchedName && props.searchedName.length
+      ? props.searchedName
+      : unavailabilityStore.selectedPersonName
   rosterStore.people.forEach((person) => {
     personToRoleOrderMap.value.set(person.id, new Set<number>())
   })
@@ -30,9 +34,7 @@ watchEffect(() => {
   filteredRoster.value = props.roster.filter((role) =>
     role.services.some((service) =>
       service.slot.some(
-        (slot) =>
-          slot.name.toLowerCase().trim() ==
-          props.selectedName?.toLowerCase().trim()
+        (slot) => slot.name.toLowerCase().trim() == name.toLowerCase().trim()
       )
     )
   )
@@ -48,11 +50,12 @@ watchEffect(() => {
             <BCard>
               <p class="text-center">
                 {{
-                  selectedName == unavailabilityStore.selectedPersonName
+                  !searchedName ||
+                  searchedName == unavailabilityStore.selectedPersonName
                     ? 'You are'
-                    : selectedName + ' is'
+                    : searchedName + ' is'
                 }}
-                not scheduled on this Sunday!
+                not rostered on this Sunday!
               </p>
             </BCard>
           </BCol>
@@ -81,13 +84,10 @@ watchEffect(() => {
                           <BListGroupItem
                             class="py-0.5 px-1.5"
                             :variant="
-                              slot.name == selectedName
-                                ? personToRoleOrderMap.get(slot.id) !==
-                                    undefined &&
-                                  personToRoleOrderMap.get(slot.id)!.size > 1
-                                  ? 'danger'
-                                  : 'primary'
-                                : 'outline-secondary'
+                              personToRoleOrderMap.get(slot.id) !== undefined &&
+                              personToRoleOrderMap.get(slot.id)!.size > 1
+                                ? 'danger'
+                                : 'primary'
                             "
                           >
                             <p>
