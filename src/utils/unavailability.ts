@@ -42,7 +42,7 @@ export const getNextTwoMonths = (): Month[] => {
   const month = now.getMonth() + 1
   const year = now.getFullYear()
   const nextTwoMonths: Month[] = []
-  for (let i = 1; i <= 2; i++) {
+  for (let i = 0; i < 2; i++) {
     if (month + i <= 12) {
       nextTwoMonths.push({
         year: year,
