@@ -98,7 +98,7 @@ export const getSundaysInNextMonth = (): Sunday => {
 
 export const getSundaysInTheMonthOf = (month: number, year: number): Sunday => {
   const days: number[] = []
-  for (let i = 1; i < new Date(year, month - 1, 0).getDate(); i++) {
+  for (let i = 1; i < new Date(year, month, 0).getDate(); i++) {
     const date = new Date(year, month - 1, i)
     if (date.getDay() == 0) {
       days.push(i)
