@@ -36,6 +36,7 @@ export const useRosterStore = defineStore({
   id: 'roster',
   persist: true,
   state: () => ({
+    lastUpdated: 0,
     services: 3,
     people: [] as PeopleRow[],
     roles: [] as RoleTemplate[],
@@ -54,7 +55,12 @@ export const useRosterStore = defineStore({
     async initializeRosterStore() {
       this.isInitializing = false
       const userStore = useUserStore()
-      if (this.someDataIsEmpty() && userStore.isLoggedIn) {
+      if (
+        (new Date().getTime() - 60_000 > this.lastUpdated ||
+          this.someDataIsEmpty()) &&
+        userStore.isLoggedIn
+      ) {
+        this.lastUpdated = Date.now()
         if (!this.isInitializing) {
           this.isInitializing = true
           await Promise.all([
@@ -81,9 +87,9 @@ export const useRosterStore = defineStore({
     },
     someDataIsEmpty() {
       return (
-        !this.people.length ||
-        !this.unavailability.length ||
-        !this.rosters.length
+        !this.people?.length ||
+        !this.unavailability?.length ||
+        !this.rosters?.length
       )
     },
     async createNewRosterWithTitle(title: string) {
