@@ -10,7 +10,7 @@ import {
   ServiceImpl,
   type Slot
 } from '@/types/roster'
-import { supabase } from '@/utils/supabase'
+import { logout, supabase } from '@/utils/supabase'
 import { useGlobalToast } from './toast'
 import { getSundaysInNextTwoMonths } from './unavailability'
 import { USER_ROLES, useUserStore } from '@/stores/user'
@@ -119,11 +119,15 @@ export const getPeople = async () => {
     // some error handling
   } else {
     const rosterStore = useRosterStore()
-    rosterStore.people = data
-      ? data.sort(function (a, b) {
-          return a.name < b.name ? -1 : a.name > b.name ? 1 : 0
-        })
-      : []
+    rosterStore.people =
+      data && data.length
+        ? data.sort(function (a, b) {
+            return a.name < b.name ? -1 : a.name > b.name ? 1 : 0
+          })
+        : []
+    if (!rosterStore.people.length) {
+      await logout()
+    }
   }
 }
 
@@ -133,9 +137,11 @@ export const getRoles = async () => {
   if (error) {
     // some error handling
   } else {
-    const roles = JSON.parse(data[0].roles) as RoleTemplate[]
-    const rosterStore = useRosterStore()
-    rosterStore.roles = roles.sort((a, b) => a.order - b.order) ?? []
+    if (data && data.length) {
+      const roles = JSON.parse(data[0].roles) as RoleTemplate[]
+      const rosterStore = useRosterStore()
+      rosterStore.roles = roles.sort((a, b) => a.order - b.order) ?? []
+    }
   }
 }
 
@@ -145,8 +151,10 @@ export const getConfig = async () => {
   if (error) {
     // some error handling
   } else {
-    const rosterStore = useRosterStore()
-    rosterStore.config = data[0]
+    if (data && data.length) {
+      const rosterStore = useRosterStore()
+      rosterStore.config = data[0]
+    }
   }
 }
 
