@@ -86,14 +86,12 @@ export const login = async (password: string) => {
 
 export const logout = async () => {
   const { error } = await supabase.auth.signOut()
-  const globalToast = useGlobalToast()
   const userStore = useUserStore()
   const rosterStore = useRosterStore()
   const unavailabilityStore = useUnavailabilityStore()
   if (error) {
     // some error handling
   }
-  globalToast.success('Logged out successfully!')
   userStore.isLoggedIn = false
   userStore.role = []
   rosterStore.clearStore()

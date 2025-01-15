@@ -126,6 +126,9 @@ export const getPeople = async () => {
           })
         : []
     if (!rosterStore.people.length) {
+      const globalToast = useGlobalToast()
+      globalToast.error('There was an error while loading')
+      globalToast.error('Please log in again')
       await logout()
     }
   }
