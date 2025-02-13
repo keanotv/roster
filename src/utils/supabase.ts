@@ -17,16 +17,16 @@ export const refreshToken = async () => {
   const globalToast = useGlobalToast()
   if (error) {
     // some error handling
-    globalToast.info('You have been logged due to inactivity')
+    globalToast.info('You have been logged out due to inactivity')
     await logout()
   } else {
     if (!data) {
-      globalToast.info('You have been logged due to inactivity')
+      globalToast.info('You have been logged out due to inactivity')
       await logout()
     } else {
       const { data, error } = await supabase.auth.refreshSession()
       if (!data || error) {
-        globalToast.info('You have been logged due to inactivity')
+        globalToast.info('You have been logged out due to inactivity')
         await logout()
       }
     }
